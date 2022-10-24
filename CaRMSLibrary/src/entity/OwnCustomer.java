@@ -30,7 +30,7 @@ public class OwnCustomer extends Customer implements Serializable {
 
     
     public OwnCustomer() {
-        super(String name, String passportNumber, String email, String phoneNumber);
+        super();
     }
 
     public OwnCustomer(String username, String password, String name, String passportNumber, String email, String phoneNumber) {
