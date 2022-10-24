@@ -6,14 +6,19 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
- * @author nevanng
+ * @author KMwong
  */
 @Entity
 public class Customer implements Serializable {
@@ -21,31 +26,57 @@ public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long custId;
+    private Long customerId;
+    @Column(nullable = false, length = 64)
+    private String name;
+    @Column(nullable = false, length = 64, unique = true)
+    private String passportNumber;
+    @Column(nullable = false, length = 64)
+    private String email;
+    @Column(nullable = false, length = 64)
+    private String phoneNumber;
+    
+    @ManyToOne
+    private Partner partner;
+    @OneToMany(mappedBy = "customer")
+    private List<Reservation> reservations;
 
-    public Long getCustId() {
-        return custId;
+    
+    public Customer() {
+        reservations = new ArrayList<>();
     }
 
-    public void setCustId(Long custId) {
-        this.custId = custId;
+    public Customer(String name, String passportNumber, String email, String phoneNumber) {
+        this();
+        this.name = name;
+        this.passportNumber = passportNumber;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (custId != null ? custId.hashCode() : 0);
+        hash += (customerId != null ? customerId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the custId fields are not set
+        // TODO: Warning - this method won't work in the case the customerId fields are not set
         if (!(object instanceof Customer)) {
             return false;
         }
         Customer other = (Customer) object;
-        if ((this.custId == null && other.custId != null) || (this.custId != null && !this.custId.equals(other.custId))) {
+        if ((this.customerId == null && other.customerId != null) || (this.customerId != null && !this.customerId.equals(other.customerId))) {
             return false;
         }
         return true;
@@ -53,7 +84,91 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Customer[ id=" + custId + " ]";
+        return "entity.Customer[ id=" + customerId + " ]";
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the passportNumber
+     */
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    /**
+     * @param passportNumber the passportNumber to set
+     */
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the phoneNumber
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * @param phoneNumber the phoneNumber to set
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * @return the partner
+     */
+    public Partner getPartner() {
+        return partner;
+    }
+
+    /**
+     * @param partner the partner to set
+     */
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }
