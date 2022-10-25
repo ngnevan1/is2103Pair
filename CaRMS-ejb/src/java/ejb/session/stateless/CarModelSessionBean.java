@@ -6,10 +6,12 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -73,4 +75,12 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             throw new CarModelNotFoundException("Car Model ID " + carModelId + "does not exist!");
         }
     }
+    
+    public List<CarModel> retrieveAllCarModels()
+    {
+        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+        
+        return query.getResultList();
+    }
+    
 }
