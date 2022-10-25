@@ -5,13 +5,13 @@
  */
 package ejb.session.stateless;
 
-import entity.Customer;
+import entity.RentalRate;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import util.exception.CustomerExistException;
-import util.exception.CustomerNotFoundException;
+import util.exception.RentalRateExistException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -19,7 +19,7 @@ import util.exception.UnknownPersistenceException;
  * @author KMwong
  */
 @Stateless
-public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
+public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -27,21 +27,21 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
 
-    public CustomerSessionBean() {
+    public RentalRateSessionBean() {
     }
     
     @Override
-    public Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException {
+    public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException {
         try {
-            em.persist(newCustomer);
+            em.persist(newRentalRate);
             em.flush();
-            em.refresh(newCustomer);
-            return newCustomer;
+            em.refresh(newRentalRate);
+            return newRentalRate;
         }
         catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new CustomerExistException("Customer already exists!");
+                    throw new RentalRateExistException("Rental Rate already exists!");
                 }
                 else {
                     throw new UnknownPersistenceException(ex.getMessage());
@@ -54,20 +54,17 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public Customer retrieveCustomerByCustomerId(Long customerId, Boolean retrieveReservation, Boolean retrievePartner) throws CustomerNotFoundException {
-        Customer customer = em.find(Customer.class, customerId);
+    public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException {
+        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
         
-        if(customer != null) {
-            if (retrieveReservation) {
-                customer.getReservations().size();
+        if(rentalRate != null) {
+            if (retrieveCarCategory) {
+                rentalRate.getCarCategory();
             }
-            if (retrievePartner) {
-                customer.getPartner();
-            }
-            return customer;
+            return rentalRate;
         }
         else {
-            throw new CustomerNotFoundException("Customer ID " + customerId + "does not exist!");
+            throw new RentalRateNotFoundException("Rental Rate ID " + rentalRateId + "does not exist!");
         }
     }
 }
