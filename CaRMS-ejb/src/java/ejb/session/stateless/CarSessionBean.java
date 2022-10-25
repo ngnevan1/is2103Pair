@@ -5,13 +5,13 @@
  */
 package ejb.session.stateless;
 
-import entity.Customer;
+import entity.Car;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import util.exception.CustomerExistException;
-import util.exception.CustomerNotFoundException;
+import util.exception.CarExistException;
+import util.exception.CarNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -19,29 +19,29 @@ import util.exception.UnknownPersistenceException;
  * @author KMwong
  */
 @Stateless
-public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
+public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
-    public CustomerSessionBean() {
+    
+    public CarSessionBean() {
     }
     
     @Override
-    public Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException {
+    public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException {
         try {
-            em.persist(newCustomer);
+            em.persist(newCar);
             em.flush();
-            em.refresh(newCustomer);
-            return newCustomer;
+            em.refresh(newCar);
+            return newCar;
         }
         catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new CustomerExistException("Customer already exists!");
+                    throw new CarExistException("Car already exists!");
                 }
                 else {
                     throw new UnknownPersistenceException(ex.getMessage());
@@ -54,20 +54,24 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public Customer retrieveCustomerByCustomerId(Long customerId, Boolean retrieveReservation, Boolean retrievePartner) throws CustomerNotFoundException {
-        Customer customer = em.find(Customer.class, customerId);
+    public Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException {
+        Car car = em.find(Car.class, carId);
         
-        if(customer != null) {
+        if(car != null) {
+            if (retrieveCarModel) {
+                car.getCarModel();
+            }
             if (retrieveReservation) {
-                customer.getReservations().size();
+                car.getReservations().size();
             }
-            if (retrievePartner) {
-                customer.getPartner();
+            if (retrieveOutlet) {
+                car.getOutlet();
             }
-            return customer;
+            return car;
         }
         else {
-            throw new CustomerNotFoundException("Customer ID " + customerId + "does not exist!");
+            throw new CarNotFoundException("Car ID " + carId + "does not exist!");
         }
     }
+
 }
