@@ -19,4 +19,5 @@ import util.exception.UnknownPersistenceException;
 public interface RentalRateSessionBeanRemote {
     RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException;
     RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException;
+    RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
 }

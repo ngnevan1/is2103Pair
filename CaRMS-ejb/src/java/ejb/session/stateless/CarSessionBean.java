@@ -8,8 +8,11 @@ package ejb.session.stateless;
 import entity.Car;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.CarExistException;
 import util.exception.CarNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -71,6 +74,19 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         else {
             throw new CarNotFoundException("Car ID " + carId + "does not exist!");
+        }
+    }
+    
+    @Override
+    public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlate = :inLicensePlate");
+        query.setParameter("inLicensePlate", licensePlate);
+        
+        try {
+            return (Car)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex) {
+            throw new CarNotFoundException("Car License Plate " + licensePlate + " does not exist!");
         }
     }
 

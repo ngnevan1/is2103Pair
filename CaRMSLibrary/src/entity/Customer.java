@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -21,12 +23,13 @@ import javax.persistence.OneToMany;
  * @author KMwong
  */
 @Entity
-public class Customer implements Serializable {
+@Inheritance(strategy= InheritanceType.JOINED)
+public abstract class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
+     Long customerId;
     @Column(nullable = false, length = 64)
     private String name;
     @Column(nullable = false, length = 64, unique = true)

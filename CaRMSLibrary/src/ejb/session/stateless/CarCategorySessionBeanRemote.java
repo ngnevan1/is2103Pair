@@ -19,4 +19,5 @@ import util.exception.UnknownPersistenceException;
 public interface CarCategorySessionBeanRemote {
     public CarCategory createNewCarCategory(CarCategory newCarCategory) throws CarCategoryExistException, UnknownPersistenceException;
     CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
+    CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
 }

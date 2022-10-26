@@ -19,4 +19,5 @@ import util.exception.UnknownPersistenceException;
 public interface CarSessionBeanLocal {
     Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException;
     Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
+    Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
 }

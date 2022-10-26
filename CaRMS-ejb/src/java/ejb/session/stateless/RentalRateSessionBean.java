@@ -8,8 +8,11 @@ package ejb.session.stateless;
 import entity.RentalRate;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -65,6 +68,19 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
         else {
             throw new RentalRateNotFoundException("Rental Rate ID " + rentalRateId + "does not exist!");
+        }
+    }
+    
+    @Override
+    public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rateName = :inRateName");
+        query.setParameter("inRateName", rateName);
+        
+        try {
+            return (RentalRate)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex) {
+            throw new RentalRateNotFoundException("Rental Rate Name " + rateName + " does not exist!");
         }
     }
 }

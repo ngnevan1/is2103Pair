@@ -19,4 +19,5 @@ import util.exception.UnknownPersistenceException;
 public interface CarModelSessionBeanRemote {
     CarModel createNewCarModel(CarModel newCarModel) throws CarModelExistException, UnknownPersistenceException;
     CarModel retrieveCarModelByCarModelId(Long carModelId, Boolean retrieveCar, Boolean retrieveReservation, Boolean retrieveCarCategory) throws CarModelNotFoundException;
+    CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
 }
