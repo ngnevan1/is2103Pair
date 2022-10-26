@@ -8,8 +8,11 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.CarCategoryExistException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -71,6 +74,19 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
         else {
             throw new CarCategoryNotFoundException("Car Category ID " + carCategoryId + "does not exist!");
+        }
+    }
+    
+    @Override
+    public CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException {
+        Query query = em.createQuery("SELECT cc FROM OwnCustomer cc WHERE cc.categoryName = :inCategoryName");
+        query.setParameter("inCategoryName", categoryName);
+        
+        try {
+            return (CarCategory)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex) {
+            throw new CarCategoryNotFoundException("Car Category Name " + categoryName + " does not exist!");
         }
     }
 }

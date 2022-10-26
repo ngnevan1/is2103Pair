@@ -9,6 +9,8 @@ import entity.CarModel;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -73,6 +75,19 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
         else {
             throw new CarModelNotFoundException("Car Model ID " + carModelId + "does not exist!");
+        }
+    }
+    
+    @Override
+    public CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException {
+        Query query = em.createQuery("SELECT cm FROM CarModel cm WHERE cm.modelName = :inModelName");
+        query.setParameter("inModelName", modelName);
+        
+        try {
+            return (CarModel)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex) {
+            throw new CarModelNotFoundException("Car Model Model Name " + modelName + " does not exist!");
         }
     }
     

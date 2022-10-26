@@ -20,9 +20,6 @@ import javax.persistence.Id;
 public class OwnCustomer extends Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
     @Column(nullable = false, length = 64, unique = true)
     private String username;
     @Column(nullable = false, length = 64)
@@ -33,18 +30,11 @@ public class OwnCustomer extends Customer implements Serializable {
         super();
     }
 
-    public OwnCustomer(String username, String password, String name, String passportNumber, String email, String phoneNumber) {
+    public OwnCustomer(Long customerId, String username, String password, String name, String passportNumber, String email, String phoneNumber) {
         super(name, passportNumber, email, phoneNumber);
+        this.customerId = customerId;
         this.username = username;
         this.password = password;
-    }
-
-    public Long getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
     }
 
     @Override

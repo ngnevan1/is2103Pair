@@ -6,10 +6,14 @@
 package ejb.session.stateless;
 
 import entity.Customer;
+import entity.OwnCustomer;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -68,6 +72,19 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         }
         else {
             throw new CustomerNotFoundException("Customer ID " + customerId + "does not exist!");
+        }
+    }
+    
+    @Override
+    public OwnCustomer retrieveOwnCustomerByUsername(String username) throws CustomerNotFoundException {
+        Query query = em.createQuery("SELECT oc FROM OwnCustomer oc WHERE oc.username = :inUsername");
+        query.setParameter("inUsername", username);
+        
+        try {
+            return (OwnCustomer)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex) {
+            throw new CustomerNotFoundException("Customer Username " + username + " does not exist!");
         }
     }
 }

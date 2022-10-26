@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Customer;
+import entity.OwnCustomer;
 import javax.ejb.Local;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
@@ -19,4 +20,5 @@ import util.exception.UnknownPersistenceException;
 public interface CustomerSessionBeanLocal {
     Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException;
     Customer retrieveCustomerByCustomerId(Long customerId, Boolean retrieveReservation, Boolean retrievePartner) throws CustomerNotFoundException;
+    OwnCustomer retrieveOwnCustomerByUsername(String username) throws CustomerNotFoundException;
 }
