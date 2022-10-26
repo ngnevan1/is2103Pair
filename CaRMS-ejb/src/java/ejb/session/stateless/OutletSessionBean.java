@@ -23,10 +23,6 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-
-    public void persist(Object object) {
-        em.persist(object);
-    }
     
     
 

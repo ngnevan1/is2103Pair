@@ -24,11 +24,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-    public void persist(Object object) {
-        em.persist(object);
-    }
-    
-    
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
