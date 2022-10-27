@@ -5,7 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.Outlet;
 import javax.ejb.Local;
+import util.exception.OutletExistException;
+import util.exception.OutletNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -13,5 +17,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface OutletSessionBeanLocal {
+    public Outlet createNewOutlet(Outlet newOutlet) throws OutletExistException, UnknownPersistenceException;
+    public Outlet retrieveOutletByOutletId(Long outletId, Boolean retrieveCars, Boolean retrieveEmployees, Boolean retrieveTransitDispatchRecords) throws OutletNotFoundException;
     
 }
