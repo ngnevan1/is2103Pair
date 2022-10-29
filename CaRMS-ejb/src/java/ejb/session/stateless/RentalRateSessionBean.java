@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -55,6 +56,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             }
         }
     }
+    
+    @Override
+    public List<RentalRate> retrieveAllRentalRates()
+    {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr");
+        
+        return query.getResultList();
+    }
+    
     
     @Override
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException {

@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -55,6 +56,15 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
             }
         }
     }
+    
+    @Override
+    public List<CarCategory> retrieveAllCarCategories()
+    {
+        Query query = em.createQuery("SELECT cc FROM CarCategory cc");
+        
+        return query.getResultList();
+    }
+    
     
     @Override
     public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveRentalRate) throws CarCategoryNotFoundException {
