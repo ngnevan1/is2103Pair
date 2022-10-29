@@ -26,6 +26,7 @@ import util.enumeration.TransitStatusEnum;
 import util.exception.CarCategoryExistException;
 import util.exception.EmployeeExistException;
 import util.exception.OutletExistException;
+import util.exception.OutletNotFoundException;
 import util.exception.PartnerExistException;
 import util.exception.UnknownPersistenceException;
 
@@ -60,22 +61,28 @@ public class DataInitSessionBean {
     
     @PostConstruct
     public void postConstruct() {
-//        try
-//        {
-//          //  carCategorySessionBeanLocal.retrieveStaffByUsername("manager");
-//        }
-//        catch(StaffNotFoundException ex)
-//        {
-//            initializeData();
-//        }
+        try
+        {
+            outletSessionBeanLocal.retrieveOutletByOutletName("Main Outlet");
+        }
+        catch(OutletNotFoundException ex)
+        {
+            initialiseData();
+        } 
     }
     
     public void initialiseData() {
         try {
-            carCategorySessionBeanLocal.createNewCarCategory(new CarCategory("SUV"));
-            outletSessionBeanLocal.createNewOutlet(new Outlet("Main Outlet", "123 Kent Ridge Park", new Date(), new Date()));
+            CarCategory newCategory = new CarCategory("SUV");
+            Outlet newOutlet = new Outlet("Main Outlet", "123 Kent Ridge Park", new Date(), new Date());
+            Employee newEmployee = new Employee("Manager", "manager", "password", EmployeeAccessRightsEnum.OPERATIONS_MANAGER, TransitStatusEnum.AVAILABLE, newOutlet);
+            
+            carCategorySessionBeanLocal.createNewCarCategory(newCategory);
+            outletSessionBeanLocal.createNewOutlet(newOutlet);
+            employeeSessionBeanLocal.createNewEmployee(newEmployee);
             partnerSessionBeanLocal.createNewPartner(new Partner("Partner", "partner", "password"));
-            employeeSessionBeanLocal.createNewEmployee(new Employee("Manager", "manager", "password", EmployeeAccessRightsEnum.OPERATIONS_MANAGER, TransitStatusEnum.AVAILABLE));
+            outletSessionBeanLocal.associateEmployeeWithOutlet(newEmployee.getEmployeeId(), newOutlet.getOutletId());
+            
         } catch (CarCategoryExistException | OutletExistException | PartnerExistException | EmployeeExistException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
