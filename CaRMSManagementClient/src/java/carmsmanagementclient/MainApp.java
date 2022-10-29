@@ -5,6 +5,7 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
@@ -24,6 +25,7 @@ public class MainApp {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     
 
     private SalesManager salesManager;
@@ -33,11 +35,12 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote,CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote,CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
     }
 
     public void runApp() {
@@ -60,7 +63,7 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-                        salesManager = new SalesManager(rentalRateSessionBeanRemote, currentEmployee);
+                        salesManager = new SalesManager(rentalRateSessionBeanRemote, currentEmployee, carCategorySessionBeanRemote);
                         operationsManager = new OperationsManager(carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {

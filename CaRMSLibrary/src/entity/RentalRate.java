@@ -48,6 +48,7 @@ public class RentalRate implements Serializable {
 
     
     public RentalRate() {
+        this.isDisabled = false;
     }
 
     public RentalRate(String rateName, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate, Boolean isDisabled) {

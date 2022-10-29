@@ -5,11 +5,20 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import entity.CarCategory;
 import entity.Employee;
+import entity.RentalRate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeAccessRightsEnum;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.InvalidAccessRightException;
+import util.exception.RentalRateExistException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -18,14 +27,16 @@ import util.exception.InvalidAccessRightException;
 public class SalesManager {
 
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private Employee currentEmployee;
 
     public SalesManager() {
     }
 
-    public SalesManager(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, Employee currentEmployee) {
+    public SalesManager(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, Employee currentEmployee, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.currentEmployee = currentEmployee;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
     }
     
     
@@ -79,7 +90,43 @@ public class SalesManager {
     }
 
     private void doCreateNewRentalRate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
+        List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+        RentalRate newRentalRate = new RentalRate();
+        
+        try {
+        System.out.println("*** CaRMS System :: Sales Management - Sales Manager :: Create New Rental Rate ***\n");
+        System.out.print("Enter Name> ");
+        newRentalRate.setRateName(scanner.nextLine().trim());
+        System.out.print("Choose Car Category by entering Car Category ID> \n");
+        System.out.printf("%8s%20s\n", "Car Category ID", "Car Category Name");
+        for(CarCategory category:carCategories) {
+            System.out.printf("%8s%20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
+        }
+        CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false, false);
+        newRentalRate.setCarCategory(chosenCategory);
+        System.out.print("Enter Rate Per Day> ");
+        newRentalRate.setRatePerDay(scanner.nextBigDecimal());
+        scanner.nextLine();
+        System.out.print("Enter Rental Rate Start Date (DD/MM/YYYY)> ");
+        newRentalRate.setRateStartDate(inputDateFormat.parse(scanner.nextLine().trim()));
+        System.out.print("Enter Rental Rate End Date (DD/MM/YYYY)> ");
+        newRentalRate.setRateEndDate(inputDateFormat.parse(scanner.nextLine().trim()));
+        
+       RentalRate createdRentalRate = rentalRateSessionBeanRemote.createNewRentalRate(newRentalRate);
+        
+            System.out.println("Rental Rate " + createdRentalRate.getRentalRateId() + " created successfully!");
+
+        } catch (ParseException ex) {
+            System.out.println("Invalid Date Input!\n");
+        } catch (CarCategoryNotFoundException ex) {
+            System.out.println("Invalid Car Category");
+        } catch (RentalRateExistException | UnknownPersistenceException ex) {
+            System.out.println("Unable to create Rental Rate!");
+        }
+        
     }
 
     private void doViewAllRentalRates() {
@@ -95,10 +142,6 @@ public class SalesManager {
     }
 
     private void doDeleteRentalRate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void doViewAllProducts() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
