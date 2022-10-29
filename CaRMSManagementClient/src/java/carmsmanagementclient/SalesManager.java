@@ -130,7 +130,24 @@ public class SalesManager {
     }
 
     private void doViewAllRentalRates() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        
+        System.out.println("*** CaRMS System :: Sales Management - Sales Manager ::  View All Rental Rates ***\n");
+        
+        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveAllRentalRates();
+        System.out.printf("%-15s%-20s%-13s%-16s%-16s%-16s%-5s\n", "Rental Rate ID", "Rate Name", "Rate Per Day", "Rate Start Date", "Rate End Date", "Car Category", "Disabled?");
+
+        for(RentalRate rate:rentalRates)
+        {
+            String rateStartDate = outputDateFormat.format(rate.getRateStartDate());
+            String rateEndDate = outputDateFormat.format(rate.getRateEndDate());
+            System.out.printf("%-15s%-20s%-20s%-15s%-16s%-16s%-5s\n", rate.getRentalRateId().toString(), rate.getRateName(), rate.getRatePerDay().toString(), rateStartDate , rateEndDate, rate.getCarCategory().getCategoryName(), rate.getIsDisabled());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
+
     }
 
     private void doViewRentalRateDetails() {
