@@ -19,5 +19,7 @@ import util.exception.UnknownPersistenceException;
 public interface OutletSessionBeanLocal {
     public Outlet createNewOutlet(Outlet newOutlet) throws OutletExistException, UnknownPersistenceException;
     public Outlet retrieveOutletByOutletId(Long outletId, Boolean retrieveCars, Boolean retrieveEmployees, Boolean retrieveTransitDispatchRecords) throws OutletNotFoundException;
+    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException;
+    public void associateEmployeeWithOutlet(Long employeeId, Long outletId);
     
 }

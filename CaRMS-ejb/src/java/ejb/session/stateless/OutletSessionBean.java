@@ -5,11 +5,16 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.Outlet;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.OutletExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -21,14 +26,12 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
+
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
-    
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    
     @Override
     public Outlet createNewOutlet(Outlet newOutlet) throws OutletExistException, UnknownPersistenceException {
         try {
@@ -36,27 +39,24 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
             em.flush();
             em.refresh(newOutlet);
             return newOutlet;
-        }
-        catch (PersistenceException ex) {
+        } catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
                     throw new OutletExistException("Outlet already exists!");
-                }
-                else {
+                } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
-            }
-            else {
+            } else {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
         }
     }
-    
+
     @Override
     public Outlet retrieveOutletByOutletId(Long outletId, Boolean retrieveCars, Boolean retrieveEmployees, Boolean retrieveTransitDispatchRecords) throws OutletNotFoundException {
         Outlet outlet = em.find(Outlet.class, outletId);
-        
-        if(outlet != null) {
+
+        if (outlet != null) {
             if (retrieveCars) {
                 outlet.getCars().size();
             }
@@ -67,9 +67,28 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
                 outlet.getTransitDispatchRecords().size();
             }
             return outlet;
-        }
-        else {
+        } else {
             throw new OutletNotFoundException("Outlet ID " + outletId + "does not exist!");
         }
+    }
+
+    @Override
+    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException {
+        Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.outletName = :inOutletname");
+        query.setParameter("inOutletname", outletName);
+
+        try {
+            return (Outlet) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new OutletNotFoundException("Outlet name " + outletName + " does not exist!");
+        }
+    }
+
+    @Override
+    public void associateEmployeeWithOutlet(Long employeeId, Long outletId)  {
+
+        Outlet outlet = em.find(Outlet.class, outletId);
+        Employee employee = em.find(Employee.class, employeeId);
+        outlet.getEmployees().add(employee);
     }
 }

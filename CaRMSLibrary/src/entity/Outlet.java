@@ -53,17 +53,19 @@ public class Outlet implements Serializable {
 
     
     public Outlet() {
-        cars = new ArrayList<>();
-        employees = new ArrayList<>();
-        transitDispatchRecords = new ArrayList<>();
+        this.cars = new ArrayList<>();
+        this.employees = new ArrayList<>();
+        this.transitDispatchRecords = new ArrayList<>();
     }
 
     public Outlet(String outletName, String outletAddress, Date openingTime, Date closingTime) {
-        this();
         this.outletName = outletName;
         this.outletAddress = outletAddress;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
+        this.cars = new ArrayList<>();
+        this.employees = new ArrayList<>();
+        this.transitDispatchRecords = new ArrayList<>();
     }
 
     public Long getOutletId() {
