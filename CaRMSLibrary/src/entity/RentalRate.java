@@ -17,6 +17,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -30,23 +35,29 @@ public class RentalRate implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateId;
     @Column(nullable = false, length = 64, unique = true)
-    private String rateName; 
-    @Column(nullable = false, precision = 19, scale = 4)
+    @NotNull
+    @Size(min = 1, max = 64)
+    private String rateName;
+    @Column(nullable = false, precision = 11, scale = 2)
+    @NotNull
+    @DecimalMin("0.00")
+    @Digits(integer = 9, fraction = 2)
     private BigDecimal ratePerDay;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @NotNull
     private Date rateStartDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @Future
     private Date rateEndDate;
     @Column(nullable = false)
     private Boolean isDisabled;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
 
-    
     public RentalRate() {
         this.isDisabled = false;
     }
@@ -175,5 +186,5 @@ public class RentalRate implements Serializable {
     public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
     }
-    
+
 }

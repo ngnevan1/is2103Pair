@@ -8,9 +8,11 @@ package ejb.session.stateless;
 import entity.RentalRate;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateRentalRateException;
 
 /**
  *
@@ -18,8 +20,14 @@ import util.exception.UnknownPersistenceException;
  */
 @Remote
 public interface RentalRateSessionBeanRemote {
-    RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException;
+
+    public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
+
     List<RentalRate> retrieveAllRentalRates();
+
     RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException;
+
     RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
+
+    public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
 }
