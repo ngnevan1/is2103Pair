@@ -142,6 +142,12 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
     }
 
+    @Override
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException {
+        RentalRate rateToRemove = retrieveRentalRateByRentalRateId(rentalRateId);
+        em.remove(rateToRemove);
+    }
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
         String msg = "Input data validation error!:";
 

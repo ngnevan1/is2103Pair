@@ -23,11 +23,13 @@ public interface RentalRateSessionBeanRemote {
 
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
 
-    List<RentalRate> retrieveAllRentalRates();
+    public List<RentalRate> retrieveAllRentalRates();
 
-    RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException;
 
-    RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
 
     public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
+    
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
 }

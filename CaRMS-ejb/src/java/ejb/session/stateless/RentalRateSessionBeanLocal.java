@@ -6,7 +6,6 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
-import java.util.List;
 import javax.ejb.Local;
 import util.exception.RentalRateNotFoundException;
 
@@ -17,7 +16,5 @@ import util.exception.RentalRateNotFoundException;
 @Local
 public interface RentalRateSessionBeanLocal {
 
-    List<RentalRate> retrieveAllRentalRates();
-    RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
 }

@@ -87,7 +87,7 @@ public class SalesManager {
                 }
             }
 
-            if (response == 6) {
+            if (response == 4) {
                 break;
             }
         }
@@ -210,7 +210,7 @@ public class SalesManager {
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
 
         try {
-            System.out.println("*** *** CaRMS System :: Sales Management - Sales Manager :: View Rental Rate Details :: Update Rental Rate ***\n");
+            System.out.println("*** CaRMS System :: Sales Management - Sales Manager :: View Rental Rate Details :: Update Rental Rate ***\n");
             System.out.print("Enter Name (blank if no change)> ");
             input = scanner.nextLine().trim();
             if (input.length() > 0) {
@@ -255,7 +255,29 @@ public class SalesManager {
     }
 
     private void doDeleteRentalRate(RentalRate rate) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);     
+        String input;
+        
+        System.out.println("*** CaRMS System :: Sales Management - Sales Manager :: View Rental Rate Details :: Delete Rental Rate ***\n");
+        System.out.printf("Confirm Delete Rental Rate %s (Enter 'Y' to Delete)> ", rate.getRateName());
+        input = scanner.nextLine().trim();
+        
+        if(input.equals("Y"))
+        {
+            try 
+            {
+                rentalRateSessionBeanRemote.deleteRentalRate(rate.getRentalRateId());
+                System.out.println("Rental Rate deleted successfully!\n");
+            } 
+            catch (RentalRateNotFoundException ex) 
+            {
+                System.out.println("An error has occurred while deleting product: " + ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("Product NOT deleted!\n");
+        }
     }
     
     private void showInputDataValidationErrorsForRentalRate(Set<ConstraintViolation<RentalRate>>constraintViolations)
