@@ -24,4 +24,5 @@ public interface CarModelSessionBeanRemote {
     CarModel retrieveCarModelByCarModelId(Long carModelId, Boolean retrieveCar, Boolean retrieveReservation, Boolean retrieveCarCategory) throws CarModelNotFoundException;
     CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
     public void updateCarModel(CarModel model) throws CarModelNotFoundException, InputDataValidationException;
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
 }

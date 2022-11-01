@@ -271,12 +271,12 @@ public class SalesManager {
             } 
             catch (RentalRateNotFoundException ex) 
             {
-                System.out.println("An error has occurred while deleting product: " + ex.getMessage() + "\n");
+                System.out.println("An error has occurred while deleting rental rate: " + ex.getMessage() + "\n");
             }
         }
         else
         {
-            System.out.println("Product NOT deleted!\n");
+            System.out.println("Rental Rate NOT deleted!\n");
         }
     }
     

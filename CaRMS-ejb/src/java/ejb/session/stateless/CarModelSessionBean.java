@@ -139,6 +139,18 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
     } 
     
+    @Override
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException {
+        CarModel modelToRemove = retrieveCarModelByCarModelId(carModelId, false, true, false);
+        
+        if (modelToRemove.getReservations().isEmpty()) {
+            em.remove(modelToRemove);
+        } else {
+            modelToRemove.setIsDisabled(true);
+        }
+        
+    }
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
         String msg = "Input data validation error!:";
 

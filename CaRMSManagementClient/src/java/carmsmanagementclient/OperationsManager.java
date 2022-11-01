@@ -225,7 +225,27 @@ public class OperationsManager {
     }
 
     private void doDeleteModel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        String input;
+
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Delete Car Model ***\n");
+
+        System.out.println("Enter Model Name of Car Model to Update>");
+
+        try {
+            CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
+            System.out.printf("Confirm Delete Car Model %s (Enter 'Y' to Delete)> ", model.getModelName());
+            
+            input = scanner.nextLine().trim();
+            if (input.equals("Y")) {
+                carModelSessionBeanRemote.deleteCarModel(model.getCarModelId());
+                System.out.println("Car Model deleted successfully!\n");
+            } else {
+                System.out.println("Car Model NOT deleted!\n");
+            }
+        } catch (CarModelNotFoundException ex) {
+            System.out.println("An error has occurred while deleting Car Model: " + ex.getMessage() + "\n");
+        }
     }
 
     private void doCreateNewCar() {
