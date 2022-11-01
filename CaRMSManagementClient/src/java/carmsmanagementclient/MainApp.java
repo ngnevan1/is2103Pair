@@ -64,7 +64,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         salesManager = new SalesManager(rentalRateSessionBeanRemote, currentEmployee, carCategorySessionBeanRemote);
-                        operationsManager = new OperationsManager(carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee);
+                        operationsManager = new OperationsManager(carCategorySessionBeanRemote,carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
