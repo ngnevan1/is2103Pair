@@ -75,13 +75,18 @@ public class DataInitSessionBean {
         try {
             CarCategory newCategory = new CarCategory("SUV");
             Outlet newOutlet = new Outlet("Main Outlet", "123 Kent Ridge Park", new Date(), new Date());
-            Employee newEmployee = new Employee("Manager", "manager", "password", EmployeeAccessRightsEnum.OPERATIONS_MANAGER, TransitStatusEnum.AVAILABLE, newOutlet);
+            Employee opsEmployee = new Employee("Manager", "ops", "password", EmployeeAccessRightsEnum.OPERATIONS_MANAGER, TransitStatusEnum.AVAILABLE, newOutlet);
+            
+            Employee salesEmployee = new Employee("Manager", "sales", "password", EmployeeAccessRightsEnum.SALES_MANAGER, TransitStatusEnum.AVAILABLE, newOutlet);
+            
             
             carCategorySessionBeanLocal.createNewCarCategory(newCategory);
             outletSessionBeanLocal.createNewOutlet(newOutlet);
-            employeeSessionBeanLocal.createNewEmployee(newEmployee);
+            employeeSessionBeanLocal.createNewEmployee(opsEmployee);
+            employeeSessionBeanLocal.createNewEmployee(salesEmployee);
             partnerSessionBeanLocal.createNewPartner(new Partner("Partner", "partner", "password"));
-            outletSessionBeanLocal.associateEmployeeWithOutlet(newEmployee.getEmployeeId(), newOutlet.getOutletId());
+            outletSessionBeanLocal.associateEmployeeWithOutlet(opsEmployee.getEmployeeId(), newOutlet.getOutletId());
+            outletSessionBeanLocal.associateEmployeeWithOutlet(salesEmployee.getEmployeeId(), newOutlet.getOutletId());
             
         } catch (CarCategoryExistException | OutletExistException | PartnerExistException | EmployeeExistException | UnknownPersistenceException ex) {
             ex.printStackTrace();

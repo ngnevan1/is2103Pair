@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -29,8 +31,12 @@ public class CarModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carModelId;
     @Column(nullable = false, length = 64, unique = true)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String modelName;
     @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String makeName;
     @Column(nullable = false)
     private Boolean isDisabled;
@@ -47,6 +53,7 @@ public class CarModel implements Serializable {
     public CarModel() {
         reservations = new ArrayList<>();
         cars = new ArrayList<>();
+        isDisabled = false;
     }
 
     public CarModel(String modelName, String makeName, Boolean isDisabled) {
