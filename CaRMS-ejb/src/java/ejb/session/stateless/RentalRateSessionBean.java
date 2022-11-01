@@ -138,13 +138,17 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
         } else {
-            throw new RentalRateNotFoundException("Rental Rate ID not provided for product to be updated");
+            throw new RentalRateNotFoundException("Rental Rate ID not provided for rental rate to be updated");
         }
     }
 
     @Override
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException {
         RentalRate rateToRemove = retrieveRentalRateByRentalRateId(rentalRateId);
+        
+        // TODO 
+        // check if there is existing reservation before removing
+        // if there is, set disabled to true, if not just remove
         em.remove(rateToRemove);
     }
 

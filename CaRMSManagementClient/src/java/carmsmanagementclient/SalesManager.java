@@ -135,7 +135,7 @@ public class SalesManager {
         } catch (CarCategoryNotFoundException ex) {
             System.out.println("Invalid Car Category");
         } catch (RentalRateExistException | UnknownPersistenceException ex) {
-            System.out.println("Unable to create Rental Rate!");
+            System.out.println("Error creating Rental Rate: " + ex.getMessage());
         } catch(InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
         }
