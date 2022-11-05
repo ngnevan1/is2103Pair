@@ -5,11 +5,19 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
+import entity.Outlet;
+import entity.OwnCustomer;
 import entity.Reservation;
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import util.exception.CarNotFoundException;
+import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -22,6 +30,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+    
+    @EJB
+    private CarSessionBeanLocal carSessionBeanLocal;
+    @EJB
+    private OutletSessionBeanLocal outletSessionBeanLocal;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
@@ -29,9 +42,23 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public Reservation createNewReservation(Reservation newReservation) throws UnknownPersistenceException {
+    public Reservation createNewReservation(Reservation newReservation, OwnCustomer customer, String licensePlate, String pickupOutletName, String returnOutletName) throws UnknownPersistenceException, CarNotFoundException, OutletNotFoundException {
         try {
             em.persist(newReservation);
+            newReservation.setCustomer(customer);
+            customer.getReservations().add(newReservation);
+            
+            Car car = carSessionBeanLocal.retrieveCarByLicensePlate(licensePlate);
+            newReservation.setCar(car);
+            car.getReservations().add(newReservation);
+            
+            Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(pickupOutletName);
+            pickupOutlet.setReservation(newReservation);
+            newReservation.setPickUpOutlet(pickupOutlet);
+            
+            Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(returnOutletName);
+            newReservation.setReturnOutlet(returnOutlet);
+            
             em.flush();
             em.refresh(newReservation);
             return newReservation;
@@ -45,7 +72,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
     
     @Override
-    public Reservation retrieveRentalRateByRentalRateId(Long reservationId) throws ReservationNotFoundException {
+    public Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
         
         if(reservation != null) {
@@ -55,5 +82,19 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Reservation ID " + reservationId + "does not exist!");
         }
     }
-
+    
+    public BigDecimal calculateRentalRate(Car reserveCar, Date pickupDate, Date returnDate) {
+        // stub
+        return null;
+    }
+    
+    public BigDecimal calculateRefund(Reservation reservation) {
+        // stub
+        return null;
+    }
+    
+    public BigDecimal calculatePenalty(Reservation reservation) {
+        // stub
+        return null;
+    }
 }

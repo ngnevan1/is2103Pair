@@ -44,7 +44,7 @@ public class Reservation implements Serializable {
     @Column(nullable = false, length = 64)
     private String CreditCardNumber;
     @Column(nullable = false)
-    private Boolean isDisabled;
+    private Boolean isPaid;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -68,13 +68,13 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(Date reservationStartDate, Date reservationEndDate, Date paymentDate, BigDecimal totalAmount, String CreditCardNumber, Boolean isDisabled) {
+    public Reservation(Date reservationStartDate, Date reservationEndDate, Date paymentDate, BigDecimal totalAmount, String CreditCardNumber, Boolean isPaid) {
         this.reservationStartDate = reservationStartDate;
         this.reservationEndDate = reservationEndDate;
         this.paymentDate = paymentDate;
         this.totalAmount = totalAmount;
         this.CreditCardNumber = CreditCardNumber;
-        this.isDisabled = isDisabled;
+        this.isPaid = isPaid;
     }
     
     public Long getReservationId() {
@@ -181,17 +181,17 @@ public class Reservation implements Serializable {
     }
 
     /**
-     * @return the isDisabled
+     * @return the isPaid
      */
-    public Boolean getIsDisabled() {
-        return isDisabled;
+    public Boolean getIsPaid() {
+        return isPaid;
     }
 
     /**
-     * @param isDisabled the isDisabled to set
+     * @param isPaid the isPaid to set
      */
-    public void setIsDisabled(Boolean isDisabled) {
-        this.isDisabled = isDisabled;
+    public void setIsPaid(Boolean isPaid) {
+        this.isPaid = isPaid;
     }
 
     /**
