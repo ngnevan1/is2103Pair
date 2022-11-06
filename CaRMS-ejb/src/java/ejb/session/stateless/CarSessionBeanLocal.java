@@ -7,9 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import javax.ejb.Local;
-import util.exception.CarExistException;
 import util.exception.CarNotFoundException;
-import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -17,7 +15,6 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface CarSessionBeanLocal {
-    Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException;
     Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
     Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
 }
