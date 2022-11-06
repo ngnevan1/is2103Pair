@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enumeration.CarStatusEnum;
 
 /**
@@ -32,8 +34,12 @@ public class Car implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
     @Column(nullable = false, length = 64, unique = true)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String licensePlate;
     @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String colour;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,6 +58,7 @@ public class Car implements Serializable {
     
     public Car() {
         reservations = new ArrayList<>();
+        carStatus = CarStatusEnum.AVAILABLE;
     }
 
     public Car(String licensePlate, String colour, CarStatusEnum carStatus, Boolean isDisabled) {

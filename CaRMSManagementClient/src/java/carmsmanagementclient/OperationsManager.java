@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
@@ -20,6 +21,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.EmployeeAccessRightsEnum;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarExistException;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
@@ -225,11 +227,64 @@ public class OperationsManager {
     }
 
     private void doDeleteModel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        String input;
+
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Delete Car Model ***\n");
+
+        System.out.println("Enter Model Name of Car Model to Update>");
+
+        try {
+            CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
+            System.out.printf("Confirm Delete Car Model %s (Enter 'Y' to Delete)> ", model.getModelName());
+            
+            input = scanner.nextLine().trim();
+            if (input.equals("Y")) {
+                carModelSessionBeanRemote.deleteCarModel(model.getCarModelId());
+                System.out.println("Car Model deleted successfully!\n");
+            } else {
+                System.out.println("Car Model NOT deleted!\n");
+            }
+        } catch (CarModelNotFoundException ex) {
+            System.out.println("An error has occurred while deleting Car Model: " + ex.getMessage() + "\n");
+        }
     }
 
     private void doCreateNewCar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+        Car newCar = new Car();
+
+        try {
+            System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Create New Car ***\n");
+            System.out.print("Enter Licence Plate Number> ");
+            newCar.setLicensePlate(scanner.nextLine().trim());
+            System.out.print("Enter Colour> ");
+            newCar.setColour(scanner.nextLine().trim());
+            System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
+
+        for (CarModel model : carModels) {
+            System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+        }
+            System.out.print("Enter Car Model ID> ");
+            CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(scanner.nextLong(), false, false, false);
+            newCar.setCarModel(chosenModel);
+            Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
+
+            if (constraintViolations.isEmpty()) {
+                Car createdCar = carSessionBeanRemote.createNewCar(newCar);
+                System.out.println("Car " + createdCar.getCarId() + " created successfully!");
+            } else {
+                showInputDataValidationErrorsForCar(constraintViolations);
+            }
+
+        } catch (CarModelNotFoundException ex) {
+            System.out.println("Invalid Car Model");
+        } catch (CarExistException | UnknownPersistenceException ex) {
+            System.out.println("Error creating Car: " + ex.getMessage());
+        } catch (InputDataValidationException ex) {
+            System.out.println(ex.getMessage() + "\n");
+        }
     }
 
     private void doViewAllCars() {
@@ -261,6 +316,16 @@ public class OperationsManager {
     }
 
     private void showInputDataValidationErrorsForCarModel(Set<ConstraintViolation<CarModel>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
