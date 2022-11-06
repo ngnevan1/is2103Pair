@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Car;
 import java.util.List;
 import java.util.Set;
+import java.util.Date;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -112,6 +113,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         catch(NoResultException | NonUniqueResultException ex) {
             throw new CarNotFoundException("Car License Plate " + licensePlate + " does not exist!");
         }
+    }
+    
+    public List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
+        // Stub
+        return null;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {

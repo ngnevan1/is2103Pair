@@ -5,18 +5,33 @@
  */
 package holidayreservationsystem;
 
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import javax.ejb.EJB;
+
 /**
  *
  * @author nevanng
  */
 public class Main {
 
+    @EJB
+    private static CarSessionBeanRemote carSessionBeanRemote;
+    @EJB
+    private static CustomerSessionBeanRemote customerSessionBeanRemote;
+    @EJB
+    private static PartnerSessionBeanRemote partnerSessionBeanRemote;
+    @EJB
+    private static ReservationSessionBeanRemote reservationSessionBeanRemote;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        MainApp mainApp = new MainApp();
+        MainApp mainApp = new MainApp(carSessionBeanRemote, customerSessionBeanRemote, partnerSessionBeanRemote, reservationSessionBeanRemote);
         mainApp.runApp();
     }
     

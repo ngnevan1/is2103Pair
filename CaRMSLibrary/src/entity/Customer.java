@@ -29,7 +29,7 @@ public abstract class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     Long customerId;
+    Long customerId;
     @Column(nullable = false, length = 64)
     private String name;
     @Column(nullable = false, length = 64, unique = true)

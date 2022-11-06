@@ -8,9 +8,6 @@ package entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 /**
  *
@@ -30,9 +27,8 @@ public class OwnCustomer extends Customer implements Serializable {
         super();
     }
 
-    public OwnCustomer(Long customerId, String username, String password, String name, String passportNumber, String email, String phoneNumber) {
+    public OwnCustomer(String name, String passportNumber, String email, String phoneNumber, String username, String password) {
         super(name, passportNumber, email, phoneNumber);
-        this.customerId = customerId;
         this.username = username;
         this.password = password;
     }
