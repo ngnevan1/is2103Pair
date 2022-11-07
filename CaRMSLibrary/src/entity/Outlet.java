@@ -15,9 +15,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -34,20 +31,16 @@ public class Outlet implements Serializable {
     private String outletName;
     @Column(nullable = false, length = 128)
     private String outletAddress;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date openingTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date closingTime;
+    private Integer openingTime;
+    private Integer closingTime;
     
     
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
-    @OneToOne(mappedBy = "pickUpOutlet")
-    private Reservation reservation;
+    @OneToMany(mappedBy = "pickUpOutlet")
+    private List<Reservation> reservations;
     @OneToMany(mappedBy = "destinationOutlet")
     private List<TransitDispatchRecord> transitDispatchRecords;
 
@@ -56,16 +49,39 @@ public class Outlet implements Serializable {
         this.cars = new ArrayList<>();
         this.employees = new ArrayList<>();
         this.transitDispatchRecords = new ArrayList<>();
+        this.reservations = new ArrayList<>();
     }
 
-    public Outlet(String outletName, String outletAddress, Date openingTime, Date closingTime) {
+    public Outlet(String outletName, String outletAddress, Integer openingTime, Integer closingTime) {
+        this();
         this.outletName = outletName;
         this.outletAddress = outletAddress;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
-        this.cars = new ArrayList<>();
-        this.employees = new ArrayList<>();
-        this.transitDispatchRecords = new ArrayList<>();
+    }
+    
+    public Outlet(String outletName, Integer openingTime, Integer closingTime) {
+        this();
+        this.outletName = outletName;
+        this.outletAddress = "Kent Ridge Park";
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+    }
+
+    public Integer getOpeningTime() {
+        return openingTime;
+    }
+
+    public void setOpeningTime(Integer openingTime) {
+        this.openingTime = openingTime;
+    }
+
+    public Integer getClosingTime() {
+        return closingTime;
+    }
+
+    public void setClosingTime(Integer closingTime) {
+        this.closingTime = closingTime;
     }
 
     public Long getOutletId() {
@@ -129,34 +145,7 @@ public class Outlet implements Serializable {
         this.outletAddress = outletAddress;
     }
 
-    /**
-     * @return the openingTime
-     */
-    public Date getOpeningTime() {
-        return openingTime;
-    }
-
-    /**
-     * @param openingTime the openingTime to set
-     */
-    public void setOpeningTime(Date openingTime) {
-        this.openingTime = openingTime;
-    }
-
-    /**
-     * @return the closingTime
-     */
-    public Date getClosingTime() {
-        return closingTime;
-    }
-
-    /**
-     * @param closingTime the closingTime to set
-     */
-    public void setClosingTime(Date closingTime) {
-        this.closingTime = closingTime;
-    }
-
+   
     /**
      * @return the cars
      */
@@ -186,17 +175,17 @@ public class Outlet implements Serializable {
     }
 
     /**
-     * @return the reservation
+     * @return the reservations
      */
-    public Reservation getReservation() {
-        return reservation;
+    public List<Reservation> getReservations() {
+        return reservations;
     }
 
     /**
-     * @param reservation the reservation to set
+     * @param reservations the reservations to set
      */
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     /**

@@ -56,17 +56,16 @@ public class Employee implements Serializable {
 
     public Employee() {
         transitDispatchRecords = new ArrayList<>();
+        transitStatus = TransitStatusEnum.AVAILABLE;
+        password = "password";
     }
 
-    public Employee(String employeeName, String username, String password, EmployeeAccessRightsEnum employeeAccessRights, TransitStatusEnum transitStatus, Outlet outlet) {
+    public Employee(String employeeName, String username, EmployeeAccessRightsEnum employeeAccessRights, Outlet outlet) {
         this();
         this.employeeName = employeeName;
         this.username = username;
-        this.password = password;
         this.employeeAccessRights = employeeAccessRights;
-        this.transitStatus = transitStatus;
         this.outlet = outlet;
-        this.transitDispatchRecords = new ArrayList<>();
     }
 
     public Long getEmployeeId() {

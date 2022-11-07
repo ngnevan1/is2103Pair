@@ -42,15 +42,13 @@ public class Partner implements Serializable {
     public Partner() {
         customers = new ArrayList<>();
         reservations = new ArrayList<>();
+        password = "password";
     }
 
-    public Partner(String name, String username, String password) {
+    public Partner(String name) {
         this();
         this.name = name;
-        this.username = username;
-        this.password = password;
-        this.customers = new ArrayList<>();
-        this.reservations = new ArrayList<>();
+        this.username = name;
     }   
 
     public Long getPartnerId() {

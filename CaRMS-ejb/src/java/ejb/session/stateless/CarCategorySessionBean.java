@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import entity.CarModel;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -67,15 +68,12 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     
     
     @Override
-    public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveRentalRate) throws CarCategoryNotFoundException {
+    public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveRentalRate) throws CarCategoryNotFoundException {
         CarCategory carCategory = em.find(CarCategory.class, carCategoryId);
         
         if(carCategory != null) {
             if (retrieveCarModel) {
                 carCategory.getCarModels().size();
-            }
-            if (retrieveReservation) {
-                carCategory.getReservations().size();
             }
             if (retrieveRentalRate) {
                 carCategory.getRentalRates().size();
@@ -97,6 +95,16 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
         catch(NoResultException | NonUniqueResultException ex) {
             throw new CarCategoryNotFoundException("Car Category Name " + categoryName + " does not exist!");
+        }
+    }
+    
+    @Override
+    public void associateCarModelsWithCarCategory(Long categoryId, List<Long> modelIds) {
+        CarCategory category = em.find(CarCategory.class, categoryId);
+        for (Long modelId: modelIds) {
+            CarModel model = em.find(CarModel.class, modelId);
+            category.getCarModels().add(model);
+            model.setCarCategory(category);
         }
     }
 }
