@@ -140,7 +140,7 @@ public class OperationsManager {
                 System.out.printf("%8s%20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
             }
             System.out.print("Enter Car Category ID> ");
-            CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false, false);
+            CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false);
             newCarModel.setCarCategory(chosenCategory);
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(newCarModel);
 
@@ -204,7 +204,7 @@ public class OperationsManager {
             System.out.print("Enter Car Category ID (blank if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
-                CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false, false);
+                CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false);
                 model.setCarCategory(chosenCategory);
             }
 
