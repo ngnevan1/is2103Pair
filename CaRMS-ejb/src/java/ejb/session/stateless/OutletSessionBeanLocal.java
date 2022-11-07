@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Outlet;
+import java.util.Date;
 import javax.ejb.Local;
 import util.exception.OutletExistException;
 import util.exception.OutletNotFoundException;
@@ -21,5 +22,6 @@ public interface OutletSessionBeanLocal {
     public Outlet retrieveOutletByOutletId(Long outletId, Boolean retrieveCars, Boolean retrieveEmployees, Boolean retrieveTransitDispatchRecords) throws OutletNotFoundException;
     public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException;
     public void associateEmployeeWithOutlet(Long employeeId, Long outletId);
+    Boolean checkOutletIsOpen(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) throws OutletNotFoundException;
     
 }

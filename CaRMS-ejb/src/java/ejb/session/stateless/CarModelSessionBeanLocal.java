@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarModelExistException;
@@ -23,4 +24,5 @@ public interface CarModelSessionBeanLocal {
     List<CarModel> retrieveAllCarModels();
     public CarModel retrieveCarModelByCarModelId(Long carModelId) throws CarModelNotFoundException; 
     CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
+    List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
 }

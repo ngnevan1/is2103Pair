@@ -18,6 +18,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -32,19 +36,25 @@ public class Reservation implements Serializable {
     private Long reservationId;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @NotNull
     private Date reservationStartDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @NotNull
     private Date reservationEndDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @NotNull
     private Date paymentDate;
-    @Column(nullable = false, precision = 19, scale = 4)
+    @Column(nullable = false, precision = 8, scale = 2)
+    @NotNull
+    @DecimalMin("0.00")
+    @Digits(integer = 6, fraction = 2) 
     private BigDecimal totalAmount;
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, length = 16)
+    @NotNull
+    @Size(min = 1, max = 16)
     private String CreditCardNumber;
-    @Column(nullable = false)
-    private Boolean isPaid;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -65,7 +75,6 @@ public class Reservation implements Serializable {
     @OneToOne(optional = false)
     private Outlet returnOutlet;
     
-
     
     public Reservation() {
     }
@@ -76,7 +85,6 @@ public class Reservation implements Serializable {
         this.paymentDate = paymentDate;
         this.totalAmount = totalAmount;
         this.CreditCardNumber = CreditCardNumber;
-        this.isPaid = isPaid;
     }
     
     public Long getReservationId() {
@@ -180,20 +188,6 @@ public class Reservation implements Serializable {
      */
     public void setCreditCardNumber(String CreditCardNumber) {
         this.CreditCardNumber = CreditCardNumber;
-    }
-
-    /**
-     * @return the isPaid
-     */
-    public Boolean getIsPaid() {
-        return isPaid;
-    }
-
-    /**
-     * @param isPaid the isPaid to set
-     */
-    public void setIsPaid(Boolean isPaid) {
-        this.isPaid = isPaid;
     }
 
     /**

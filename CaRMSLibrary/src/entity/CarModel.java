@@ -30,15 +30,16 @@ public class CarModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carModelId;
-    @Column(nullable = false, length = 64, unique = true)
+    @Column(nullable = false, length = 32)
     @NotNull
-    @Size(min = 1, max = 64)
-    private String modelName;
-    @Column(nullable = false, length = 64)
-    @NotNull
-    @Size(min = 1, max = 64)
+    @Size(min = 1, max = 32)
     private String makeName;
+    @Column(nullable = false, length = 32, unique = true)
+    @NotNull
+    @Size(min = 1, max = 32)
+    private String modelName;
     @Column(nullable = false)
+    @NotNull
     private Boolean isDisabled;
     
     @ManyToOne(optional = false)
@@ -96,20 +97,6 @@ public class CarModel implements Serializable {
     }
 
     /**
-     * @return the modelName
-     */
-    public String getModelName() {
-        return modelName;
-    }
-
-    /**
-     * @param modelName the modelName to set
-     */
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    /**
      * @return the makeName
      */
     public String getMakeName() {
@@ -121,6 +108,20 @@ public class CarModel implements Serializable {
      */
     public void setMakeName(String makeName) {
         this.makeName = makeName;
+    }
+    
+    /**
+     * @return the modelName
+     */
+    public String getModelName() {
+        return modelName;
+    }
+
+    /**
+     * @param modelName the modelName to set
+     */
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     /**

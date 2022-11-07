@@ -5,8 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.CarModel;
 import entity.CarCategory;
 import entity.RentalRate;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -78,7 +81,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
         Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.rateEndDate");
-
         return query.getResultList();
     }
 
@@ -153,6 +155,12 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         // check if there is existing reservation before removing
         // if there is, set disabled to true, if not just remove
         em.remove(rateToRemove);
+    }
+    
+    @Override
+    public BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) {
+        // WIP
+        return null;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {

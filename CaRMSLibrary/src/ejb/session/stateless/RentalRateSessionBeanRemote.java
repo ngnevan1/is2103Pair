@@ -5,7 +5,10 @@
  */
 package ejb.session.stateless;
 
+import entity.CarModel;
 import entity.RentalRate;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.InputDataValidationException;
@@ -32,4 +35,5 @@ public interface RentalRateSessionBeanRemote {
     public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
     
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
+    BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
 }

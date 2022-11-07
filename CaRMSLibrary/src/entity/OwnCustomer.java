@@ -8,6 +8,8 @@ package entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -18,8 +20,12 @@ public class OwnCustomer extends Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Column(nullable = false, length = 64, unique = true)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String username;
     @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String password;
 
     
