@@ -7,7 +7,10 @@ package ejb.session.stateless;
 
 import entity.RentalRate;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -15,6 +18,6 @@ import util.exception.RentalRateNotFoundException;
  */
 @Local
 public interface RentalRateSessionBeanLocal {
-
+    public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
 }

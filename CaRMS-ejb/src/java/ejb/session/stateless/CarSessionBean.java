@@ -6,9 +6,12 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarModel;
+import entity.Outlet;
 import java.util.List;
 import java.util.Set;
 import java.util.Date;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -31,7 +34,7 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
-
+    
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
     private final ValidatorFactory validatorFactory;
@@ -54,6 +57,13 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             em.persist(newCar);
             em.flush();
             em.refresh(newCar);
+            
+            // associate outlet with car
+            Outlet outlet = em.find(Outlet.class, newCar.getOutlet().getOutletId());
+            outlet.getCars().add(newCar);
+            
+            CarModel model = em.find(CarModel.class, newCar.getCarModel().getCarModelId());
+            model.getCars().add(newCar);
             return newCar;
         }
         catch (PersistenceException ex) {

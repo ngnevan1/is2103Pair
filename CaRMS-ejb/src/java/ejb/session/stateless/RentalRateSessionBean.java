@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +55,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 em.persist(newRentalRate);
                 em.flush();
                 em.refresh(newRentalRate);
+                CarCategory category = em.find(CarCategory.class, newRentalRate.getCarCategory().getCarCategoryId());
+                category.getRentalRates().add(newRentalRate);
                 return newRentalRate;
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
