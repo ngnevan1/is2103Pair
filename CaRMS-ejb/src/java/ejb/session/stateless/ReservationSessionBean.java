@@ -10,6 +10,9 @@ import entity.Outlet;
 import entity.OwnCustomer;
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -101,14 +104,53 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
     }
     
-    public BigDecimal calculateRefund(Reservation reservation) {
-        // WIP
-        return null;
-    }
-    
-    public BigDecimal calculatePenalty(Reservation reservation) {
-        // WIP
-        return null;
+    @Override
+    public BigDecimal calculateRefundPenalty(Reservation reservation) {
+        Date currentDate = new Date();
+        Date paymentDate = reservation.getPaymentDate();
+        
+        Calendar startingDate = new GregorianCalendar();
+        startingDate.setTime(reservation.getReservationStartDate());
+        startingDate.add(Calendar.DAY_OF_MONTH, -14);                   // (20%) StartDate - 14 Days 
+        Date penaltyFourteen = startingDate.getTime();                  
+        startingDate.add(Calendar.DAY_OF_MONTH, 7);                     // (50%) StartDate - 14 Days + 7 Days 
+        Date penaltySeven = startingDate.getTime();
+        startingDate.add(Calendar.DAY_OF_MONTH, 4);                     // (70%) StartDate - 14 Days + 7 Days + 4 Days
+        Date penaltyThree = startingDate.getTime();
+        
+        if (currentDate.after(penaltyThree)) {
+            if (paymentDate.compareTo(reservation.getReservationStartDate()) < 0) {
+                return new BigDecimal("0.3").multiply(reservation.getTotalAmount());
+            }
+            else {
+                return new BigDecimal("0.7").multiply(reservation.getTotalAmount());
+            }
+        } 
+        else if (currentDate.after(penaltySeven)) {
+           if (paymentDate.compareTo(reservation.getReservationStartDate()) < 0) {
+                return new BigDecimal("0.5").multiply(reservation.getTotalAmount());
+            }
+            else {
+                return new BigDecimal("0.5").multiply(reservation.getTotalAmount());
+            }
+        }
+        else if (currentDate.after(penaltyFourteen)) {
+            if (paymentDate.compareTo(reservation.getReservationStartDate()) < 0) {
+                return new BigDecimal("0.8").multiply(reservation.getTotalAmount());
+            }
+            else {
+                return new BigDecimal("0.2").multiply(reservation.getTotalAmount());
+            }
+        }
+        else {
+            if (paymentDate.compareTo(reservation.getReservationStartDate()) < 0) {
+                return reservation.getTotalAmount();
+            }
+            else {
+                return new BigDecimal("0.0");
+            }
+        }
+
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Reservation>>constraintViolations) {

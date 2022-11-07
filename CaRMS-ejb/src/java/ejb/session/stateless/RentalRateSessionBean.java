@@ -5,11 +5,13 @@
  */
 package ejb.session.stateless;
 
-import entity.CarModel;
 import entity.CarCategory;
 import entity.RentalRate;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -41,12 +43,13 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     public RentalRateSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+    
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
 
     @Override
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException {
@@ -159,7 +162,20 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     
     @Override
     public BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) {
-        // WIP
+        Calendar startDate = new GregorianCalendar();
+        startDate.setTime(pickupDate);
+        Calendar endDate = new GregorianCalendar();
+        endDate.setTime(returnDate);
+        
+        List<RentalRate> applicableRates = new ArrayList<>();
+        BigDecimal totalAmount = new BigDecimal("0.0");
+        
+        /* WIP
+        while (startDate.before(endDate)) {
+            
+        }
+        */
+        
         return null;
     }
 

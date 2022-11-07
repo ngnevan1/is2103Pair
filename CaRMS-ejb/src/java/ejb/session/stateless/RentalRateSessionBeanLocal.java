@@ -5,7 +5,6 @@
  */
 package ejb.session.stateless;
 
-import entity.CarModel;
 import entity.RentalRate;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,7 +23,6 @@ import util.exception.UnknownPersistenceException;
 public interface RentalRateSessionBeanLocal {
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
-    public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
     public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
     BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
 }

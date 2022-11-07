@@ -24,6 +24,5 @@ public interface ReservationSessionBeanLocal {
     Reservation createNewReservation(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName) 
             throws UnknownPersistenceException, CarModelNotFoundException, OutletNotFoundException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
-    BigDecimal calculateRefund(Reservation reservation);
-    BigDecimal calculatePenalty(Reservation reservation);
+    BigDecimal calculateRefundPenalty(Reservation reservation);
 }
