@@ -48,7 +48,6 @@ public class CarModel implements Serializable {
     private List<Reservation> reservations;
     @OneToMany(mappedBy = "carModel")
     private List<Car> cars;
-
     
     public CarModel() {
         reservations = new ArrayList<>();
@@ -56,11 +55,11 @@ public class CarModel implements Serializable {
         isDisabled = false;
     }
 
-    public CarModel(String modelName, String makeName, Boolean isDisabled) {
+    public CarModel(String makeName, String modelName, CarCategory category) {
         this();
-        this.modelName = modelName;
         this.makeName = makeName;
-        this.isDisabled = isDisabled;
+        this.modelName = modelName;
+        this.carCategory = category;
     }
 
     public Long getCarModelId() {

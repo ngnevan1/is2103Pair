@@ -49,20 +49,22 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Car car;
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarModel carModel;
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
     @ManyToOne(optional = false)
     private Partner partner;
     @ManyToOne(optional = false)
     private Customer customer;
-    @OneToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private Outlet pickUpOutlet;
-    @OneToOne
+    @OneToOne(optional = false)
     private Outlet returnOutlet;
+    
 
     
     public Reservation() {

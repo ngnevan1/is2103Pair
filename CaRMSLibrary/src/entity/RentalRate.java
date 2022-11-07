@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,6 +24,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.RentalRateEnum;
 
 /**
  *
@@ -43,15 +46,16 @@ public class RentalRate implements Serializable {
     @DecimalMin("0.00")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal ratePerDay;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RentalRateEnum rateType;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
     private Date rateStartDate;
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
     @Future
     private Date rateEndDate;
-    @Column(nullable = false)
     private Boolean isDisabled;
 
     @ManyToOne(optional = false)
@@ -62,7 +66,7 @@ public class RentalRate implements Serializable {
         this.isDisabled = false;
     }
 
-    public RentalRate(String rateName, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate, Boolean isDisabled) {
+    public RentalRate(String rateName, RentalRateEnum rateType, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate, Boolean isDisabled) {
         this.rateName = rateName;
         this.ratePerDay = ratePerDay;
         this.rateStartDate = rateStartDate;
@@ -70,6 +74,14 @@ public class RentalRate implements Serializable {
         this.isDisabled = isDisabled;
     }
 
+    public RentalRateEnum getRateType() {
+        return rateType;
+    }
+
+    public void setRateType(RentalRateEnum rateType) {
+        this.rateType = rateType;
+    }
+    
     public Long getRentalRateId() {
         return rentalRateId;
     }

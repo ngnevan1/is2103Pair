@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryExistException;
 import util.exception.CarCategoryNotFoundException;
@@ -18,6 +19,7 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface CarCategorySessionBeanLocal {
     public CarCategory createNewCarCategory(CarCategory newCarCategory) throws CarCategoryExistException, UnknownPersistenceException;
-    CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
+    CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
     CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
+    public void associateCarModelsWithCarCategory(Long categoryId, List<Long> modelIds);
 }
