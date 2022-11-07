@@ -9,7 +9,9 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
@@ -26,21 +28,25 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
-    
+    private OutletSessionBeanRemote outletSessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     private SalesManager salesManager;
     private OperationsManager operationsManager;
+    private CustomerService customerService;
     private Employee currentEmployee;
 
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote,CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
     }
 
     public void runApp() {
@@ -64,7 +70,8 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         salesManager = new SalesManager(rentalRateSessionBeanRemote, currentEmployee, carCategorySessionBeanRemote);
-                        operationsManager = new OperationsManager(carCategorySessionBeanRemote,carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee);
+                        operationsManager = new OperationsManager(carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee, outletSessionBeanRemote);
+                        customerService = new CustomerService(currentEmployee, carSessionBeanRemote, reservationSessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
@@ -129,9 +136,13 @@ public class MainApp {
                         operationsManager.menuOperationsManager();
                     } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-                    } 
+                    }
                 } else if (response == 3) {
-                   doCustomerServiceMenu();
+                    try {
+                        customerService.menuCustomerService();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 4) {
                     break;
                 } else {
@@ -143,10 +154,6 @@ public class MainApp {
                 break;
             }
         }
-    }
-
-    private void doCustomerServiceMenu() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

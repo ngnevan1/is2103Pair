@@ -137,6 +137,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return null;
     }
 
+    @Override
     public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException {
         if (car != null && car.getCarId() != null) {
             Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
