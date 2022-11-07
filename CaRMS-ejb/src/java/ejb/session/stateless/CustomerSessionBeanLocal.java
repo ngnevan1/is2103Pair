@@ -10,8 +10,10 @@ import entity.OwnCustomer;
 import javax.ejb.Local;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.OwnCustomerExistException;
+import util.exception.OwnCustomerNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -20,9 +22,9 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface CustomerSessionBeanLocal {
-    Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException;
-    Customer retrieveCustomerByCustomerId(Long customerId, Boolean retrieveReservation, Boolean retrievePartner) throws CustomerNotFoundException;
-    OwnCustomer createNewOwnCustomer(OwnCustomer newOwnCustomer) throws OwnCustomerExistException, UnknownPersistenceException;
-    OwnCustomer retrieveOwnCustomerByUsername(String username) throws CustomerNotFoundException;
-    OwnCustomer ownCustomerLogin(String username, String password) throws InvalidLoginCredentialException, CustomerNotFoundException;
+    Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException;
+    Customer retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
+    OwnCustomer createNewOwnCustomer(OwnCustomer newOwnCustomer) throws OwnCustomerExistException, UnknownPersistenceException, InputDataValidationException;
+    OwnCustomer retrieveOwnCustomerByUsername(String username) throws OwnCustomerNotFoundException;
+    OwnCustomer ownCustomerLogin(String username, String password) throws InvalidLoginCredentialException, OwnCustomerNotFoundException;
 }

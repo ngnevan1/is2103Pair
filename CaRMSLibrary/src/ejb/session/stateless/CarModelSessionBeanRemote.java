@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarModelExistException;
@@ -25,4 +26,5 @@ public interface CarModelSessionBeanRemote {
     CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
     public void updateCarModel(CarModel model) throws CarModelNotFoundException, InputDataValidationException;
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
+    List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
 }

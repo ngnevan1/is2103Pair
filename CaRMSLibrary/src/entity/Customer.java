@@ -17,6 +17,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -31,12 +33,20 @@ public abstract class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long customerId;
     @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String name;
     @Column(nullable = false, length = 64, unique = true)
-    private String passportNumber;
-    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String email;
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
+    private String passportNumber;
+    @Column(length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String phoneNumber;
     
     @ManyToOne

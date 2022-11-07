@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Outlet;
+import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -90,5 +91,23 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         Outlet outlet = em.find(Outlet.class, outletId);
         Employee employee = em.find(Employee.class, employeeId);
         outlet.getEmployees().add(employee);
+    }
+    
+    public Boolean checkOutletIsOpen(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) throws OutletNotFoundException {
+        Outlet pOutlet = retrieveOutletByOutletName(pickupOutlet);
+        Outlet rOutlet = retrieveOutletByOutletName(returnOutlet);
+        
+        Integer openingTimeMinutes = pOutlet.getOpeningTime();
+        Integer closingTimeMinutes = rOutlet.getClosingTime();
+        
+        if (openingTimeMinutes == null || closingTimeMinutes == null) {
+            return true;
+        }
+        else if (openingTimeMinutes*60 >= (pickupDate.getHours()*60 + pickupDate.getMinutes()) ||  closingTimeMinutes*60 <= (returnDate.getHours()*60 + returnDate.getMinutes())) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

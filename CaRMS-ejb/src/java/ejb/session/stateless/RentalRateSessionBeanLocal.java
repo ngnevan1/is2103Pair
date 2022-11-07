@@ -5,7 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.CarModel;
 import entity.RentalRate;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.RentalRateNotFoundException;
 
@@ -15,6 +19,6 @@ import util.exception.RentalRateNotFoundException;
  */
 @Local
 public interface RentalRateSessionBeanLocal {
-
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
+    BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
 }

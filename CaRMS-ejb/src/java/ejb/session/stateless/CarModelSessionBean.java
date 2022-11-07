@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -149,6 +150,12 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             modelToRemove.setIsDisabled(true);
         }
         
+    }
+    
+    @Override
+    public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
+        // WIP
+        return null;
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {

@@ -7,7 +7,9 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.DecimalMin;
@@ -37,17 +40,18 @@ public class RentalRate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateId;
-    @Column(nullable = false, length = 64, unique = true)
+    @Column(nullable = false, length = 32, unique = true)
     @NotNull
-    @Size(min = 1, max = 64)
+    @Size(min = 1, max = 32)
     private String rateName;
-    @Column(nullable = false, precision = 11, scale = 2)
+    @Column(nullable = false, precision = 8, scale = 2)
     @NotNull
     @DecimalMin("0.00")
-    @Digits(integer = 9, fraction = 2)
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal ratePerDay;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull
     private RentalRateEnum rateType;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
@@ -56,22 +60,26 @@ public class RentalRate implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Future
     private Date rateEndDate;
+    @NotNull
     private Boolean isDisabled;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
+    @OneToMany
+    private List<Reservation> reservations;
 
     public RentalRate() {
+        this.reservations = new ArrayList<>();
         this.isDisabled = false;
     }
 
-    public RentalRate(String rateName, RentalRateEnum rateType, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate, Boolean isDisabled) {
+    public RentalRate(String rateName, RentalRateEnum rateType, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate) {
+        this();
         this.rateName = rateName;
         this.ratePerDay = ratePerDay;
         this.rateStartDate = rateStartDate;
         this.rateEndDate = rateEndDate;
-        this.isDisabled = isDisabled;
     }
 
     public RentalRateEnum getRateType() {
@@ -197,6 +205,20 @@ public class RentalRate implements Serializable {
      */
     public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
 }
