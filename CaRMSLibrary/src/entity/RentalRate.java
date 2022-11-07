@@ -60,7 +60,6 @@ public class RentalRate implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Future
     private Date rateEndDate;
-    @NotNull
     private Boolean isDisabled;
 
     @ManyToOne(optional = false)
@@ -74,9 +73,11 @@ public class RentalRate implements Serializable {
         this.isDisabled = false;
     }
 
-    public RentalRate(String rateName, RentalRateEnum rateType, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate) {
+    public RentalRate(String rateName, RentalRateEnum rateType, CarCategory category, BigDecimal ratePerDay, Date rateStartDate, Date rateEndDate) {
         this();
         this.rateName = rateName;
+        this.rateType = rateType;
+        this.carCategory = category;
         this.ratePerDay = ratePerDay;
         this.rateStartDate = rateStartDate;
         this.rateEndDate = rateEndDate;

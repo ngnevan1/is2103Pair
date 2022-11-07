@@ -61,12 +61,15 @@ public class Car implements Serializable {
     public Car() {
         reservations = new ArrayList<>(); 
         colour = "White";
+        isDisabled = false;
     }
 
-    public Car(String licensePlate, CarStatusEnum carStatus) {
+    public Car(String licensePlate, CarModel model, CarStatusEnum carStatus, Outlet outlet) {
         this();
         this.licensePlate = licensePlate;
+        this.carModel = model;
         this.carStatus = carStatus;
+        this.outlet = outlet;
     }
     
     public Long getCarId() {

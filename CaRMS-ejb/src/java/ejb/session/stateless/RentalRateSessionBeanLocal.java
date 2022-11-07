@@ -11,7 +11,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -20,5 +23,8 @@ import util.exception.RentalRateNotFoundException;
 @Local
 public interface RentalRateSessionBeanLocal {
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
+    public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
+    public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
     BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
 }

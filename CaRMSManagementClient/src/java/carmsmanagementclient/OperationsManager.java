@@ -8,25 +8,33 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
+import entity.Outlet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightsEnum;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarExistException;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCarException;
 
 /**
  *
@@ -40,17 +48,19 @@ public class OperationsManager {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private Employee currentEmployee;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
 
     public OperationsManager() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee) {
+    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee, OutletSessionBeanRemote outletSessionBeanRemote) {
         this();
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.currentEmployee = currentEmployee;
     }
 
@@ -72,17 +82,15 @@ public class OperationsManager {
             System.out.println("5: Create New Car");
             System.out.println("6: View All Cars");
             System.out.println("7: View Car Details");
-            System.out.println("8: Update Car");
-            System.out.println("9: Delete Car");
             System.out.println("-----------------------");
-            System.out.println("10: View Transit Driver Dispatch Records for Current Day Reservations");
-            System.out.println("11: Assign Transit Driver");
-            System.out.println("12: Update Transit As Completed");
+            System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
+            System.out.println("9: Assign Transit Driver");
+            System.out.println("10: Update Transit As Completed");
             System.out.println("-----------------------");
-            System.out.println("13: Back\n");
+            System.out.println("11: Back\n");
             response = 0;
 
-            while (response < 1 || response > 13) {
+            while (response < 1 || response > 11) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -102,23 +110,19 @@ public class OperationsManager {
                 } else if (response == 7) {
                     doViewCarDetails();
                 } else if (response == 8) {
-                    doUpdateCar();
-                } else if (response == 9) {
-                    doDeleteCar();
-                } else if (response == 10) {
                     doViewDispatchRecords();
-                } else if (response == 11) {
+                } else if (response == 9) {
                     doAssignTransitDriver();
-                } else if (response == 12) {
+                } else if (response == 10) {
                     doUpdateTransitAsCompleted();
-                } else if (response == 13) {
+                } else if (response == 11) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 13) {
+            if (response == 11) {
                 break;
             }
         }
@@ -140,7 +144,7 @@ public class OperationsManager {
                 System.out.printf("%8s%20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
             }
             System.out.print("Enter Car Category ID> ");
-            CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false, false);
+            CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false);
             newCarModel.setCarCategory(chosenCategory);
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(newCarModel);
 
@@ -204,7 +208,7 @@ public class OperationsManager {
             System.out.print("Enter Car Category ID (blank if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
-                CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false, false);
+                CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false);
                 model.setCarCategory(chosenCategory);
             }
 
@@ -237,7 +241,7 @@ public class OperationsManager {
         try {
             CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
             System.out.printf("Confirm Delete Car Model %s (Enter 'Y' to Delete)> ", model.getModelName());
-            
+
             input = scanner.nextLine().trim();
             if (input.equals("Y")) {
                 carModelSessionBeanRemote.deleteCarModel(model.getCarModelId());
@@ -253,6 +257,7 @@ public class OperationsManager {
     private void doCreateNewCar() {
         Scanner scanner = new Scanner(System.in);
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
         Car newCar = new Car();
 
         try {
@@ -263,12 +268,35 @@ public class OperationsManager {
             newCar.setColour(scanner.nextLine().trim());
             System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
 
-        for (CarModel model : carModels) {
-            System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
-        }
+            for (CarModel model : carModels) {
+                System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+            }
             System.out.print("Enter Car Model ID> ");
             CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(scanner.nextLong(), false, false, false);
             newCar.setCarModel(chosenModel);
+
+            while (true) {
+                System.out.print("Select Car Status (1: In Outlet, 2: On Rental, 3: In Transit, 4: Servicing)> ");
+                Integer carStatusInt = scanner.nextInt();
+
+                if (carStatusInt >= 1 && carStatusInt <= 4) {
+                    newCar.setCarStatus(CarStatusEnum.values()[carStatusInt - 1]);
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            
+            System.out.printf("%-15s%-20s%-20s\n", "Outlet ID", "Outlet Name", "Outlet Address");
+
+            for (Outlet outlet : outlets) {
+                System.out.printf("%-15s%-20s%-20s\n", outlet.getOutletId().toString(), outlet.getOutletName(), outlet.getOutletAddress());
+            }
+            System.out.print("Enter Outlet ID> ");
+            Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(scanner.nextLong(), false, false, false);
+            newCar.setOutlet(chosenOutlet);
+            
+            
             Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
 
             if (constraintViolations.isEmpty()) {
@@ -279,28 +307,158 @@ public class OperationsManager {
             }
 
         } catch (CarModelNotFoundException ex) {
-            System.out.println("Invalid Car Model");
+            System.out.println("Error retrieving Car Model: " + ex.getMessage());
+        } catch (OutletNotFoundException ex) {
+            System.out.println("Error retrieving Outlet: " + ex.getMessage());
         } catch (CarExistException | UnknownPersistenceException ex) {
             System.out.println("Error creating Car: " + ex.getMessage());
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
-        }
+        } 
     }
 
     private void doViewAllCars() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Cars ***\n");
+
+        List<Car> cars = carSessionBeanRemote.retrieveAllCars();
+        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name",  "Disabled?");
+
+        for (Car car : cars) {
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
+        }
+
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
     }
 
     private void doViewCarDetails() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View Car Details ***\n");
+
+        try {
+            System.out.println("Enter Car Licence Plate Number>");
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlate(scanner.nextLine().trim());
+
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name",  "Disabled?");
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
+            
+            System.out.println("------------------------");
+            System.out.println("1: Update Car");
+            System.out.println("2: Delete Car");
+            System.out.println("3: Back\n");
+            System.out.print("> ");
+
+            int response = scanner.nextInt();
+
+            if (response == 1) {
+                doUpdateCar(car);
+            } else if (response == 2) {
+                doDeleteCar(car);
+            }
+
+        } catch (CarNotFoundException ex) {
+            System.out.println("An error has occured while retrieving car " + ex.getMessage() + "\n");
+        }
+
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
+
     }
 
-    private void doUpdateCar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void doUpdateCar(Car car) {
+        Scanner scanner = new Scanner(System.in);
+        String input;
+        Long longInput;
+        List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+
+        try {
+            System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: View Car Details :: Update Car ***\n");
+            System.out.print("Enter Colour (blank if no change)> ");
+            input = scanner.nextLine().trim();
+            if (input.length() > 0) {
+                car.setColour(input);
+            }
+            System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
+
+            for (CarModel model : carModels) {
+                System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+            }
+            System.out.print("Enter Car Model ID (blank if no change)> ");
+            longInput = scanner.nextLong();
+            if (longInput > 0l) {
+            CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(longInput, false, false, false);
+            car.setCarModel(chosenModel);
+            }
+            while (true) {
+                System.out.print("Select Car Status (1: In Outlet, 2: On Rental, 3: In Transit, 4: Servicing)> ");
+                Integer carStatusInt = scanner.nextInt();
+
+                if (carStatusInt >= 1 && carStatusInt <= 4) {
+                    car.setCarStatus(CarStatusEnum.values()[carStatusInt - 1]);
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            
+            System.out.printf("%-15s%-20s%-20s\n", "Outlet ID", "Outlet Name", "Outlet Address");
+
+            for (Outlet outlet : outlets) {
+                System.out.printf("%-15s%-20s%-20s\n", outlet.getOutletId().toString(), outlet.getOutletName(), outlet.getOutletAddress());
+            }
+            System.out.print("Enter Outlet ID (blank if no change)> ");
+            longInput = scanner.nextLong();
+            if (longInput > 0l) {
+            Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(longInput, false, false, false);
+            car.setOutlet(chosenOutlet);
+            }
+            Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
+
+            if (constraintViolations.isEmpty()) {
+                carSessionBeanRemote.updateCar(car);
+                System.out.println("Car " + car.getCarId() + " updated successfully!");
+            } else {
+                showInputDataValidationErrorsForCar(constraintViolations);
+            }
+
+        } catch (CarModelNotFoundException ex) {
+            System.out.println("Error retrieving Car Model: " + ex.getMessage());
+        } catch (OutletNotFoundException ex) {
+            System.out.println("Error retrieving Outlet: " + ex.getMessage());
+        } catch (CarNotFoundException | UpdateCarException ex) {
+            System.out.println("Error updating Car: " + ex.getMessage());
+        } catch (InputDataValidationException ex) {
+            System.out.println(ex.getMessage() + "\n");
+        } 
     }
 
-    private void doDeleteCar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void doDeleteCar(Car car) {
+        Scanner scanner = new Scanner(System.in);     
+        String input;
+        
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: View Car Details :: Delete Car ***\n");
+        System.out.printf("Confirm Delete Car %s (Enter 'Y' to Delete)> ", car.getLicensePlate());
+        input = scanner.nextLine().trim();
+        
+        if(input.equals("Y"))
+        {
+            try 
+            {
+                carSessionBeanRemote.deleteCar(car.getCarId());
+                System.out.println("Car deleted successfully!\n");
+            } 
+            catch (CarNotFoundException ex) 
+            {
+                System.out.println("An error has occurred while deleting Car: " + ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("Car NOT deleted!\n");
+        }
     }
 
     private void doViewDispatchRecords() {
@@ -324,7 +482,7 @@ public class OperationsManager {
 
         System.out.println("\nPlease try again......\n");
     }
-    
+
     private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 

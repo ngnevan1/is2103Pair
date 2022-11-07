@@ -43,13 +43,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    
     public ReservationSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+    
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
 
     @Override
     public Reservation createNewReservation(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName) 

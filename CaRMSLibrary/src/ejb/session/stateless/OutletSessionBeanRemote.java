@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Outlet;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Remote;
 import util.exception.OutletExistException;
 import util.exception.OutletNotFoundException;
@@ -20,5 +21,6 @@ import util.exception.UnknownPersistenceException;
 public interface OutletSessionBeanRemote {
     public Outlet createNewOutlet(Outlet newOutlet) throws OutletExistException, UnknownPersistenceException;
     public Outlet retrieveOutletByOutletId(Long outletId, Boolean retrieveCars, Boolean retrieveEmployees, Boolean retrieveTransitDispatchRecords) throws OutletNotFoundException;
+    public List<Outlet> retrieveAllOutlets();
     Boolean checkOutletIsOpen(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) throws OutletNotFoundException;
 }

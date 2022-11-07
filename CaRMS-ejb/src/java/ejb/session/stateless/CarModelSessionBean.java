@@ -116,7 +116,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     @Override
     public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+        Query query = em.createQuery("SELECT cm FROM CarModel cm ORDER BY cm.carCategory, cm.makeName, cm.modelName");
 
         return query.getResultList();
     }
