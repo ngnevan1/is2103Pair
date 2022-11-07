@@ -6,7 +6,6 @@
 package carmsreservationclient;
 
 import ejb.session.stateless.CarModelSessionBeanRemote;
-import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
@@ -44,7 +43,6 @@ public class MainApp {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
-    private CarSessionBeanRemote carSessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
@@ -59,11 +57,10 @@ public class MainApp {
         validator = validatorFactory.getValidator();
     }
 
-    public MainApp(CarSessionBeanRemote carSessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, 
-            CustomerSessionBeanRemote customerSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, 
-            ReservationSessionBeanRemote reservationSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
+    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, 
+            OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, 
+            RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
         this();
-        this.carSessionBeanRemote = carSessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
@@ -369,12 +366,12 @@ public class MainApp {
             
             Reservation reservation = reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId);
             if(reservation.getPaymentDate().before(new Date())) {
-                BigDecimal refundAmount = reservationSessionBeanRemote.calculateRefund(reservation);
+                BigDecimal refundAmount = reservationSessionBeanRemote.calculateRefundPenalty(reservation);
                 System.out.println("Refunded Amount After Penalty Fee (if any): $ " + refundAmount);
                 System.out.println("Refund Successful!\n");
             }
             else {
-                BigDecimal penaltyAmount = reservationSessionBeanRemote.calculatePenalty(reservation);
+                BigDecimal penaltyAmount = reservationSessionBeanRemote.calculateRefundPenalty(reservation);
                 System.out.println("Penalty Fee: $ " + penaltyAmount + " charged to " + reservation.getCreditCardNumber());
                 System.out.print("Enter CVV> ");
                 String ccCVV = scanner.nextLine().trim();
