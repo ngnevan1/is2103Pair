@@ -13,6 +13,7 @@ import util.exception.CarExistException;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCarException;
 
 /**
  *
@@ -21,7 +22,10 @@ import util.exception.UnknownPersistenceException;
 @Remote
 public interface CarSessionBeanRemote {
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException;
-    Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
-    Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
-    List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
+    public List<Car> retrieveAllCars();
+    public Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
+    public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+    public List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
+    public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException;
+    public void deleteCar(Long carId) throws CarNotFoundException;
 }
