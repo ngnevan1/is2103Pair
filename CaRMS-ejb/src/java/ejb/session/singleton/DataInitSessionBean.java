@@ -7,19 +7,23 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.CarCategorySessionBeanLocal;
 import ejb.session.stateless.CarModelSessionBeanLocal;
+import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.RentalRateSessionBeanLocal;
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
 import entity.Partner;
+import entity.RentalRate;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -27,15 +31,18 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightsEnum;
-import util.enumeration.TransitStatusEnum;
+import util.enumeration.RentalRateEnum;
 import util.exception.CarCategoryExistException;
+import util.exception.CarExistException;
 import util.exception.CarModelExistException;
 import util.exception.EmployeeExistException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.PartnerExistException;
+import util.exception.RentalRateExistException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -46,6 +53,12 @@ import util.exception.UnknownPersistenceException;
 @LocalBean
 @Startup
 public class DataInitSessionBean {
+
+    @EJB
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
+
+    @EJB
+    private CarSessionBeanLocal carSessionBeanLocal;
 
     @EJB
     private CarModelSessionBeanLocal carModelSessionBeanLocal;
@@ -170,11 +183,34 @@ public class DataInitSessionBean {
             carCategorySessionBeanLocal.associateCarModelsWithCarCategory(standard.getCarCategoryId(), standardModels);
             carCategorySessionBeanLocal.associateCarModelsWithCarCategory(luxury.getCarCategoryId(), luxuryModels);
             
+            carSessionBeanLocal.createNewCar(new Car("SS00A1TC", corolla, CarStatusEnum.AVAILABLE, outletA));
+            carSessionBeanLocal.createNewCar(new Car("SS00A2TC", corolla, CarStatusEnum.AVAILABLE, outletA));
+            carSessionBeanLocal.createNewCar(new Car("SS00A3TC", corolla, CarStatusEnum.AVAILABLE, outletA));
+            carSessionBeanLocal.createNewCar(new Car("SS00B1HC", civic, CarStatusEnum.AVAILABLE, outletB));
+            carSessionBeanLocal.createNewCar(new Car("SS00B2HC", civic, CarStatusEnum.AVAILABLE, outletB));
+            carSessionBeanLocal.createNewCar(new Car("SS00B3HC", civic, CarStatusEnum.AVAILABLE, outletB));
+            carSessionBeanLocal.createNewCar(new Car("SS00C1NS", sunny, CarStatusEnum.AVAILABLE, outletC));
+            carSessionBeanLocal.createNewCar(new Car("SS00C2NS", sunny, CarStatusEnum.AVAILABLE, outletC));
+            carSessionBeanLocal.createNewCar(new Car("SS00C3NS", sunny, CarStatusEnum.SERVICING, outletC));
+            carSessionBeanLocal.createNewCar(new Car("LS00A4ME", eClass, CarStatusEnum.AVAILABLE, outletA));
+            carSessionBeanLocal.createNewCar(new Car("LS00B4B5", series, CarStatusEnum.AVAILABLE, outletB));
+            carSessionBeanLocal.createNewCar(new Car("LS00C4A6", a6, CarStatusEnum.AVAILABLE, outletC));
             
-        } catch (CarCategoryExistException | OutletExistException | PartnerExistException | EmployeeExistException | UnknownPersistenceException ex) {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Default", RentalRateEnum.DEFAULT, standard, new BigDecimal(100), null, null));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Weekend Promo", RentalRateEnum.PROMOTION, standard, new BigDecimal(80), format.parse("09/12/2022 12:00"), format.parse("11/12/2022 00:00")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Family Sedan - Default", RentalRateEnum.DEFAULT, family, new BigDecimal(200), null, null));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Default", RentalRateEnum.DEFAULT, luxury, new BigDecimal(300), null, null));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Monday", RentalRateEnum.PEAK, luxury, new BigDecimal(310), format.parse("5/12/2022 00:00"), format.parse("5/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Tuesday", RentalRateEnum.PEAK, luxury, new BigDecimal(320), format.parse("6/12/2022 00:00"), format.parse("6/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Wednesday", RentalRateEnum.PEAK, luxury, new BigDecimal(330), format.parse("7/12/2022 00:00"), format.parse("7/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Weekday Promo", RentalRateEnum.PROMOTION, luxury, new BigDecimal(250), format.parse("7/12/2022 12:00"), format.parse("8/12/2022 12:00")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("SUV and Minivan - Default", RentalRateEnum.DEFAULT, suv, new BigDecimal(400), null, null));
+            
+            
+            
+        } catch (CarCategoryExistException | OutletExistException | PartnerExistException | EmployeeExistException | UnknownPersistenceException | CarModelExistException | InputDataValidationException | CarExistException | RentalRateExistException | ParseException ex) {
             ex.printStackTrace();
-        } catch (CarModelExistException | InputDataValidationException ex) {
-            Logger.getLogger(DataInitSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
