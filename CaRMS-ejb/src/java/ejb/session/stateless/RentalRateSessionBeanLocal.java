@@ -20,4 +20,5 @@ import util.exception.UnknownPersistenceException;
 public interface RentalRateSessionBeanLocal {
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
 }

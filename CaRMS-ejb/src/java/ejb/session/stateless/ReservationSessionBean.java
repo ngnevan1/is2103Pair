@@ -53,7 +53,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             car.getReservations().add(newReservation);
             
             Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(pickupOutletName);
-            pickupOutlet.setReservation(newReservation);
+            pickupOutlet.getReservations().add(newReservation);
             newReservation.setPickUpOutlet(pickupOutlet);
             
             Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(returnOutletName);
