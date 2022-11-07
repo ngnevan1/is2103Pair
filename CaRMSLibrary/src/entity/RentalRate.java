@@ -50,8 +50,6 @@ public class RentalRate implements Serializable {
     @Column(nullable = false)
     private RentalRateEnum rateType;
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    @NotNull
     private Date rateStartDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Future
