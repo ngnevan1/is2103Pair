@@ -8,17 +8,21 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EjbTimerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.TransitDispatchRecordSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import entity.TransitDispatchRecord;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -33,6 +37,7 @@ import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.OutletNotFoundException;
+import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarException;
 
@@ -49,19 +54,23 @@ public class OperationsManager {
     private CarSessionBeanRemote carSessionBeanRemote;
     private Employee currentEmployee;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
+    private TransitDispatchRecordSessionBeanRemote transitDispatchRecordSessionBeanRemote;
 
     public OperationsManager() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee, OutletSessionBeanRemote outletSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote, TransitDispatchRecordSessionBeanRemote transitDispatchRecordSessionBeanRemote) {
         this();
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.currentEmployee = currentEmployee;
+        this.ejbTimerSessionBeanRemote = ejbTimerSessionBeanRemote;
+        this.transitDispatchRecordSessionBeanRemote = transitDispatchRecordSessionBeanRemote;
     }
 
     public void menuOperationsManager() throws InvalidAccessRightException {
@@ -87,10 +96,13 @@ public class OperationsManager {
             System.out.println("9: Assign Transit Driver");
             System.out.println("10: Update Transit As Completed");
             System.out.println("-----------------------");
-            System.out.println("11: Back\n");
+            System.out.println("11: Allocate Cars to Current Day Reservations");
+            System.out.println("-----------------------");
+            
+            System.out.println("12: Back\n");
             response = 0;
 
-            while (response < 1 || response > 11) {
+            while (response < 1 || response > 12) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -116,13 +128,15 @@ public class OperationsManager {
                 } else if (response == 10) {
                     doUpdateTransitAsCompleted();
                 } else if (response == 11) {
+                    doAllocateCars();
+                } else if (response == 12) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 11) {
+            if (response == 12) {
                 break;
             }
         }
@@ -462,7 +476,19 @@ public class OperationsManager {
     }
 
     private void doViewDispatchRecords() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Transit Dispatch Records ***\n");
+
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
+        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
+
+        for (TransitDispatchRecord tdr : tdrs) {
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee().getEmployeeName());
+        }
+
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
     }
 
     private void doAssignTransitDriver() {
@@ -470,7 +496,39 @@ public class OperationsManager {
     }
 
     private void doUpdateTransitAsCompleted() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  Update Transit Dispatch Record as Completed ***\n");
+
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
+        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
+
+        for (TransitDispatchRecord tdr : tdrs) {
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee().getEmployeeName());
+        }
+
+        System.out.print("Enter ID of Transit Dispatch Record to be updated> ");
+        try {
+            transitDispatchRecordSessionBeanRemote.transitCompleted(scanner.nextLong());
+        } catch (TransitDispatchRecordNotFoundException ex) {
+            System.out.println("An error has occurred: " + ex.getMessage());
+        }
+        
+    }
+    private void doAllocateCars() {
+        Scanner scanner = new Scanner(System.in); 
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Allocate Cars to Current Day Reservations ***\n");
+        
+        try {
+        System.out.print("Enter Date (DD/MM/YYYY)> ");
+        Date date = inputDateFormat.parse(scanner.nextLine().trim());
+        
+        ejbTimerSessionBeanRemote.allocateCarsManually(date);
+        
+        } catch (ParseException ex) {
+            System.out.println("Invalid Date Entered!");
+        }
     }
 
     private void showInputDataValidationErrorsForCarModel(Set<ConstraintViolation<CarModel>> constraintViolations) {

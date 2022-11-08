@@ -6,11 +6,15 @@
 package ejb.session.stateless;
 
 import entity.TransitDispatchRecord;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.TransitDispatchRecordExistException;
+import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -46,4 +50,34 @@ public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSe
         }
     }
 
+    public TransitDispatchRecord retrieveTransitDispatchRecordByTransitDispatchRecordId(Long transitDispatchRecordId) throws TransitDispatchRecordNotFoundException {
+        TransitDispatchRecord dispatchRecord = em.find(TransitDispatchRecord.class, transitDispatchRecordId);
+
+        if (dispatchRecord != null) {
+            return dispatchRecord;
+        } else {
+            throw new TransitDispatchRecordNotFoundException("Transit Dispatch Record ID " + transitDispatchRecordId + "does not exist!");
+        }
     }
+
+    @Override
+    public List<TransitDispatchRecord> retrieveCurrentDayTransitDispatchRecords() {
+        Date today = new Date();
+        Query query = em.createQuery("SELECT tdr FROM TransitDispatchRecord tdr");
+        List<TransitDispatchRecord> dispatchRecords = query.getResultList();
+
+        for (TransitDispatchRecord tdr : dispatchRecords) {
+            if (!tdr.getDispatchTime().equals(today)) {
+                dispatchRecords.remove(tdr);
+            }
+        }
+        return dispatchRecords;
+    }
+
+    @Override
+    public void transitCompleted(Long dispatchId) throws TransitDispatchRecordNotFoundException {
+
+        TransitDispatchRecord dispatchRecord = retrieveTransitDispatchRecordByTransitDispatchRecordId(dispatchId);
+        dispatchRecord.setIsCompleted(true);
+    }
+}

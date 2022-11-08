@@ -12,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -37,12 +35,13 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
     @EJB
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
-    @Schedule(hour = "*", minute = "*", second = "*/5", info = "allocateCars")
+    //@Schedule(hour = "*", minute = "*", second = "*/5", info = "allocateCars")
     // For testing purpose, we are allowing the timer to trigger every 5 seconds instead of every 5 minutes
     // To trigger the timer at 2am instead, use the following the @Schedule annotation
-    // @Schedule(hour = "2", info = "allocateCars")
+    @Schedule(hour = "2", info = "allocateCars")
     public void allocateCars() {
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh.mm");
         System.out.println("********** Car Allocation(): Timeout at " + timeStamp);
 
         List<Reservation> currentDayReservations = reservationSessionBeanLocal.retrieveCurrentDayReservations();
@@ -54,8 +53,9 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
             for (Car car : possibleCars) {
                 if (Objects.equals(pickupOutlet.getOutletId(), car.getOutlet().getOutletId())) {
                     try {
-                        if (carSessionBeanLocal.isAvailableAtOutlet(car.getCarId(), pickupOutlet.getOutletId(), reservation.getReservationStartDate())) {
+                        if (carSessionBeanLocal.isAvailable(car.getCarId(), reservation.getReservationStartDate())) {
                             reservationSessionBeanLocal.allocateCar(car.getCarId(), reservation.getReservationId());
+                            System.out.println("Car " + car.getLicensePlate() + " allocated to " + reservation.getCustomer().getName() + " for pickup on " + outputDateFormat.format(reservation.getReservationStartDate()) + " at " + pickupOutlet.getOutletName());
                             carAllocated = true;
                             break;
                         }
@@ -71,6 +71,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
                         try {
                             reservationSessionBeanLocal.allocateCar(car.getCarId(), reservation.getReservationId());
+                            System.out.println("Car " + car.getLicensePlate() + " allocated to " + reservation.getCustomer().getName() + " for pickup on " + outputDateFormat.format(reservation.getReservationStartDate()) + " at " + pickupOutlet.getOutletName());
+                            System.out.println("Car is currently at " + car.getOutlet().getOutletName() + " and needs transit dispatch");
                             break;
                         } catch (CarNotFoundException | ReservationNotFoundException ex) {
                             System.out.println("An error has occured: " + ex.getMessage());
@@ -83,4 +85,53 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
         }
     }
 
+    @Override
+    public void allocateCarsManually(Date date) {
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh.mm");
+        System.out.println("********** Manual Car Allocation(): for " + outputDateFormat.format(date));
+
+        List<Reservation> currentDayReservations = reservationSessionBeanLocal.retrieveReservationsByDate(date);
+
+        for (Reservation reservation : currentDayReservations) {
+            List<Car> possibleCars = reservation.getCarModel().getCars();
+            Outlet pickupOutlet = reservation.getPickUpOutlet();
+            boolean carAllocated = false;
+
+            // check cars at outlet
+            for (Car car : possibleCars) {
+                if (Objects.equals(pickupOutlet.getOutletId(), car.getOutlet().getOutletId())) {
+                    try {
+                        if (carSessionBeanLocal.isAvailableOnDate(car.getCarId(), reservation.getReservationStartDate(), reservation.getReservationEndDate())) {
+                            reservationSessionBeanLocal.allocateCar(car.getCarId(), reservation.getReservationId());
+                            System.out.println("Car " + car.getLicensePlate() + " allocated to " + reservation.getCustomer().getName() + " for pickup on " + outputDateFormat.format(reservation.getReservationStartDate()) + " at " + pickupOutlet.getOutletName());
+                            carAllocated = true;
+                            break;
+                        }
+                    } catch (CarNotFoundException | ReservationNotFoundException ex) {
+                        System.out.println("An error has occured: " + ex.getMessage());
+                    }
+
+                }
+            }
+
+            // if no cars available at outlet, check all cars
+            if (!carAllocated) {
+                for (Car car : possibleCars) {
+                    try {
+                        if (carSessionBeanLocal.isAvailableOnDate(car.getCarId(), reservation.getReservationStartDate(), reservation.getReservationEndDate())) {
+                            reservationSessionBeanLocal.allocateCar(car.getCarId(), reservation.getReservationId());
+                            System.out.println("Car " + car.getLicensePlate() + " allocated to " + reservation.getCustomer().getName() + " for pickup on " + outputDateFormat.format(reservation.getReservationStartDate()) + " at " + pickupOutlet.getOutletName());
+                            System.out.println("Car is currently at " + car.getOutlet().getOutletName() + " and needs transit dispatch");
+                            break;
+                        }
+
+                    } catch (CarNotFoundException | ReservationNotFoundException ex) {
+                        System.out.println("An error has occured: " + ex.getMessage());
+                    }
+
+                }
+            }
+        }
+
+    }
 }

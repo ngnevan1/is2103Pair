@@ -175,6 +175,20 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
     
     @Override
+    public List<Reservation> retrieveReservationsByDate(Date date) {
+        Query query = em.createQuery("SELECT r FROM Reservation r");
+
+        List<Reservation> allReservations = query.getResultList();
+        
+        for (Reservation res:allReservations) {
+            if(!res.getReservationStartDate().equals(date)) {
+                allReservations.remove(res);
+            }
+        }
+        return allReservations;
+    }
+    
+    @Override
     public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException {
         Car car = carSessionBeanLocal.retrieveCarByCarId(carId, false, true, false);
         Reservation res = retrieveReservationByReservationId(reservationId);

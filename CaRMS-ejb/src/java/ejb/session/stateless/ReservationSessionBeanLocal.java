@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.OwnCustomer;
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarModelNotFoundException;
@@ -29,4 +30,5 @@ public interface ReservationSessionBeanLocal {
     BigDecimal calculateRefundPenalty(Reservation reservation);
     public List<Reservation> retrieveCurrentDayReservations();
     public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException;
+    public List<Reservation> retrieveReservationsByDate(Date date);
 }

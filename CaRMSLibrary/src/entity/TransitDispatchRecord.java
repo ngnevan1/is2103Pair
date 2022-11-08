@@ -46,9 +46,11 @@ public class TransitDispatchRecord implements Serializable {
 
 
     public TransitDispatchRecord() {
+        this.isCompleted = false;
     }
     
     public TransitDispatchRecord(Date dispatchTime, Boolean isCompleted) {
+        this();
         this.dispatchTime = dispatchTime;
         this.isCompleted = isCompleted;
     }
