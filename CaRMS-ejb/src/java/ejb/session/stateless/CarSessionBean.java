@@ -8,9 +8,11 @@ package ejb.session.stateless;
 import entity.Car;
 import entity.CarModel;
 import entity.Outlet;
+import entity.Reservation;
 import java.util.List;
 import java.util.Set;
 import java.util.Date;
+import java.util.Objects;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -168,6 +170,20 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         } else {
             carToRemove.setIsDisabled(true);
         }
+    }
+    
+    @Override
+    public boolean isAvailableAtOutlet(Long carId, Long outletId, Date startDate) throws CarNotFoundException {
+        Car car = retrieveCarByCarId(carId);
+        List<Reservation> reservations = car.getReservations();
+        Reservation currentReservation = reservations.get(reservations.size() - 1);
+        if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
+            return true;
+        } else if (Objects.equals(currentReservation.getReturnOutlet().getOutletId(), outletId)) {
+            return startDate.after(currentReservation.getReservationEndDate());
+        }
+        return false;
+        
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
