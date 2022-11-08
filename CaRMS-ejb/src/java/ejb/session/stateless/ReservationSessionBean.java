@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.CarModel;
 import entity.Outlet;
 import entity.OwnCustomer;
@@ -13,17 +14,20 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
@@ -43,6 +47,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private CarModelSessionBeanLocal carModelSessionBeanLocal;
     @EJB
     private OutletSessionBeanLocal outletSessionBeanLocal;
+    @EJB
+    private CarSessionBeanLocal carSessionBeanLocal;
+    
     
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
@@ -151,6 +158,29 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
         }
 
+    }
+    @Override
+    public List<Reservation> retrieveCurrentDayReservations() {
+        Date today = new Date();
+        Query query = em.createQuery("SELECT r FROM Reservation r");
+
+        List<Reservation> allReservations = query.getResultList();
+        
+        for (Reservation res:allReservations) {
+            if(!res.getReservationStartDate().equals(today)) {
+                allReservations.remove(res);
+            }
+        }
+        return allReservations;
+    }
+    
+    @Override
+    public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException {
+        Car car = carSessionBeanLocal.retrieveCarByCarId(carId, false, true, false);
+        Reservation res = retrieveReservationByReservationId(reservationId);
+        
+        car.getReservations().add(res);
+        res.setCar(car);
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Reservation>>constraintViolations) {

@@ -24,4 +24,5 @@ public interface CarSessionBeanLocal {
     Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
     Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
     List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
+    public boolean isAvailableAtOutlet(Long carId, Long outletId, Date startDate) throws CarNotFoundException;
 }
