@@ -76,7 +76,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         salesManager = new SalesManager(rentalRateSessionBeanRemote, currentEmployee, carCategorySessionBeanRemote);
-                        operationsManager = new OperationsManager(carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee, outletSessionBeanRemote, ejbTimerSessionBeanRemote, transitDispatchRecordSessionBeanRemote);
+                        operationsManager = new OperationsManager(carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, currentEmployee, outletSessionBeanRemote, ejbTimerSessionBeanRemote, transitDispatchRecordSessionBeanRemote, employeeSessionBeanRemote);
                         customerService = new CustomerService(currentEmployee, carSessionBeanRemote, reservationSessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {

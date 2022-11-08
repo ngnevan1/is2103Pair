@@ -9,6 +9,7 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EjbTimerSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.TransitDispatchRecordSessionBeanRemote;
 import entity.Car;
@@ -34,6 +35,7 @@ import util.exception.CarExistException;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.OutletNotFoundException;
@@ -56,13 +58,14 @@ public class OperationsManager {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
     private TransitDispatchRecordSessionBeanRemote transitDispatchRecordSessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
 
     public OperationsManager() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee, OutletSessionBeanRemote outletSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote, TransitDispatchRecordSessionBeanRemote transitDispatchRecordSessionBeanRemote) {
+    public OperationsManager(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, Employee currentEmployee, OutletSessionBeanRemote outletSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote, TransitDispatchRecordSessionBeanRemote transitDispatchRecordSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
         this();
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
@@ -71,6 +74,7 @@ public class OperationsManager {
         this.currentEmployee = currentEmployee;
         this.ejbTimerSessionBeanRemote = ejbTimerSessionBeanRemote;
         this.transitDispatchRecordSessionBeanRemote = transitDispatchRecordSessionBeanRemote;
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
     }
 
     public void menuOperationsManager() throws InvalidAccessRightException {
@@ -98,7 +102,7 @@ public class OperationsManager {
             System.out.println("-----------------------");
             System.out.println("11: Allocate Cars to Current Day Reservations");
             System.out.println("-----------------------");
-            
+
             System.out.println("12: Back\n");
             response = 0;
 
@@ -300,7 +304,7 @@ public class OperationsManager {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            
+
             System.out.printf("%-15s%-20s%-20s\n", "Outlet ID", "Outlet Name", "Outlet Address");
 
             for (Outlet outlet : outlets) {
@@ -309,8 +313,7 @@ public class OperationsManager {
             System.out.print("Enter Outlet ID> ");
             Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(scanner.nextLong(), false, false, false);
             newCar.setOutlet(chosenOutlet);
-            
-            
+
             Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
 
             if (constraintViolations.isEmpty()) {
@@ -328,7 +331,7 @@ public class OperationsManager {
             System.out.println("Error creating Car: " + ex.getMessage());
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
-        } 
+        }
     }
 
     private void doViewAllCars() {
@@ -336,7 +339,7 @@ public class OperationsManager {
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Cars ***\n");
 
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name",  "Disabled?");
+        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
 
         for (Car car : cars) {
             System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
@@ -355,9 +358,9 @@ public class OperationsManager {
             System.out.println("Enter Car Licence Plate Number>");
             Car car = carSessionBeanRemote.retrieveCarByLicensePlate(scanner.nextLine().trim());
 
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name",  "Disabled?");
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
             System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
-            
+
             System.out.println("------------------------");
             System.out.println("1: Update Car");
             System.out.println("2: Delete Car");
@@ -403,8 +406,8 @@ public class OperationsManager {
             System.out.print("Enter Car Model ID (blank if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
-            CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(longInput, false, false, false);
-            car.setCarModel(chosenModel);
+                CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(longInput, false, false, false);
+                car.setCarModel(chosenModel);
             }
             while (true) {
                 System.out.print("Select Car Status (1: In Outlet, 2: On Rental, 3: In Transit, 4: Servicing)> ");
@@ -417,7 +420,7 @@ public class OperationsManager {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            
+
             System.out.printf("%-15s%-20s%-20s\n", "Outlet ID", "Outlet Name", "Outlet Address");
 
             for (Outlet outlet : outlets) {
@@ -426,8 +429,8 @@ public class OperationsManager {
             System.out.print("Enter Outlet ID (blank if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
-            Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(longInput, false, false, false);
-            car.setOutlet(chosenOutlet);
+                Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(longInput, false, false, false);
+                car.setOutlet(chosenOutlet);
             }
             Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
 
@@ -446,31 +449,25 @@ public class OperationsManager {
             System.out.println("Error updating Car: " + ex.getMessage());
         } catch (InputDataValidationException ex) {
             System.out.println(ex.getMessage() + "\n");
-        } 
+        }
     }
 
     private void doDeleteCar(Car car) {
-        Scanner scanner = new Scanner(System.in);     
+        Scanner scanner = new Scanner(System.in);
         String input;
-        
+
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: View Car Details :: Delete Car ***\n");
         System.out.printf("Confirm Delete Car %s (Enter 'Y' to Delete)> ", car.getLicensePlate());
         input = scanner.nextLine().trim();
-        
-        if(input.equals("Y"))
-        {
-            try 
-            {
+
+        if (input.equals("Y")) {
+            try {
                 carSessionBeanRemote.deleteCar(car.getCarId());
                 System.out.println("Car deleted successfully!\n");
-            } 
-            catch (CarNotFoundException ex) 
-            {
+            } catch (CarNotFoundException ex) {
                 System.out.println("An error has occurred while deleting Car: " + ex.getMessage() + "\n");
             }
-        }
-        else
-        {
+        } else {
             System.out.println("Car NOT deleted!\n");
         }
     }
@@ -492,7 +489,35 @@ public class OperationsManager {
     }
 
     private void doAssignTransitDriver() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  Assign Transit Driver ***\n");
+
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
+        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
+        for (TransitDispatchRecord tdr : tdrs) {
+            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee().getEmployeeName());
+        }
+
+        System.out.print("Enter ID of Transit Dispatch Record to Assign Driver> ");
+        Long chosenTdrId = scanner.nextLong();
+
+        List<Employee> employees = employeeSessionBeanRemote.retrieveEmployeesAtOutlet(currentEmployee.getOutlet());
+
+        System.out.printf("%-15s%-20s%-20s\n", "Employee ID", "Employee Name", "Transit Status");
+
+        for (Employee e : employees) {
+            System.out.printf("%-15s%-20s%-20s\n", e.getEmployeeId().toString(), e.getEmployeeName(), e.getTransitStatus());
+        }
+        System.out.print("Enter ID of Employee to be assigned> ");
+        Long chosenEmployeeId = scanner.nextLong();
+
+        try {
+            transitDispatchRecordSessionBeanRemote.assignDriver(chosenTdrId, chosenEmployeeId);
+        } catch (EmployeeNotFoundException | TransitDispatchRecordNotFoundException ex) {
+            System.out.println("An error has occurred: " + ex.getMessage());
+        }
+
     }
 
     private void doUpdateTransitAsCompleted() {
@@ -513,19 +538,20 @@ public class OperationsManager {
         } catch (TransitDispatchRecordNotFoundException ex) {
             System.out.println("An error has occurred: " + ex.getMessage());
         }
-        
+
     }
+
     private void doAllocateCars() {
-        Scanner scanner = new Scanner(System.in); 
+        Scanner scanner = new Scanner(System.in);
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Allocate Cars to Current Day Reservations ***\n");
-        
+
         try {
-        System.out.print("Enter Date (DD/MM/YYYY)> ");
-        Date date = inputDateFormat.parse(scanner.nextLine().trim());
-        
-        ejbTimerSessionBeanRemote.allocateCarsManually(date);
-        
+            System.out.print("Enter Date (DD/MM/YYYY)> ");
+            Date date = inputDateFormat.parse(scanner.nextLine().trim());
+
+            ejbTimerSessionBeanRemote.allocateCarsManually(date);
+
         } catch (ParseException ex) {
             System.out.println("Invalid Date Entered!");
         }

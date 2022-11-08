@@ -5,14 +5,17 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.TransitDispatchRecord;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.EmployeeNotFoundException;
 import util.exception.TransitDispatchRecordExistException;
 import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -23,6 +26,9 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSessionBeanRemote, TransitDispatchRecordSessionBeanLocal {
+
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -72,6 +78,13 @@ public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSe
             }
         }
         return dispatchRecords;
+    }
+
+    @Override
+    public void assignDriver(Long tdrId, Long employeeId) throws EmployeeNotFoundException, TransitDispatchRecordNotFoundException {
+        Employee employee = employeeSessionBeanLocal.retrieveEmployeeByEmployeeId(employeeId);
+        TransitDispatchRecord tdr = retrieveTransitDispatchRecordByTransitDispatchRecordId(tdrId);
+
     }
 
     @Override
