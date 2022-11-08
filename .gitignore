@@ -36,13 +36,9 @@ CaRMSReservationClient/nbproject/private/
 CaRMSReservationClient/build/
 CaRMSReservationClient/dist/
 
-HolidayReservationSystem/nbproject/private/
-HolidayReservationSystem/build/
-HolidayReservationSystem/dist/
-
 HolidayReservationSystemWebClient/nbproject/private/
-HolidayReservationSystem/build/
-HolidayReservationSystem/dist/
+HolidayReservationSystemWebClient/build/
+HolidayReservationSystemWebClient/dist/
 
 CaRMSLibrary/nbproject/private/
 CaRMSLibrary/build/
