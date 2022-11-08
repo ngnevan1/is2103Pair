@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -27,92 +29,74 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
+
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    
     @Override
-    public Long createNewEmployee(Employee newEmployee) throws EmployeeExistException, UnknownPersistenceException
-    {
-        try
-        {
+    public Long createNewEmployee(Employee newEmployee) throws EmployeeExistException, UnknownPersistenceException {
+        try {
             em.persist(newEmployee);
             em.flush();
 
             return newEmployee.getEmployeeId();
-        }
-        catch(PersistenceException ex)
-        {
-            if(ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException"))
-            {
-                if(ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException"))
-                {
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
                     throw new EmployeeExistException();
-                }
-                else
-                {
+                } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
-            }
-            else
-            {
+            } else {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
         }
     }
-    
+
     @Override
-    public Employee retrieveEmployeeByEmployeeId(Long staffId) throws EmployeeNotFoundException
-    {
+    public Employee retrieveEmployeeByEmployeeId(Long staffId) throws EmployeeNotFoundException {
         Employee staffEntity = em.find(Employee.class, staffId);
-        
-        if(staffEntity != null)
-        {
+
+        if (staffEntity != null) {
             return staffEntity;
-        }
-        else
-        {
+        } else {
             throw new EmployeeNotFoundException("Employee ID " + staffId + " does not exist!");
         }
     }
-    
+
     @Override
-    public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException
-    {
+    public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException {
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :inUsername");
         query.setParameter("inUsername", username);
-        
-        try
-        {
-            return (Employee)query.getSingleResult();
-        }
-        catch(NoResultException | NonUniqueResultException ex)
-        {
+
+        try {
+            return (Employee) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
             throw new EmployeeNotFoundException("Employee Username " + username + " does not exist!");
         }
     }
-    
+
     @Override
-    public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialException
-    {
-        try
-        {
+    public List<Employee> retrieveEmployeesAtOutlet(Outlet outlet) {
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.outlet = :inOutlet");
+        query.setParameter("inOutlet", outlet);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialException {
+        try {
             Employee employee = retrieveEmployeeByUsername(username);
-            
-            if(employee.getPassword().equals(password))
-            {
-                employee.getTransitDispatchRecords().size();                
+
+            if (employee.getPassword().equals(password)) {
+                employee.getTransitDispatchRecords().size();
                 return employee;
-            }
-            else
-            {
+            } else {
                 throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
             }
-        }
-        catch(EmployeeNotFoundException ex)
-        {
+        } catch (EmployeeNotFoundException ex) {
             throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
     }
-    
+
 }

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Customer;
 import entity.OwnCustomer;
 import entity.Reservation;
 import java.math.BigDecimal;
@@ -25,4 +26,6 @@ public interface ReservationSessionBeanRemote {
             throws UnknownPersistenceException, CarModelNotFoundException, OutletNotFoundException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
     BigDecimal calculateRefundPenalty(Reservation reservation);
+    public Reservation retrieveReservationsByCustomer(Customer customer) throws ReservationNotFoundException;
+    public void updateReservation(Reservation reservation) throws ReservationNotFoundException, InputDataValidationException;
 }
