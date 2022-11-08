@@ -13,6 +13,9 @@ import java.util.Scanner;
  */
 
 public class MainApp {
+    
+    // Partner partner;
+    
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -44,8 +47,7 @@ public class MainApp {
                 }
             }
             
-            if(response == 3)
-            {
+            if(response == 3) {
                 break;
             }
         }
@@ -101,6 +103,18 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         
         System.out.println("*** Holiday Reservation System :: Partner Login ***\n");
+        System.out.print("Enter username> ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Enter password> ");
+        String password = scanner.nextLine().trim();
+        
+        if(username.length() > 0 && password.length() > 0) {
+            // partner = partnerLogin(username, password);
+        } 
+        else {
+            // throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+        
     }
     
     public void partnerSearchCar() {
@@ -126,4 +140,12 @@ public class MainApp {
         
         System.out.println("*** Holiday Reservation System :: Partner Cancel Reservation ***\n");
     }
+    
+    /*
+    private static Partner partnerLogin(java.lang.String username, java.lang.String password) {
+        ws.client.PartnerWebService_Service partnerWebService_Service = new ws.client.PartnerWebService_Service();
+        ws.client.PartnerWebService partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
+        return port.partnerLogin(username, password);
+    }
+    */
 }
