@@ -39,16 +39,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+    
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    
     public CarSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
+    
     @Override
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException {
         Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
