@@ -5,10 +5,15 @@
  */
 package ejb.session.ws;
 
+import ejb.session.stateless.PartnerSessionBeanLocal;
+import entity.Partner;
+import javax.ejb.EJB;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.ejb.Stateless;
+import util.exception.InvalidLoginCredentialException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -17,6 +22,14 @@ import javax.ejb.Stateless;
 @WebService(serviceName = "PartnerWebService")
 @Stateless()
 public class PartnerWebService {
+
+    @EJB
+    private PartnerSessionBeanLocal partnerSessionBeanLocal;
+    
+    @WebMethod(operationName = "partnerLogin")
+    public Partner partnerLogin(@WebParam String username, @WebParam String password) throws InvalidLoginCredentialException, PartnerNotFoundException {
+        return partnerSessionBeanLocal.partnerLogin(username, password);
+    }
 
     /**
      * This is a sample web service operation
