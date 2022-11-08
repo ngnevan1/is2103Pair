@@ -49,13 +49,13 @@ public class Reservation implements Serializable {
     @Column(nullable = false, precision = 8, scale = 2)
     @NotNull
     @DecimalMin("0.00")
-    @Digits(integer = 6, fraction = 2) 
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal totalAmount;
     @Column(nullable = false, length = 16)
     @NotNull
     @Size(min = 1, max = 16)
     private String CreditCardNumber;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Car car;
@@ -74,8 +74,7 @@ public class Reservation implements Serializable {
     private Outlet pickUpOutlet;
     @OneToOne(optional = false)
     private Outlet returnOutlet;
-    
-    
+
     public Reservation() {
     }
 
@@ -86,7 +85,7 @@ public class Reservation implements Serializable {
         this.totalAmount = totalAmount;
         this.CreditCardNumber = CreditCardNumber;
     }
-    
+
     public Long getReservationId() {
         return reservationId;
     }
@@ -287,5 +286,5 @@ public class Reservation implements Serializable {
     public void setReturnOutlet(Outlet returnOutlet) {
         this.returnOutlet = returnOutlet;
     }
-    
+
 }
