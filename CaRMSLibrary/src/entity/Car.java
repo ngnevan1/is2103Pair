@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.CarStatusEnum;
@@ -56,6 +57,8 @@ public class Car implements Serializable {
     private List<Reservation> reservations;
     @ManyToOne
     private Outlet outlet;
+    @OneToOne
+    private Reservation currentReservation;
 
     
     public Car() {
@@ -201,6 +204,14 @@ public class Car implements Serializable {
      */
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
+    }
+
+    public Reservation getCurrentReservation() {
+        return currentReservation;
+    }
+
+    public void setCurrentReservation(Reservation currentReservation) {
+        this.currentReservation = currentReservation;
     }
     
 }

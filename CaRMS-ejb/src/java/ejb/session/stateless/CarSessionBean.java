@@ -12,8 +12,6 @@ import entity.Reservation;
 import java.util.List;
 import java.util.Set;
 import java.util.Date;
-import java.util.Objects;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -164,26 +162,44 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void deleteCar(Long carId) throws CarNotFoundException {
         Car carToRemove = retrieveCarByCarId(carId);
 
-        //Delete if servicing??
+        //TODO Delete if servicing??
         if (carToRemove.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
             em.remove(carToRemove);
         } else {
             carToRemove.setIsDisabled(true);
         }
     }
-    
+
     @Override
-    public boolean isAvailableAtOutlet(Long carId, Long outletId, Date startDate) throws CarNotFoundException {
+    public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException {
         Car car = retrieveCarByCarId(carId);
-        List<Reservation> reservations = car.getReservations();
-        Reservation currentReservation = reservations.get(reservations.size() - 1);
+//        List<Reservation> reservations = car.getReservations();
+//        Reservation currentReservation = reservations.get(reservations.size() - 1);
+
+        Reservation currentReservation = car.getCurrentReservation();
         if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
             return true;
-        } else if (Objects.equals(currentReservation.getReturnOutlet().getOutletId(), outletId)) {
+            // if car not currently available, check if current reservation returns to 
+        } else {
             return startDate.after(currentReservation.getReservationEndDate());
         }
-        return false;
-        
+
+    }
+
+    @Override
+    public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException {
+        Car car = retrieveCarByCarId(carId);
+        List<Reservation> reservations = car.getReservations();
+        // check if car is free on particular day
+
+        for (Reservation r : reservations) {
+            Date rStart = r.getReservationStartDate();
+            Date rEnd = r.getReservationEndDate();
+            if (rEnd.after(startDate) || rStart.before(rEnd)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {

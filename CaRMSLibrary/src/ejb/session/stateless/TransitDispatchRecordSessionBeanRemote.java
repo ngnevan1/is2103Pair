@@ -5,7 +5,10 @@
  */
 package ejb.session.stateless;
 
+import entity.TransitDispatchRecord;
+import java.util.List;
 import javax.ejb.Remote;
+import util.exception.TransitDispatchRecordNotFoundException;
 
 /**
  *
@@ -13,5 +16,6 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface TransitDispatchRecordSessionBeanRemote {
-    
+    public List<TransitDispatchRecord> retrieveCurrentDayTransitDispatchRecords();
+    public void transitCompleted(Long dispatchId) throws TransitDispatchRecordNotFoundException;
 }
