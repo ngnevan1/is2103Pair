@@ -84,7 +84,10 @@ public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSe
     public void assignDriver(Long tdrId, Long employeeId) throws EmployeeNotFoundException, TransitDispatchRecordNotFoundException {
         Employee employee = employeeSessionBeanLocal.retrieveEmployeeByEmployeeId(employeeId);
         TransitDispatchRecord tdr = retrieveTransitDispatchRecordByTransitDispatchRecordId(tdrId);
-
+        
+        tdr.setEmployee(employee);
+        employee.setTransitDispatchRecord(tdr);
+        employee.getTransitDispatchRecords().add(tdr);
     }
 
     @Override
