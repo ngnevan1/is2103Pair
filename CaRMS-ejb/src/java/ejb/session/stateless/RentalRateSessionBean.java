@@ -8,7 +8,6 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.RentalRate;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -25,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.RentalRateEnum;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotFoundException;
@@ -167,16 +167,40 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         Calendar endDate = new GregorianCalendar();
         endDate.setTime(returnDate);
         
-        List<RentalRate> applicableRates = new ArrayList<>();
         BigDecimal totalAmount = new BigDecimal("0.0");
         
-        /* WIP
         while (startDate.before(endDate)) {
+            BigDecimal cheapestRate = new BigDecimal("1000.0");
             
+            for (RentalRate rate : rates) {
+                Calendar rentalRateStartDate = new GregorianCalendar();
+                rentalRateStartDate.setTime(rate.getRateStartDate());
+                Calendar rentalRateEndDate = new GregorianCalendar();
+                rentalRateStartDate.setTime(rate.getRateEndDate());
+                
+                if (!rate.getIsDisabled()) {
+                    if (rentalRateStartDate == null || 
+                            (rentalRateStartDate.before(startDate) && rentalRateEndDate.after(startDate) || 
+                            (rentalRateStartDate.equals(startDate) || rentalRateEndDate.equals(startDate)))) {
+                    
+                        if (rate.getRateType().equals(RentalRateEnum.PEAK)) {
+                            cheapestRate = rate.getRatePerDay();
+                            break;
+                        }
+                        else {
+                            if (rate.getRatePerDay().compareTo(cheapestRate) == -1) {
+                                cheapestRate = rate.getRatePerDay();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            totalAmount = totalAmount.add(cheapestRate);
+            startDate.add(Calendar.DAY_OF_MONTH, 1);           
         }
-        */
         
-        return null;
+        return totalAmount;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {

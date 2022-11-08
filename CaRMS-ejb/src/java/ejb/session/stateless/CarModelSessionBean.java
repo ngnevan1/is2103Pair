@@ -5,10 +5,17 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.CarModel;
+import entity.Reservation;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -34,15 +41,20 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+    
+    @EJB
+    private CarSessionBeanLocal carSessionBeanLocal;
+    
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    
     public CarModelSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+    
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
 
     @Override
     public CarModel createNewCarModel(CarModel newCarModel) throws CarModelExistException, UnknownPersistenceException, InputDataValidationException {
@@ -154,8 +166,46 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
-        // WIP
-        return null;
+        List<CarModel> availableModels = new ArrayList<>();
+        List<Car> allCars = carSessionBeanLocal.retrieveAllCars();
+        Calendar pDate = new GregorianCalendar();
+        pDate.setTime(pickupDate);
+        Calendar rDate = new GregorianCalendar();
+        rDate.setTime(returnDate);
+        
+        for (Car car : allCars) {
+            if (car.getReservations().isEmpty()) {
+                availableModels.add(car.getCarModel());
+            }
+            else {
+                Boolean isAvailable = Boolean.TRUE;
+                
+                for (Reservation reservation : car.getReservations()) {
+                    Calendar startDate = new GregorianCalendar();
+                    startDate.setTime(reservation.getReservationStartDate());
+                    Calendar endDate = new GregorianCalendar();
+                    endDate.setTime(reservation.getReservationEndDate());
+                    if ((pDate.after(startDate) && pDate.before(endDate)) || (rDate.after(startDate) && rDate.before(endDate))) {
+                        isAvailable = Boolean.FALSE;
+                        break;
+                    }
+                    else {
+                        startDate.add(Calendar.HOUR_OF_DAY, -2);
+                        endDate.add(Calendar.HOUR_OF_DAY, 2);
+                        if ((pDate.before(endDate)) || (rDate.after(startDate))) {
+                            isAvailable = Boolean.FALSE;
+                            break;
+                        }
+                    }
+                }
+
+                if (isAvailable) {
+                    availableModels.add(car.getCarModel());
+                }
+            }
+        }
+        
+        return new ArrayList<>(new HashSet(availableModels));
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {

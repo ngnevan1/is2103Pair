@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.Customer;
 import entity.OwnCustomer;
+import entity.Reservation;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

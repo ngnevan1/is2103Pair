@@ -33,11 +33,14 @@ public class CarCategory implements Serializable {
     private List<CarModel> carModels;
     @OneToMany(mappedBy = "carCategory")
     private List<RentalRate> rentalRates;
+    @OneToMany(mappedBy = "carCategory")
+    private List<Reservation> reservations;
 
     
     public CarCategory() {
         carModels = new ArrayList<>();
         rentalRates = new ArrayList<>();
+        reservations = new ArrayList<>();
     }
 
     public CarCategory(String categoryName) {
@@ -118,6 +121,20 @@ public class CarCategory implements Serializable {
      */
     public void setRentalRates(List<RentalRate> rentalRates) {
         this.rentalRates = rentalRates;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }

@@ -23,6 +23,7 @@ public interface CarSessionBeanLocal {
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException;
     Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
     Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+    List<Car> retrieveAllCars();
     List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
     public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException;
     public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException;
