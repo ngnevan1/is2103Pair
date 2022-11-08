@@ -15,8 +15,6 @@ import entity.Reservation;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightsEnum;
 import util.exception.CarNotFoundException;
@@ -85,9 +83,7 @@ public class CustomerService {
 
     private void doPickupCar() {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("*** CaRMS System :: Customer Service Module :: Pickup Car ***\n");
-
         try {
             System.out.print("Enter Customer Email> ");
             Customer customer = customerSessionBeanRemote.retrieveCustomerByCustomerEmail(scanner.nextLine().trim());
@@ -112,17 +108,34 @@ public class CustomerService {
             car.setCurrentReservation(reservation);
             carSessionBeanRemote.updateCar(car);
             reservationSessionBeanRemote.updateReservation(reservation);
-            
+
             System.out.println("Customer has been allocated " + car.getColour() + " " + car.getCarModel().getMakeName() + " " + car.getCarModel().getModelName() + " with licence plate number: " + car.getLicensePlate());
             System.out.println("Car must be returned by " + reservation.getReservationEndDate());
-
         } catch (CustomerNotFoundException | ReservationNotFoundException | CarNotFoundException | UpdateCarException | InputDataValidationException ex) {
             System.out.println("An error has occurred: " + ex.getMessage());
         }
     }
 
     private void doReturnCar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS System :: Customer Service Module :: Return Car ***\n");
+        
+        try {
+            System.out.print("Enter Customer Email> ");
+            Customer customer = customerSessionBeanRemote.retrieveCustomerByCustomerEmail(scanner.nextLine().trim());
+
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(customer);
+            
+            Car car = reservation.getCar();
+            car.setCarStatus(CarStatusEnum.AVAILABLE);
+            car.setOutlet(reservation.getReturnOutlet());
+            car.setCurrentReservation(null);
+            carSessionBeanRemote.updateCar(car);
+            System.out.println("Car " + car.getLicensePlate() + "returned successfully!");
+
+        } catch (CustomerNotFoundException | ReservationNotFoundException | CarNotFoundException | UpdateCarException | InputDataValidationException ex) {
+            System.out.println("An error has occurred: " + ex.getMessage());
+        }
     }
 
 }
