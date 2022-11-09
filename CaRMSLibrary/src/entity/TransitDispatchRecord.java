@@ -33,9 +33,10 @@ public class TransitDispatchRecord implements Serializable {
     private Date dispatchTime;
     @Column(nullable = false)
     private Boolean isCompleted;
-    
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+   
+    // employee can be null because employee only assigned when day start?
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
     private Employee employee;
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
