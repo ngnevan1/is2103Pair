@@ -5,7 +5,14 @@
  */
 package holidayreservationsystemwebclient;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
+// import ws.client.partner.Partner;
+import ws.client.partner.PartnerWebService_Service;
+import ws.client.partner.PartnerWebService;
+
 
 /**
  *
@@ -32,9 +39,15 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if(response == 1) {
-                    partnerLogin();
-                    System.out.println("Login successful!\n");
-                    menuMain();
+                    /*
+                    try {
+                        partnerLogin();
+                        System.out.println("Login successful!\n");
+                        menuMain();
+                    } catch (InvalidLoginCredentialException | PartnerNotFoundException) {
+                        System.out.println("Invalid login credential: " + ex.getMessage());
+                    }
+                    */
                 }
                 else if(response == 2) {
                     partnerSearchCar();
@@ -118,11 +131,89 @@ public class MainApp {
     }
     
     public void partnerSearchCar() {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y H");
+            
+            System.out.println("*** Holiday Reservation System :: Partner Search Car ***\n");
+            System.out.println("*** CaRMS Reservation System :: Search Car ***\n");
+            System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH> ");
+            Date pickupDate = inputDateFormat.parse(scanner.nextLine().trim());
+            System.out.print("Enter Pickup Outlet> ");
+            String pickupOutlet = scanner.nextLine().trim();
+            System.out.print("Enter Return Date/Time> ");
+            Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
+            System.out.print("Enter Return Outlet> ");
+            String returnOutlet = scanner.nextLine().trim();
+            /*
+            if (checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
+                List<CarModel> availableCarModels = searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
+                System.out.printf("%15s%15s%15s", "Car Category", "Car Make", "Car Model", "Rental Rate");
+                
+                // WIP
+                for(CarModel carModel : availableCarModels) {
+                    List<RentalRate> rentalRates = carModel.getCarCategory().getRentalRates();
+                    BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
+                    System.out.printf("%15s%15s%15s", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), rentalRate);
+                }
+            
+                System.out.println("------------------------");
+                System.out.println("1: Make Reservation By Car Category");
+                System.out.println("2: Make Reservation By Car Model");
+                System.out.println("3: Back\n");
+                System.out.print("> ");
+                response = scanner.nextInt();
+                scanner.nextLine();
+            
+                if (partner != null) {
+                    if (response == 1) {
+                        System.out.print("Enter Car Category Name> ");
+                        String carCategoryName = scanner.nextLine().trim();
+                        reserveCarByCarCategory(carCategoryName, pickupDate, returnDate, pickupOutlet, returnOutlet);
+                    }
+                    else if (response == 2) {
+                        System.out.print("Enter Car Model Name> ");
+                        String carModelName = scanner.nextLine().trim();
+                        reserveCarByCarModel(carModelName, pickupDate, returnDate, pickupOutlet, returnOutlet);
+                    }
+                }
+                else {
+                    System.out.println("Please login first before making a reservation!\n");
+                }
+            }
+            else {
+                System.out.println("Outlet is closed during Pickup or Return Time!");
+            }
+            */
+        } catch (ParseException ex) {
+            System.out.println("Invalid date/time input!");
+        // } catch (OutletNotFoundException | CarModelNotFoundException | CarCategoryNotFoundException ex) {
+            // System.out.println(ex.getMessage());
+        }
+    }
+    /*
+    public void reserveCarByCarModel(String carModelName, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarModelNotFoundException {
         Scanner scanner = new Scanner(System.in);
-        
-        System.out.println("*** Holiday Reservation System :: Partner Search Car ***\n");
+            
+        System.out.println("*** CaRMS Reservation System :: Reserve Car ***\n");
+        System.out.print("Enter Credit Card Number> ");
+        String ccNumber = scanner.nextLine().trim();
+        System.out.print("Do you want to do immediate payment? (Enter 'Y' to Pay)> ");
+        String input = scanner.nextLine().trim();
+    
     }
     
+    public void reserveCarByCarCategory(String carCategoryName, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarCategoryNotFoundException {
+        Scanner scanner = new Scanner(System.in);
+            
+        System.out.println("*** CaRMS Reservation System :: Reserve Car ***\n");
+        System.out.print("Enter Credit Card Number> ");
+        String ccNumber = scanner.nextLine().trim();
+        System.out.print("Do you want to do immediate payment? (Enter 'Y' to Pay)> ");
+        String input = scanner.nextLine().trim();
+    
+    }
+    */
     public void partnerViewAllReservations() {
         Scanner scanner = new Scanner(System.in);
         
@@ -143,9 +234,33 @@ public class MainApp {
     
     /*
     private static Partner partnerLogin(java.lang.String username, java.lang.String password) {
-        ws.client.PartnerWebService_Service partnerWebService_Service = new ws.client.PartnerWebService_Service();
-        ws.client.PartnerWebService partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
+        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.partnerLogin(username, password);
+    }
+    */
+    
+    /*
+    private static Boolean checkOutletIsOpen(java.util.Date pickupDate, java.lang.String pickupOutlet, java.util.Date returnDate, java.lang.String returnOutlet) {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet);
+    }
+    */
+    
+    /*
+    private static java.util.List<ws.client.partner.CarModel> searchAvailableCarModels(java.util.Date pickupDate, java.lang.String pickupOutlet, java.util.Date returnDate, java.lang.String returnOutlet) {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
+    }
+    */
+    
+    /*
+    private static BigDecimal calculateRentalRate(java.util.List<ws.client.partner.RentalRate> rentalRates, java.util.Date pickupDate, java.util.Date returnDate) {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.calculateRentalRate(rentalRates, pickupDate, returnDate);
     }
     */
 }
