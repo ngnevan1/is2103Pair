@@ -37,180 +37,181 @@ import util.exception.UpdateCarException;
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
-    @PersistenceContext(unitName = "CaRMS-ejbPU")
-    private EntityManager em;
-    
-    private final ValidatorFactory validatorFactory;
-    private final Validator validator;
-    
-    public CarSessionBean() {
-        validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-    }
+	@PersistenceContext(unitName = "CaRMS-ejbPU")
+	private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
-    @Override
-    public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException {
-        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
+	private final ValidatorFactory validatorFactory;
+	private final Validator validator;
 
-        if (constraintViolations.isEmpty()) {
-            try {
-                em.persist(newCar);
-                em.flush();
-                em.refresh(newCar);
+	public CarSessionBean() {
+		validatorFactory = Validation.buildDefaultValidatorFactory();
+		validator = validatorFactory.getValidator();
+	}
 
-                // associate outlet with car
-                Outlet outlet = em.find(Outlet.class, newCar.getOutlet().getOutletId());
-                outlet.getCars().add(newCar);
+	// Add business logic below. (Right-click in editor and choose
+	// "Insert Code > Add Business Method")
+	@Override
+	public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException {
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
 
-                CarModel model = em.find(CarModel.class, newCar.getCarModel().getCarModelId());
-                model.getCars().add(newCar);
-                return newCar;
-            } catch (PersistenceException ex) {
-                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                        throw new CarExistException("Car already exists!");
-                    } else {
-                        throw new UnknownPersistenceException(ex.getMessage());
-                    }
-                } else {
-                    throw new UnknownPersistenceException(ex.getMessage());
-                }
-            }
-        } else {
-            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-        }
-    }
+		if (constraintViolations.isEmpty()) {
+			try {
+				em.persist(newCar);
+				em.flush();
+				em.refresh(newCar);
 
-    @Override
-    public List<Car> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.carModel.carCategory.categoryName, c.carModel.makeName, c.carModel.modelName, c.licensePlate");
+				// associate outlet with car
+				Outlet outlet = em.find(Outlet.class, newCar.getOutlet().getOutletId());
+				outlet.getCars().add(newCar);
 
-        return query.getResultList();
-    }
+				CarModel model = em.find(CarModel.class, newCar.getCarModel().getCarModelId());
+				model.getCars().add(newCar);
+				return newCar;
+			} catch (PersistenceException ex) {
+				if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+					if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+						throw new CarExistException("Car already exists!");
+					} else {
+						throw new UnknownPersistenceException(ex.getMessage());
+					}
+				} else {
+					throw new UnknownPersistenceException(ex.getMessage());
+				}
+			}
+		} else {
+			throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+		}
+	}
 
-    @Override
-    public Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException {
-        Car car = em.find(Car.class, carId);
+	@Override
+	public List<Car> retrieveAllCars() {
+		Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.carModel.carCategory.categoryName, c.carModel.makeName, c.carModel.modelName, c.licensePlate");
 
-        if (car != null) {
-            if (retrieveCarModel) {
-                car.getCarModel();
-            }
-            if (retrieveReservation) {
-                car.getReservations().size();
-            }
-            if (retrieveOutlet) {
-                car.getOutlet();
-            }
-            return car;
-        } else {
-            throw new CarNotFoundException("Car ID " + carId + "does not exist!");
-        }
-    }
+		return query.getResultList();
+	}
 
-    public Car retrieveCarByCarId(Long carId) throws CarNotFoundException {
-        Car car = em.find(Car.class, carId);
+	@Override
+	public Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException {
+		Car car = em.find(Car.class, carId);
 
-        if (car != null) {
-            return car;
-        } else {
-            throw new CarNotFoundException("Car ID " + carId + "does not exist!");
-        }
-    }
+		if (car != null) {
+			if (retrieveCarModel) {
+				car.getCarModel();
+			}
+			if (retrieveReservation) {
+				car.getReservations().size();
+			}
+			if (retrieveOutlet) {
+				car.getOutlet();
+			}
+			return car;
+		} else {
+			throw new CarNotFoundException("Car ID " + carId + "does not exist!");
+		}
+	}
 
-    @Override
-    public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException {
-        Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlate = :inLicensePlate");
-        query.setParameter("inLicensePlate", licensePlate);
+	public Car retrieveCarByCarId(Long carId) throws CarNotFoundException {
+		Car car = em.find(Car.class, carId);
 
-        try {
-            return (Car) query.getSingleResult();
-        } catch (NoResultException | NonUniqueResultException ex) {
-            throw new CarNotFoundException("Car License Plate " + licensePlate + " does not exist!");
-        }
-    }
+		if (car != null) {
+			return car;
+		} else {
+			throw new CarNotFoundException("Car ID " + carId + "does not exist!");
+		}
+	}
 
-    @Override
-    public List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
-        // Stub
-        return null;
-    }
+	@Override
+	public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException {
+		Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlate = :inLicensePlate");
+		query.setParameter("inLicensePlate", licensePlate);
 
-    @Override
-    public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException {
-        if (car != null && car.getCarId() != null) {
-            Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
+		try {
+			return (Car) query.getSingleResult();
+		} catch (NoResultException | NonUniqueResultException ex) {
+			throw new CarNotFoundException("Car License Plate " + licensePlate + " does not exist!");
+		}
+	}
 
-            if (constraintViolations.isEmpty()) {
-                Car carToUpdate = retrieveCarByCarId(car.getCarId());
+	@Override
+	public List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
+		// Stub
+		return null;
+	}
 
-                if (carToUpdate.getLicensePlate().equals(car.getLicensePlate())) {
-                    em.merge(car);
-                } else {
-                    throw new UpdateCarException("Licence Plate Number of Car record to be updated does not match the existing record");
-                }
-            } else {
-                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-            }
-        } else {
-            throw new CarNotFoundException("Car ID not provided for rental car to be updated");
-        }
-    }
+	@Override
+	public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException {
+		if (car != null && car.getCarId() != null) {
+			Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
 
-    @Override
-    public void deleteCar(Long carId) throws CarNotFoundException {
-        Car carToRemove = retrieveCarByCarId(carId);
+			if (constraintViolations.isEmpty()) {
+				Car carToUpdate = retrieveCarByCarId(car.getCarId());
 
-        //TODO Delete if servicing??
-        if (carToRemove.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
-            em.remove(carToRemove);
-        } else {
-            carToRemove.setIsDisabled(true);
-        }
-    }
+				if (carToUpdate.getLicensePlate().equals(car.getLicensePlate())) {
+					em.merge(car);
+				} else {
+					throw new UpdateCarException("Licence Plate Number of Car record to be updated does not match the existing record");
+				}
+			} else {
+				throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+			}
+		} else {
+			throw new CarNotFoundException("Car ID not provided for rental car to be updated");
+		}
+	}
 
-    @Override
-    public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException {
-        Car car = retrieveCarByCarId(carId);
-//        List<Reservation> reservations = car.getReservations();
-//        Reservation currentReservation = reservations.get(reservations.size() - 1);
+	@Override
+	public void deleteCar(Long carId) throws CarNotFoundException {
+		Car carToRemove = retrieveCarByCarId(carId);
 
-        Reservation currentReservation = car.getCurrentReservation();
-        if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
-            return true;
-            // if car not currently available, check if current reservation returns to 
-        } else {
-            return startDate.after(currentReservation.getReservationEndDate());
-        }
+		if (carToRemove.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
+			em.remove(carToRemove);
+		} else {
+			carToRemove.setIsDisabled(true);
+		}
+	}
 
-    }
+	@Override
+	public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException {
+		Car car = retrieveCarByCarId(carId);
 
-    @Override
-    public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException {
-        Car car = retrieveCarByCarId(carId);
-        List<Reservation> reservations = car.getReservations();
-        // check if car is free on particular day
+		Reservation currentReservation = car.getCurrentReservation();
 
-        for (Reservation r : reservations) {
-            Date rStart = r.getReservationStartDate();
-            Date rEnd = r.getReservationEndDate();
-            if (rEnd.after(startDate) || rStart.before(rEnd)) {
-                return false;
-            }
-        }
-        return true;
-    }
+		if (!car.getIsDisabled()) {
+			if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
+				return true;
+				// if car not currently available, check if current reservation returns to 
+			} else {
+				return startDate.after(currentReservation.getReservationEndDate());
+			}
+		} else {
+			return false;
+		}
 
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
-        String msg = "Input data validation error!:";
+	}
 
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
-        }
+	@Override
+	public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException {
+		Car car = retrieveCarByCarId(carId);
+		List<Reservation> reservations = car.getReservations();
+		// check if car is free on particular day
 
-        return msg;
-    }
+		for (Reservation r : reservations) {
+			Date rStart = r.getReservationStartDate();
+			Date rEnd = r.getReservationEndDate();
+			if (rEnd.after(startDate) || rStart.before(rEnd)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
+		String msg = "Input data validation error!:";
+
+		for (ConstraintViolation constraintViolation : constraintViolations) {
+			msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+		}
+
+		return msg;
+	}
 }

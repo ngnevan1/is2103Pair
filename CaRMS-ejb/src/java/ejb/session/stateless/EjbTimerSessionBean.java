@@ -10,12 +10,9 @@ import entity.Outlet;
 import entity.Reservation;
 import entity.TransitDispatchRecord;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -144,7 +141,6 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 	@Schedule(hour = "2", minute = "5", info = "generateTransitDispatchRecords")
 	public void generateTransitDispatchRecordsForCurrentDay() {
 		String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh.mm");
 		System.out.println("********** Car Allocation(): Timeout at " + timeStamp);
 
 		List<Reservation> currentDayReservations = reservationSessionBeanLocal.retrieveCurrentDayReservations();
@@ -161,6 +157,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 					newDispatch.setDispatchTime(dispatchTime);
 
 					transitDispatchRecordSessionBeanLocal.createNewTransitDispatchRecord(newDispatch);
+					System.out.println("New Transit Dispatch Record Created for " + r.getCar().getLicensePlate());
 				} catch (TransitDispatchRecordExistException | UnknownPersistenceException ex) {
 					System.out.println("An error has occured: " + ex.getMessage());
 				}
