@@ -153,10 +153,10 @@ public class OperationsManager {
 
         try {
             System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Create New Car Model ***\n");
-            System.out.print("Enter Model Name> ");
-            newCarModel.setModelName(scanner.nextLine().trim());
             System.out.print("Enter Make Name> ");
             newCarModel.setMakeName(scanner.nextLine().trim());
+			System.out.print("Enter Model Name> ");
+            newCarModel.setModelName(scanner.nextLine().trim());
             System.out.printf("%8s%20s\n", "Car Category ID", "Car Category Name");
             for (CarCategory category : carCategories) {
                 System.out.printf("%8s%20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
@@ -168,7 +168,7 @@ public class OperationsManager {
 
             if (constraintViolations.isEmpty()) {
                 CarModel createdCarModel = carModelSessionBeanRemote.createNewCarModel(newCarModel);
-                System.out.println("Car Model " + createdCarModel.getCarModelId() + " created successfully!");
+                System.out.println("Car Model: " + createdCarModel.getMakeName() + " " + createdCarModel.getModelName() + " created successfully!");
             } else {
                 showInputDataValidationErrorsForCarModel(constraintViolations);
             }
@@ -187,10 +187,10 @@ public class OperationsManager {
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Car Models ***\n");
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
-        System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
+        System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
 
         for (CarModel model : carModels) {
-            System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+            System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getCarCategory().getCategoryName(), model.getMakeName(), model.getModelName(), model.getIsDisabled() ? "Yes" : "No");
         }
 
         System.out.print("Press any key to continue...> ");
@@ -208,16 +208,15 @@ public class OperationsManager {
         System.out.println("Enter Model Name of Car Model to Update>");
         try {
             CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
-
-            System.out.print("Enter Model Name (blank if no change)> ");
-            input = scanner.nextLine().trim();
-            if (input.length() > 0) {
-                model.setModelName(input);
-            }
             System.out.print("Enter Make Name (blank if no change)> ");
             input = scanner.nextLine().trim();
             if (input.length() > 0) {
                 model.setMakeName(input);
+            }
+			System.out.print("Enter Model Name (blank if no change)> ");
+            input = scanner.nextLine().trim();
+            if (input.length() > 0) {
+                model.setModelName(input);
             }
             System.out.printf("%8s%20s\n", "Car Category ID", "Car Category Name");
             for (CarCategory category : carCategories) {
@@ -228,7 +227,8 @@ public class OperationsManager {
             if (longInput > 0l) {
                 CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false);
                 model.setCarCategory(chosenCategory);
-            }
+            } 
+			scanner.nextLine();
 
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(model);
 
@@ -258,6 +258,8 @@ public class OperationsManager {
 
         try {
             CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
+			 System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
+            System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getCarCategory().getCategoryName(), model.getMakeName(), model.getModelName(), model.getIsDisabled() ? "Yes" : "No");
             System.out.printf("Confirm Delete Car Model %s (Enter 'Y' to Delete)> ", model.getModelName());
 
             input = scanner.nextLine().trim();
@@ -284,10 +286,10 @@ public class OperationsManager {
             newCar.setLicensePlate(scanner.nextLine().trim());
             System.out.print("Enter Colour> ");
             newCar.setColour(scanner.nextLine().trim());
-            System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
+            System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
 
             for (CarModel model : carModels) {
-                System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+            System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getCarCategory().getCategoryName(), model.getMakeName(), model.getModelName(), model.getIsDisabled() ? "Yes" : "No");
             }
             System.out.print("Enter Car Model ID> ");
             CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(scanner.nextLong(), false, false, false);
@@ -339,10 +341,10 @@ public class OperationsManager {
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Cars ***\n");
 
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
+        System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
 
         for (Car car : cars) {
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
+            System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory().getCategoryName(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled() ? "Yes" : "No");
         }
 
         System.out.print("Press any key to continue...> ");
@@ -358,8 +360,8 @@ public class OperationsManager {
             System.out.println("Enter Car Licence Plate Number>");
             Car car = carSessionBeanRemote.retrieveCarByLicensePlate(scanner.nextLine().trim());
 
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled());
+            System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
+            System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory().getCategoryName(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled() ? "Yes" : "No");
 
             System.out.println("------------------------");
             System.out.println("1: Update Car");
@@ -398,12 +400,11 @@ public class OperationsManager {
             if (input.length() > 0) {
                 car.setColour(input);
             }
-            System.out.printf("%-15s%-20s%-20s%-5s\n", "Car Model ID", "Model Name", "Make Name", "Disabled?");
-
+			 System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
             for (CarModel model : carModels) {
-                System.out.printf("%-15s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getModelName(), model.getMakeName(), model.getIsDisabled());
+			System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getCarCategory().getCategoryName(), model.getMakeName(), model.getModelName(), model.getIsDisabled() ? "Yes" : "No");
             }
-            System.out.print("Enter Car Model ID (blank if no change)> ");
+            System.out.print("Enter Car Model ID (negative number if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
                 CarModel chosenModel = carModelSessionBeanRemote.retrieveCarModelByCarModelId(longInput, false, false, false);
@@ -426,7 +427,7 @@ public class OperationsManager {
             for (Outlet outlet : outlets) {
                 System.out.printf("%-15s%-20s%-20s\n", outlet.getOutletId().toString(), outlet.getOutletName(), outlet.getOutletAddress());
             }
-            System.out.print("Enter Outlet ID (blank if no change)> ");
+            System.out.print("Enter Outlet ID (negative number if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
                 Outlet chosenOutlet = outletSessionBeanRemote.retrieveOutletByOutletId(longInput, false, false, false);

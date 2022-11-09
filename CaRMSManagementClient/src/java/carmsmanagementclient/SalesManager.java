@@ -279,6 +279,7 @@ public class SalesManager {
 					System.out.println("Invalid option, please try again!\n");
 				}
 			}
+			scanner.nextLine();
 			
 			rentalRateSessionBeanRemote.updateRentalRate(rate);
 			System.out.println("Rental Rate " + rate.getRateName() + " updated successfully!");
