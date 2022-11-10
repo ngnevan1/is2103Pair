@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
+import util.exception.RentalRateNotAvailableException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -24,5 +25,5 @@ public interface RentalRateSessionBeanLocal {
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
     public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
-    BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
+    List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException;
 }

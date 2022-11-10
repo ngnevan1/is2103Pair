@@ -193,15 +193,15 @@ public class DataInitSessionBean {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 			Date fillerStart = format.parse("01/01/1900 00:00");
 			Date fillerEnd = format.parse("31/12/2100 23:59");
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Default", RentalRateEnum.DEFAULT, standard, new BigDecimal(100), fillerStart, fillerEnd));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Weekend Promo", RentalRateEnum.PROMOTION, standard, new BigDecimal(80), format.parse("09/12/2022 12:00"), format.parse("11/12/2022 00:00")));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Family Sedan - Default", RentalRateEnum.DEFAULT, family, new BigDecimal(200), fillerStart, fillerEnd));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Default", RentalRateEnum.DEFAULT, luxury, new BigDecimal(300), fillerStart, fillerEnd));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Monday", RentalRateEnum.PEAK, luxury, new BigDecimal(310), format.parse("5/12/2022 00:00"), format.parse("5/12/2022 23:59")));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Tuesday", RentalRateEnum.PEAK, luxury, new BigDecimal(320), format.parse("6/12/2022 00:00"), format.parse("6/12/2022 23:59")));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Wednesday", RentalRateEnum.PEAK, luxury, new BigDecimal(330), format.parse("7/12/2022 00:00"), format.parse("7/12/2022 23:59")));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Weekday Promo", RentalRateEnum.PROMOTION, luxury, new BigDecimal(250), format.parse("7/12/2022 12:00"), format.parse("8/12/2022 12:00")));
-            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("SUV and Minivan - Default", RentalRateEnum.DEFAULT, suv, new BigDecimal(400), fillerStart, fillerEnd));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Default", RentalRateEnum.DEFAULT, standard, new BigDecimal("100.00"), fillerStart, fillerEnd));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Weekend Promo", RentalRateEnum.PROMOTION, standard, new BigDecimal("80.00"), format.parse("09/12/2022 12:00"), format.parse("11/12/2022 00:00")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Family Sedan - Default", RentalRateEnum.DEFAULT, family, new BigDecimal("200.00"), fillerStart, fillerEnd));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Default", RentalRateEnum.DEFAULT, luxury, new BigDecimal("300.00"), fillerStart, fillerEnd));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Monday", RentalRateEnum.PEAK, luxury, new BigDecimal("310.00"), format.parse("5/12/2022 00:00"), format.parse("5/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Tuesday", RentalRateEnum.PEAK, luxury, new BigDecimal("320.00"), format.parse("6/12/2022 00:00"), format.parse("6/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Wednesday", RentalRateEnum.PEAK, luxury, new BigDecimal("330.00"), format.parse("7/12/2022 00:00"), format.parse("7/12/2022 23:59")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Luxury Sedan - Weekday Promo", RentalRateEnum.PROMOTION, luxury, new BigDecimal("250.00"), format.parse("7/12/2022 12:00"), format.parse("8/12/2022 12:00")));
+            rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("SUV and Minivan - Default", RentalRateEnum.DEFAULT, suv, new BigDecimal("400.00"), fillerStart, fillerEnd));
 
         } catch (CarCategoryExistException | OutletExistException | PartnerExistException | EmployeeExistException | UnknownPersistenceException | CarModelExistException | InputDataValidationException | CarExistException | RentalRateExistException | ParseException ex) {
             ex.printStackTrace();
