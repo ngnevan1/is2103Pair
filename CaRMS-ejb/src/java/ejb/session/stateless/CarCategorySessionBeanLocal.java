@@ -19,7 +19,7 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface CarCategorySessionBeanLocal {
     public CarCategory createNewCarCategory(CarCategory newCarCategory) throws CarCategoryExistException, UnknownPersistenceException;
-    CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
+	public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId) throws CarCategoryNotFoundException; 
     CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
     public void associateCarModelsWithCarCategory(Long categoryId, List<Long> modelIds);
 }
