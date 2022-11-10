@@ -1,18 +1,269 @@
 <?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is Metro/2.4.3 (RELEASE-2.4.3-ad3323c; 2019-01-21T17:46:06+0000) JAXWS-RI/2.3.2 JAXWS-API/2.3.2 JAXB-RI/2.3.2 JAXB-API/2.3.2 git-revision#unknown. --><xs:schema xmlns:tns="http://ws.session.ejb/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.session.ejb/">
 
-<xs:element name="hello" type="tns:hello"/>
+<xs:element name="CarModelNotFoundException" type="tns:CarModelNotFoundException"/>
 
-<xs:element name="helloResponse" type="tns:helloResponse"/>
+<xs:element name="InvalidLoginCredentialException" type="tns:InvalidLoginCredentialException"/>
 
-<xs:complexType name="hello">
+<xs:element name="OutletNotFoundException" type="tns:OutletNotFoundException"/>
+
+<xs:element name="PartnerNotFoundException" type="tns:PartnerNotFoundException"/>
+
+<xs:element name="calculateRentalRate" type="tns:calculateRentalRate"/>
+
+<xs:element name="calculateRentalRateResponse" type="tns:calculateRentalRateResponse"/>
+
+<xs:element name="checkOutletIsOpen" type="tns:checkOutletIsOpen"/>
+
+<xs:element name="checkOutletIsOpenResponse" type="tns:checkOutletIsOpenResponse"/>
+
+<xs:element name="partnerLogin" type="tns:partnerLogin"/>
+
+<xs:element name="partnerLoginResponse" type="tns:partnerLoginResponse"/>
+
+<xs:element name="searchAvailableCarModels" type="tns:searchAvailableCarModels"/>
+
+<xs:element name="searchAvailableCarModelsResponse" type="tns:searchAvailableCarModelsResponse"/>
+
+<xs:complexType name="checkOutletIsOpen">
 <xs:sequence>
+<xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="pickupOutlet" type="xs:string" minOccurs="0"/>
+<xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnOutlet" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="checkOutletIsOpenResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="OutletNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="calculateRentalRate">
+<xs:sequence>
+<xs:element name="rentalRates" type="tns:rentalRate" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="rentalRate">
+<xs:sequence>
+<xs:element name="carCategory" type="tns:carCategory" minOccurs="0"/>
+<xs:element name="isDisabled" type="xs:boolean" minOccurs="0"/>
+<xs:element name="rateEndDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rateName" type="xs:string" minOccurs="0"/>
+<xs:element name="ratePerDay" type="xs:decimal" minOccurs="0"/>
+<xs:element name="rateStartDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rateType" type="tns:rentalRateEnum" minOccurs="0"/>
+<xs:element name="rentalRateId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="carCategory">
+<xs:sequence>
+<xs:element name="carCategoryId" type="xs:long" minOccurs="0"/>
+<xs:element name="carModels" type="tns:carModel" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="categoryName" type="xs:string" minOccurs="0"/>
+<xs:element name="rentalRates" type="tns:rentalRate" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="carModel">
+<xs:sequence>
+<xs:element name="carCategory" type="tns:carCategory" minOccurs="0"/>
+<xs:element name="carModelId" type="xs:long" minOccurs="0"/>
+<xs:element name="cars" type="tns:car" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="isDisabled" type="xs:boolean" minOccurs="0"/>
+<xs:element name="makeName" type="xs:string" minOccurs="0"/>
+<xs:element name="modelName" type="xs:string" minOccurs="0"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="car">
+<xs:sequence>
+<xs:element name="carId" type="xs:long" minOccurs="0"/>
+<xs:element name="carModel" type="tns:carModel" minOccurs="0"/>
+<xs:element name="carStatus" type="tns:carStatusEnum" minOccurs="0"/>
+<xs:element name="colour" type="xs:string" minOccurs="0"/>
+<xs:element name="currentReservation" type="tns:reservation" minOccurs="0"/>
+<xs:element name="isDisabled" type="xs:boolean" minOccurs="0"/>
+<xs:element name="licensePlate" type="xs:string" minOccurs="0"/>
+<xs:element name="outlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="reservation">
+<xs:sequence>
+<xs:element name="car" type="tns:car" minOccurs="0"/>
+<xs:element name="carCategory" type="tns:carCategory" minOccurs="0"/>
+<xs:element name="carModel" type="tns:carModel" minOccurs="0"/>
+<xs:element name="creditCardNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="customer" type="tns:customer" minOccurs="0"/>
+<xs:element name="partner" type="tns:partner" minOccurs="0"/>
+<xs:element name="paymentDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="pickUpOutlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="reservationEndDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="reservationId" type="xs:long" minOccurs="0"/>
+<xs:element name="reservationStartDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnOutlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="totalAmount" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="customer">
+<xs:sequence>
+<xs:element name="customerId" type="xs:long" minOccurs="0"/>
+<xs:element name="email" type="xs:string" minOccurs="0"/>
 <xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="partner" type="tns:partner" minOccurs="0"/>
+<xs:element name="passportNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="phoneNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="helloResponse">
+<xs:complexType name="partner">
 <xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0"/>
+<xs:element name="customers" type="tns:customer" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="partnerId" type="xs:long" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
+
+<xs:complexType name="outlet">
+<xs:sequence>
+<xs:element name="cars" type="tns:car" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="closingTime" type="xs:int" minOccurs="0"/>
+<xs:element name="employees" type="tns:employee" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="openingTime" type="xs:int" minOccurs="0"/>
+<xs:element name="outletAddress" type="xs:string" minOccurs="0"/>
+<xs:element name="outletId" type="xs:long" minOccurs="0"/>
+<xs:element name="outletName" type="xs:string" minOccurs="0"/>
+<xs:element name="reservations" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="transitDispatchRecords" type="tns:transitDispatchRecord" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="employee">
+<xs:sequence>
+<xs:element name="employeeAccessRights" type="tns:employeeAccessRightsEnum" minOccurs="0"/>
+<xs:element name="employeeId" type="xs:long" minOccurs="0"/>
+<xs:element name="employeeName" type="xs:string" minOccurs="0"/>
+<xs:element name="outlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+<xs:element name="transitDispatchRecord" type="tns:transitDispatchRecord" minOccurs="0"/>
+<xs:element name="transitDispatchRecords" type="tns:transitDispatchRecord" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="transitStatus" type="tns:transitStatusEnum" minOccurs="0"/>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="transitDispatchRecord">
+<xs:sequence>
+<xs:element name="currentOutlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="destinationOutlet" type="tns:outlet" minOccurs="0"/>
+<xs:element name="dispatchTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="employee" type="tns:employee" minOccurs="0"/>
+<xs:element name="isCompleted" type="xs:boolean" minOccurs="0"/>
+<xs:element name="transitDispatchRecordId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="calculateRentalRateResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerLogin">
+<xs:sequence>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerLoginResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:partner" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="InvalidLoginCredentialException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="PartnerNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchAvailableCarModels">
+<xs:sequence>
+<xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="pickupOutlet" type="xs:string" minOccurs="0"/>
+<xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnOutlet" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchAvailableCarModelsResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:carModel" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CarModelNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="carStatusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="AVAILABLE"/>
+<xs:enumeration value="ONRENTAL"/>
+<xs:enumeration value="INTRANSIT"/>
+<xs:enumeration value="SERVICING"/>
+</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="employeeAccessRightsEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="EMPLOYEE"/>
+<xs:enumeration value="SALES_MANAGER"/>
+<xs:enumeration value="OPERATIONS_MANAGER"/>
+<xs:enumeration value="CS_EXECUTIVE"/>
+</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="transitStatusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="AVAILABLE"/>
+<xs:enumeration value="INTRANSIT"/>
+</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="rentalRateEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="DEFAULT"/>
+<xs:enumeration value="PEAK"/>
+<xs:enumeration value="PROMOTION"/>
+</xs:restriction>
+</xs:simpleType>
 </xs:schema>
