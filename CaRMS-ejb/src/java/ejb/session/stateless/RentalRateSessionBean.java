@@ -126,6 +126,13 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 	}
 
 	@Override
+	public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory) {
+		Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.carCategory = :inCarCategory");
+		query.setParameter("inCarCategory", carCategory);
+		return query.getResultList();
+	}
+
+	@Override
 	public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException {
 		if (rate != null && rate.getRentalRateId() != null) {
 			Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rate);
@@ -174,6 +181,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 	}
 
 	@Override
+	//TODO fix
 	public BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) {
 		Calendar startDate = new GregorianCalendar();
 		startDate.setTime(pickupDate);

@@ -56,11 +56,9 @@ public class Reservation implements Serializable {
     @Size(min = 1, max = 16)
     private String CreditCardNumber;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private Car car;
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private CarModel carModel;
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)

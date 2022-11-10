@@ -341,10 +341,10 @@ public class OperationsManager {
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Cars ***\n");
 
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
+        System.out.printf("%-10s%-25s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
 
         for (Car car : cars) {
-            System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory().getCategoryName(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled() ? "Yes" : "No");
+            System.out.printf("%-10s%-25s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory().getCategoryName(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled() ? "Yes" : "No");
         }
 
         System.out.print("Press any key to continue...> ");
@@ -360,7 +360,7 @@ public class OperationsManager {
             System.out.println("Enter Car Licence Plate Number>");
             Car car = carSessionBeanRemote.retrieveCarByLicensePlate(scanner.nextLine().trim());
 
-            System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
+            System.out.printf("%-10s%-25s%-20s%-20s%-20s\n", "Car ID", "Licence Plate Number", "Car Category", "Make Name", "Model Name", "Disabled?");
             System.out.printf("%-10s%-20s%-20s%-20s%-20s\n", car.getCarId().toString(), car.getLicensePlate(), car.getCarModel().getCarCategory().getCategoryName(), car.getCarModel().getMakeName(), car.getCarModel().getModelName(), car.getIsDisabled() ? "Yes" : "No");
 
             System.out.println("------------------------");

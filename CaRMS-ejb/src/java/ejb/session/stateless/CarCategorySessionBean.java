@@ -87,7 +87,7 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     
     @Override
     public CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException {
-        Query query = em.createQuery("SELECT cc FROM OwnCustomer cc WHERE cc.categoryName = :inCategoryName");
+        Query query = em.createQuery("SELECT cc FROM CarCategory cc WHERE cc.categoryName = :inCategoryName");
         query.setParameter("inCategoryName", categoryName);
         
         try {
