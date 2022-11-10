@@ -13,6 +13,7 @@ import entity.Outlet;
 import entity.OwnCustomer;
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -209,31 +210,33 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
 	@Override
 	public List<Reservation> retrieveCurrentDayReservations() {
-		Date today = new Date();
+		int today = new Date().getDate();
 		Query query = em.createQuery("SELECT r FROM Reservation r");
 
 		List<Reservation> allReservations = query.getResultList();
-
-		for (Reservation res : allReservations) {
-			if (!res.getReservationStartDate().equals(today)) {
-				allReservations.remove(res);
+		List<Reservation> todayReservations = new ArrayList<>();	
+		allReservations.forEach(res -> {
+			int resDate = res.getReservationStartDate().getDate();
+			if (resDate == today) {
+				todayReservations.add(res);
 			}
-		}
-		return allReservations;
+		});
+		return todayReservations;
 	}
 
 	@Override
 	public List<Reservation> retrieveReservationsByDate(Date date) {
 		Query query = em.createQuery("SELECT r FROM Reservation r");
-
+		int dateInt = date.getDate();
 		List<Reservation> allReservations = query.getResultList();
-
-		for (Reservation res : allReservations) {
-			if (!res.getReservationStartDate().equals(date)) {
-				allReservations.remove(res);
+		List<Reservation> dateReservations = new ArrayList<>();	
+		allReservations.forEach(res -> {
+			int resDate = res.getReservationStartDate().getDate();
+			if (resDate == dateInt) {
+				dateReservations.add(res);
 			}
-		}
-		return allReservations;
+		});
+		return dateReservations;
 	}
 
 	@Override
@@ -294,7 +297,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
 	@Override
 	public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException {
-		Car car = carSessionBeanLocal.retrieveCarByCarId(carId, false, true, false);
+		Car car = carSessionBeanLocal.retrieveCarByCarId(carId, true);
 		Reservation res = retrieveReservationByReservationId(reservationId);
 
 		car.getReservations().add(res);

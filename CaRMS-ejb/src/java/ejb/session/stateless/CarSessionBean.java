@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
 import entity.Reservation;
@@ -91,18 +92,12 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 	}
 
 	@Override
-	public Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException {
+	public Car retrieveCarByCarId(Long carId, Boolean retrieveReservations) throws CarNotFoundException {
 		Car car = em.find(Car.class, carId);
 
 		if (car != null) {
-			if (retrieveCarModel) {
-				car.getCarModel();
-			}
-			if (retrieveReservation) {
+			if (retrieveReservations) {
 				car.getReservations().size();
-			}
-			if (retrieveOutlet) {
-				car.getOutlet();
 			}
 			return car;
 		} else {
@@ -130,6 +125,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 		} catch (NoResultException | NonUniqueResultException ex) {
 			throw new CarNotFoundException("Car License Plate " + licensePlate + " does not exist!");
 		}
+	}
+
+	@Override
+	public List<Car> retrieveCarsByCarCategory(CarCategory category) {
+		Query query = em.createQuery("SELECT c FROM Car c WHERE c.carModel.carCategory = :inCarCategory");
+		query.setParameter("inCarCategory", category);
+
+		return query.getResultList();
 	}
 
 	@Override
@@ -171,40 +174,46 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 	}
 
 	@Override
-	public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException {
-		Car car = retrieveCarByCarId(carId);
+	public boolean isAvailable(Long carId, Date rNewStart, Date rNewEnd) throws CarNotFoundException {
+		Car car = retrieveCarByCarId(carId, true);
 
-		Reservation currentReservation = car.getCurrentReservation();
+		List<Reservation> reservations = car.getReservations();
 
+		// check if disabled
 		if (!car.getIsDisabled()) {
-			if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
-				return true;
-				// if car not currently available, check if current reservation returns to 
-			} else {
-				return startDate.after(currentReservation.getReservationEndDate());
+			// check if available during reservation time
+			for (Reservation r : reservations) {
+				Date rExistingStart = r.getReservationStartDate();
+				Date rExistingEnd = r.getReservationEndDate();
+
+				if ((rNewStart.before(rExistingEnd) && rNewStart.after(rExistingStart))
+						|| (rNewEnd.after(rExistingStart) && rNewEnd.before(rExistingEnd))
+						|| rNewStart.before(rExistingStart) && rNewEnd.after(rExistingEnd)) {
+					return false;
+				}
 			}
 		} else {
 			return false;
 		}
-
-	}
-
-	@Override
-	public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException {
-		Car car = retrieveCarByCarId(carId);
-		List<Reservation> reservations = car.getReservations();
-		// check if car is free on particular day
-
-		for (Reservation r : reservations) {
-			Date rStart = r.getReservationStartDate();
-			Date rEnd = r.getReservationEndDate();
-			if (rEnd.after(startDate) || rStart.before(rEnd)) {
-				return false;
-			}
-		}
 		return true;
+
 	}
 
+//	@Override
+//	public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException {
+//		Car car = retrieveCarByCarId(carId);
+//		List<Reservation> reservations = car.getReservations();
+//		// check if car is free on particular day
+//
+//		for (Reservation r : reservations) {
+//			Date rStart = r.getReservationStartDate();
+//			Date rEnd = r.getReservationEndDate();
+//			if (rEnd.after(startDate) || rStart.before(rEnd)) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 	private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
 		String msg = "Input data validation error!:";
 

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.TransitDispatchRecord;
 import javax.ejb.Local;
+import util.exception.OutletNotFoundException;
 import util.exception.TransitDispatchRecordExistException;
 import util.exception.UnknownPersistenceException;
 
@@ -16,6 +17,6 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface TransitDispatchRecordSessionBeanLocal {
-    public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, UnknownPersistenceException;
+    public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, OutletNotFoundException, UnknownPersistenceException;
     
 }
