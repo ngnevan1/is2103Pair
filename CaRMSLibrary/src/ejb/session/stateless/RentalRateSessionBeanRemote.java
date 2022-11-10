@@ -15,6 +15,7 @@ import javax.ejb.Remote;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
+import util.exception.RentalRateNotAvailableException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateRentalRateException;
@@ -36,7 +37,7 @@ public interface RentalRateSessionBeanRemote {
     public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
     
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
-    BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate);
+    List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException;
 	
-		public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
+    public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
 }

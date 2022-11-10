@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.CarStatusEnum;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
@@ -174,7 +175,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         rDate.setTime(returnDate);
         
         for (Car car : allCars) {
-            if (car.getReservations().isEmpty()) {
+            if (car.getReservations().isEmpty() && car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
                 availableModels.add(car.getCarModel());
             }
             else {
@@ -192,9 +193,10 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
                     else {
                         startDate.add(Calendar.HOUR_OF_DAY, -2);
                         endDate.add(Calendar.HOUR_OF_DAY, 2);
-                        if ((pDate.before(endDate)) || (rDate.after(startDate))) {
-                            isAvailable = Boolean.FALSE;
-                            break;
+                        if (!car.getOutlet().getOutletName().equals(pickupOutlet))
+                            if ((pDate.before(endDate)) || (rDate.after(startDate))) {
+                                isAvailable = Boolean.FALSE;
+                                break;
                         }
                     }
                 }

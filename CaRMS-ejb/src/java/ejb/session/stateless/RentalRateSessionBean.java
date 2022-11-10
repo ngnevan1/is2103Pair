@@ -9,6 +9,8 @@ import entity.CarCategory;
 import entity.RentalRate;
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -30,6 +32,7 @@ import util.enumeration.RentalRateEnum;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
+import util.exception.RentalRateNotAvailableException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateRentalRateException;
@@ -216,15 +219,45 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 	}
 
 	@Override
-	//TODO fix
-	public BigDecimal calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) {
-		Calendar startDate = new GregorianCalendar();
+	public List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException {
+                Calendar startDate = new GregorianCalendar();
 		startDate.setTime(pickupDate);
 		Calendar endDate = new GregorianCalendar();
 		endDate.setTime(returnDate);
-
-		BigDecimal totalAmount = new BigDecimal("0.0");
-
+                List<RentalRate> usedRates = new ArrayList<>();
+                
+                while (startDate.before(endDate)) {
+                    BigDecimal cheapestRate = new BigDecimal("0.00");
+                    RentalRate rateToUse = null;
+                    Date currentDate = startDate.getTime();
+                    Boolean correctRate = Boolean.FALSE;
+                    
+                    for (RentalRate rate : rates) {
+                        Date rateStartDate = rate.getRateStartDate();
+                        Date rateEndDate = rate.getRateEndDate();
+                        if ((!rate.getIsDisabled()) && 
+                                (rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) && 
+                                (rateEndDate.equals(currentDate) || rateEndDate.after(currentDate)) && 
+                                ((rate.getRatePerDay().compareTo(cheapestRate) == -1) || (correctRate.equals(new BigDecimal("0.00"))))) {
+                            cheapestRate = rate.getRatePerDay();
+                            rateToUse = rate;
+                            correctRate = Boolean.TRUE;
+                        }
+                    }
+                    
+                    if (correctRate) {
+                        usedRates.add(rateToUse);
+                    } 
+                    else {
+                        throw new RentalRateNotAvailableException("Rental Rate is not available for a particular day!");
+                    }
+                    
+                    startDate.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                
+                return usedRates;
+                		
+                /*
 		while (startDate.before(endDate)) {
 			BigDecimal cheapestRate = new BigDecimal("1000.0");
 
@@ -256,6 +289,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 		}
 
 		return totalAmount;
+                */
 	}
 
 	private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
