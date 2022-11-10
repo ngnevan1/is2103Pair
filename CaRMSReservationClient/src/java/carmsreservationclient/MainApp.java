@@ -235,8 +235,14 @@ public class MainApp {
             String pickupOutlet = scanner.nextLine().trim();
             System.out.print("Enter Return Date/Time (dd/MM/yyyy HH)> ");
             Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
-            System.out.print("Enter Return Outlet> ");
-            String returnOutlet = scanner.nextLine().trim();
+            System.out.print("Enter Return Outlet (leave blank if same as pickup outlet> ");
+            String input = scanner.nextLine().trim();
+			String returnOutlet;
+			if (input.length() > 0) {
+				returnOutlet = input;	
+			} else {
+				returnOutlet = pickupOutlet;
+			}
             
             if (outletSessionBeanRemote.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
                 List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
@@ -314,6 +320,7 @@ public class MainApp {
             System.out.println("Amount Paid: $" + rentalRate);
         }
         else {
+			newReservation.setCreditCardNumber(ccNumber);
             newReservation.setPaymentDate(pickupDate);
             System.out.println("Amount Due: $" + rentalRate + " During Pickup!");
         }
@@ -336,7 +343,8 @@ public class MainApp {
         }
         
     }
-    
+
+	//TODO optimise
     public void reserveCarByCarCategory(String carCategoryName, CarCategory reserveCarCategory, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarCategoryNotFoundException {
         Scanner scanner = new Scanner(System.in);
             
@@ -365,6 +373,7 @@ public class MainApp {
             System.out.println("Amount Paid: $" + rentalRate);
         }
         else {
+			newReservation.setCreditCardNumber(ccNumber);
             newReservation.setPaymentDate(pickupDate);
             System.out.println("Amount Due: $" + rentalRate + " During Pickup!");
         }
