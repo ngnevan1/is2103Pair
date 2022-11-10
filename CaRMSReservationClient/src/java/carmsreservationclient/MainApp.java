@@ -369,7 +369,7 @@ public class MainApp {
         }
         // Testing Ends
         
-        BigDecimal totalAmount = new BigDecimal("0.0");
+        BigDecimal totalAmount = new BigDecimal("0.00");
         List<RentalRate> usedRates = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
         for (RentalRate rate : usedRates) {
             totalAmount.add(rate.getRatePerDay());
@@ -419,7 +419,6 @@ public class MainApp {
         for(Reservation reservation : reservations) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
         }
-
     }
     
     public void viewReservationDetails() {
@@ -462,11 +461,11 @@ public class MainApp {
                 BigDecimal penaltyAmount = reservationSessionBeanRemote.calculateRefundPenalty(reservation);
                 System.out.println("Penalty Fee: $ " + penaltyAmount + " charged to " + reservation.getCreditCardNumber());
                 System.out.print("Enter CVV (For Verification)> ");
-                scanner.nextLine().trim();
+                scanner.nextLine();
                 System.out.println("Payment Successful!\n");
             }
             
-            ownCustomer = reservationSessionBeanRemote.removeReservation(reservationId, ownCustomer);   // Ensures local copy is synchronous
+            ownCustomer = reservationSessionBeanRemote.removeReservationByOwnCustomer(reservationId, ownCustomer);   // Ensures local copy is synchronous
         } catch (ReservationNotFoundException ex) {
             System.out.println(ex.getMessage());
         }

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarCategoryNotFoundException;
-import util.exception.CarModelNotFoundException;
+// import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.OwnCustomerNotFoundException;
@@ -25,14 +25,14 @@ import util.exception.UnknownPersistenceException;
  */
 @Remote
 public interface ReservationSessionBeanRemote {
-		public Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName)
-			throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
-    public Reservation createNewReservationByModel(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName)
-			throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
+    public Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName)
+            throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
+    // public Reservation createNewReservationByModel(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName)
+            // throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
     BigDecimal calculateRefundPenalty(Reservation reservation);
     List<Reservation> retrieveReservationsByCustomerEmail(String email);
-    OwnCustomer removeReservation(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
+    OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
     public Reservation retrieveReservationsByCustomer(Customer customer) throws ReservationNotFoundException;
     public void updateReservation(Reservation reservation) throws ReservationNotFoundException, InputDataValidationException;
 }
