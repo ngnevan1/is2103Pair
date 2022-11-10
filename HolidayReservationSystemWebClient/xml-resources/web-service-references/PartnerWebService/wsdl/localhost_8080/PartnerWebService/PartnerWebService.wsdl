@@ -16,11 +16,14 @@
 <message name="PartnerNotFoundException">
 <part name="fault" element="tns:PartnerNotFoundException"/>
 </message>
-<message name="calculateRentalRate">
-<part name="parameters" element="tns:calculateRentalRate"/>
+<message name="searchAvailableCarModels">
+<part name="parameters" element="tns:searchAvailableCarModels"/>
 </message>
-<message name="calculateRentalRateResponse">
-<part name="parameters" element="tns:calculateRentalRateResponse"/>
+<message name="searchAvailableCarModelsResponse">
+<part name="parameters" element="tns:searchAvailableCarModelsResponse"/>
+</message>
+<message name="CarModelNotFoundException">
+<part name="fault" element="tns:CarModelNotFoundException"/>
 </message>
 <message name="checkOutletIsOpen">
 <part name="parameters" element="tns:checkOutletIsOpen"/>
@@ -31,14 +34,14 @@
 <message name="OutletNotFoundException">
 <part name="fault" element="tns:OutletNotFoundException"/>
 </message>
-<message name="searchAvailableCarModels">
-<part name="parameters" element="tns:searchAvailableCarModels"/>
+<message name="calculateRentalRate">
+<part name="parameters" element="tns:calculateRentalRate"/>
 </message>
-<message name="searchAvailableCarModelsResponse">
-<part name="parameters" element="tns:searchAvailableCarModelsResponse"/>
+<message name="calculateRentalRateResponse">
+<part name="parameters" element="tns:calculateRentalRateResponse"/>
 </message>
-<message name="CarModelNotFoundException">
-<part name="fault" element="tns:CarModelNotFoundException"/>
+<message name="RentalRateNotAvailableException">
+<part name="fault" element="tns:RentalRateNotAvailableException"/>
 </message>
 <portType name="PartnerWebService">
 <operation name="partnerLogin">
@@ -47,19 +50,20 @@
 <fault message="tns:InvalidLoginCredentialException" name="InvalidLoginCredentialException" wsam:Action="http://ws.session.ejb/PartnerWebService/partnerLogin/Fault/InvalidLoginCredentialException"/>
 <fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/partnerLogin/Fault/PartnerNotFoundException"/>
 </operation>
-<operation name="calculateRentalRate">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/calculateRentalRateRequest" message="tns:calculateRentalRate"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/calculateRentalRateResponse" message="tns:calculateRentalRateResponse"/>
+<operation name="searchAvailableCarModels">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsRequest" message="tns:searchAvailableCarModels"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsResponse" message="tns:searchAvailableCarModelsResponse"/>
+<fault message="tns:CarModelNotFoundException" name="CarModelNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModels/Fault/CarModelNotFoundException"/>
 </operation>
 <operation name="checkOutletIsOpen">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/checkOutletIsOpenRequest" message="tns:checkOutletIsOpen"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/checkOutletIsOpenResponse" message="tns:checkOutletIsOpenResponse"/>
 <fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/checkOutletIsOpen/Fault/OutletNotFoundException"/>
 </operation>
-<operation name="searchAvailableCarModels">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsRequest" message="tns:searchAvailableCarModels"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsResponse" message="tns:searchAvailableCarModelsResponse"/>
-<fault message="tns:CarModelNotFoundException" name="CarModelNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModels/Fault/CarModelNotFoundException"/>
+<operation name="calculateRentalRate">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/calculateRentalRateRequest" message="tns:calculateRentalRate"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/calculateRentalRateResponse" message="tns:calculateRentalRateResponse"/>
+<fault message="tns:RentalRateNotAvailableException" name="RentalRateNotAvailableException" wsam:Action="http://ws.session.ejb/PartnerWebService/calculateRentalRate/Fault/RentalRateNotAvailableException"/>
 </operation>
 </portType>
 <binding name="PartnerWebServicePortBinding" type="tns:PartnerWebService">
@@ -79,7 +83,7 @@
 <soap:fault name="PartnerNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="calculateRentalRate">
+<operation name="searchAvailableCarModels">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -87,6 +91,9 @@
 <output>
 <soap:body use="literal"/>
 </output>
+<fault name="CarModelNotFoundException">
+<soap:fault name="CarModelNotFoundException" use="literal"/>
+</fault>
 </operation>
 <operation name="checkOutletIsOpen">
 <soap:operation soapAction=""/>
@@ -100,7 +107,7 @@
 <soap:fault name="OutletNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="searchAvailableCarModels">
+<operation name="calculateRentalRate">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -108,8 +115,8 @@
 <output>
 <soap:body use="literal"/>
 </output>
-<fault name="CarModelNotFoundException">
-<soap:fault name="CarModelNotFoundException" use="literal"/>
+<fault name="RentalRateNotAvailableException">
+<soap:fault name="RentalRateNotAvailableException" use="literal"/>
 </fault>
 </operation>
 </binding>

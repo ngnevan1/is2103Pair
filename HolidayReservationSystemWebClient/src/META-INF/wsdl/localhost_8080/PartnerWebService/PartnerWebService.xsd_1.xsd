@@ -8,6 +8,8 @@
 
 <xs:element name="PartnerNotFoundException" type="tns:PartnerNotFoundException"/>
 
+<xs:element name="RentalRateNotAvailableException" type="tns:RentalRateNotAvailableException"/>
+
 <xs:element name="calculateRentalRate" type="tns:calculateRentalRate"/>
 
 <xs:element name="calculateRentalRateResponse" type="tns:calculateRentalRateResponse"/>
@@ -184,7 +186,13 @@
 
 <xs:complexType name="calculateRentalRateResponse">
 <xs:sequence>
-<xs:element name="return" type="xs:decimal" minOccurs="0"/>
+<xs:element name="return" type="tns:rentalRate" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="RentalRateNotAvailableException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

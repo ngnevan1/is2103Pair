@@ -28,6 +28,7 @@ import util.exception.CarModelNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.OutletNotFoundException;
 import util.exception.PartnerNotFoundException;
+import util.exception.RentalRateNotAvailableException;
 
 /**
  *
@@ -59,10 +60,9 @@ public class PartnerWebService {
         em.detach(partner);
         
         for (Reservation reservation : partner.getReservations()) {
-            em.detach(reservation);
             reservation.setPartner(null);
         }
-        
+        // nullify - detach
         for (Customer customer : partner.getCustomers()) {
             em.detach(customer);
             customer.setPartner(null);
@@ -82,7 +82,7 @@ public class PartnerWebService {
     }
     
     @WebMethod(operationName = "calculateRentalRate")
-    public BigDecimal calculateRentalRate(@WebParam(name = "rentalRates") List<RentalRate> rentalRates, @WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) {
+    public List<RentalRate> calculateRentalRate(@WebParam(name = "rentalRates") List<RentalRate> rentalRates, @WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) throws RentalRateNotAvailableException {
         return rentalRateSessionBeanLocal.calculateRentalRate(rentalRates, pickupDate, returnDate);
     }
 

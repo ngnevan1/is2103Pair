@@ -5,13 +5,31 @@
  */
 package holidayreservationsystemwebclient;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import ws.client.partner.CarModel;
+import ws.client.partner.CarModelNotFoundException_Exception;
+import ws.client.partner.InvalidLoginCredentialException;
+import ws.client.partner.InvalidLoginCredentialException_Exception;
+import ws.client.partner.OutletNotFoundException_Exception;
+import ws.client.partner.Partner;
+import ws.client.partner.PartnerNotFoundException;
+import ws.client.partner.PartnerNotFoundException_Exception;
 // import ws.client.partner.Partner;
 import ws.client.partner.PartnerWebService_Service;
 import ws.client.partner.PartnerWebService;
+import ws.client.partner.RentalRate;
+import ws.client.partner.RentalRateNotAvailableException_Exception;
 
 
 /**
@@ -21,7 +39,7 @@ import ws.client.partner.PartnerWebService;
 
 public class MainApp {
     
-    // Partner partner;
+    Partner partner;
     
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
@@ -39,15 +57,13 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if(response == 1) {
-                    /*
                     try {
                         partnerLogin();
                         System.out.println("Login successful!\n");
                         menuMain();
-                    } catch (InvalidLoginCredentialException | PartnerNotFoundException) {
+                    } catch (InvalidLoginCredentialException_Exception | PartnerNotFoundException_Exception ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage());
                     }
-                    */
                 }
                 else if(response == 2) {
                     partnerSearchCar();
@@ -112,7 +128,7 @@ public class MainApp {
         }
     }
     
-    public void partnerLogin() {
+    public void partnerLogin() throws InvalidLoginCredentialException_Exception, PartnerNotFoundException_Exception {
         Scanner scanner = new Scanner(System.in);
         
         System.out.println("*** Holiday Reservation System :: Partner Login ***\n");
@@ -120,39 +136,38 @@ public class MainApp {
         String username = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         String password = scanner.nextLine().trim();
-        
-        if(username.length() > 0 && password.length() > 0) {
-            // partner = partnerLogin(username, password);
-        } 
-        else {
-            // throw new InvalidLoginCredentialException("Missing login credential!");
-        }
-        
+        partner = partnerLogin(username, password);       
     }
     
     public void partnerSearchCar() {
         try {
             Scanner scanner = new Scanner(System.in);
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y H");
+            GregorianCalendar calendar = new GregorianCalendar();
             
             System.out.println("*** Holiday Reservation System :: Partner Search Car ***\n");
             System.out.println("*** CaRMS Reservation System :: Search Car ***\n");
             System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH> ");
-            Date pickupDate = inputDateFormat.parse(scanner.nextLine().trim());
+            Date pDate = inputDateFormat.parse(scanner.nextLine().trim());
+            calendar.setTime(pDate);
+            XMLGregorianCalendar pickupDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
             System.out.print("Enter Pickup Outlet> ");
             String pickupOutlet = scanner.nextLine().trim();
             System.out.print("Enter Return Date/Time> ");
-            Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
+            Date rDate = inputDateFormat.parse(scanner.nextLine().trim());
+            calendar.setTime(rDate);
+            XMLGregorianCalendar returnDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
             System.out.print("Enter Return Outlet> ");
             String returnOutlet = scanner.nextLine().trim();
-            /*
+            
             if (checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
                 List<CarModel> availableCarModels = searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-                System.out.printf("%15s%15s%15s", "Car Category", "Car Make", "Car Model", "Rental Rate");
+                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
                 
                 // WIP
+                /* 
                 for(CarModel carModel : availableCarModels) {
-                    List<RentalRate> rentalRates = carModel.getCarCategory().getRentalRates();
+                    List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(carModel.getCarCategory());
                     BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
                     System.out.printf("%15s%15s%15s", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), rentalRate);
                 }
@@ -180,17 +195,18 @@ public class MainApp {
                 else {
                     System.out.println("Please login first before making a reservation!\n");
                 }
+                */
             }
             else {
                 System.out.println("Outlet is closed during Pickup or Return Time!");
             }
-            */
-        } catch (ParseException ex) {
+        } catch (ParseException | DatatypeConfigurationException ex) {
             System.out.println("Invalid date/time input!");
-        // } catch (OutletNotFoundException | CarModelNotFoundException | CarCategoryNotFoundException ex) {
-            // System.out.println(ex.getMessage());
+        } catch (OutletNotFoundException_Exception | CarModelNotFoundException_Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
+    
     /*
     public void reserveCarByCarModel(String carModelName, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarModelNotFoundException {
         Scanner scanner = new Scanner(System.in);
@@ -232,35 +248,29 @@ public class MainApp {
         System.out.println("*** Holiday Reservation System :: Partner Cancel Reservation ***\n");
     }
     
-    /*
-    private static Partner partnerLogin(java.lang.String username, java.lang.String password) {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+    private static Partner partnerLogin(java.lang.String username, java.lang.String password) throws InvalidLoginCredentialException_Exception, PartnerNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.partnerLogin(username, password);
     }
-    */
-    
-    /*
-    private static Boolean checkOutletIsOpen(java.util.Date pickupDate, java.lang.String pickupOutlet, java.util.Date returnDate, java.lang.String returnOutlet) {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+
+    private static Boolean checkOutletIsOpen(javax.xml.datatype.XMLGregorianCalendar pickupDate, java.lang.String pickupOutlet, javax.xml.datatype.XMLGregorianCalendar returnDate, java.lang.String returnOutlet) throws OutletNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        // XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(pickupDate.getYear(), pickupDate.getMonth(), pickupDate.getDay(), pickupDate.getHours(), 0, 0);
         return port.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet);
     }
-    */
-    
-    /*
-    private static java.util.List<ws.client.partner.CarModel> searchAvailableCarModels(java.util.Date pickupDate, java.lang.String pickupOutlet, java.util.Date returnDate, java.lang.String returnOutlet) {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+
+    private static java.util.List<ws.client.partner.CarModel> searchAvailableCarModels(javax.xml.datatype.XMLGregorianCalendar pickupDate, java.lang.String pickupOutlet, javax.xml.datatype.XMLGregorianCalendar returnDate, java.lang.String returnOutlet) throws CarModelNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
     }
-    */
     
-    /*
-    private static BigDecimal calculateRentalRate(java.util.List<ws.client.partner.RentalRate> rentalRates, java.util.Date pickupDate, java.util.Date returnDate) {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.PartnerWebService_Service();
+    private static java.util.List<ws.client.partner.RentalRate> calculateRentalRate(java.util.List<ws.client.partner.RentalRate> rentalRates, javax.xml.datatype.XMLGregorianCalendar pickupDate, javax.xml.datatype.XMLGregorianCalendar returnDate) throws RentalRateNotAvailableException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.calculateRentalRate(rentalRates, pickupDate, returnDate);
     }
-    */
+
 }
