@@ -228,7 +228,7 @@ public class MainApp {
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y H");
             
             System.out.println("*** CaRMS Reservation System :: Search Car ***\n");
-            System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH> ");
+            System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH)> ");
             Date pickupDate = inputDateFormat.parse(scanner.nextLine().trim());
             System.out.print("Enter Pickup Outlet> ");
             String pickupOutlet = scanner.nextLine().trim();
@@ -239,12 +239,13 @@ public class MainApp {
             
             if (outletSessionBeanRemote.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
                 List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-                System.out.printf("%15s%15s%15s", "Car Category", "Car Make", "Car Model", "Rental Rate");
+                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
             
                 for(CarModel carModel : availableCarModels) {
-                    List<RentalRate> rentalRates = carModel.getCarCategory().getRentalRates();
+				List<RentalRate> rentalRates =	rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(carModel.getCarCategory());
+                     //= carModel.getCarCategory().getRentalRates();
                     BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
-                    System.out.printf("%15s%15s%15s", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), rentalRate);
+                    System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), rentalRate);
                 }
                 
                 System.out.println("------------------------");
@@ -259,7 +260,8 @@ public class MainApp {
                     if (response == 1) {
                         System.out.print("Enter Car Category Name> ");
                         String carCategoryName = scanner.nextLine().trim();
-                        reserveCarByCarCategory(carCategoryName, pickupDate, returnDate, pickupOutlet, returnOutlet);
+						CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
+                        reserveCarByCarCategory(carCategoryName, reserveCarCategory, pickupDate, returnDate, pickupOutlet, returnOutlet);
                     }
                     else if (response == 2) {
                         System.out.print("Enter Car Model Name> ");
@@ -291,7 +293,9 @@ public class MainApp {
         String input = scanner.nextLine().trim();
             
         CarModel reserveCarModel = carModelSessionBeanRemote.retrieveCarModelByModelName(carModelName);
-        List<RentalRate> rentalRates = reserveCarModel.getCarCategory().getRentalRates();
+        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarModel.getCarCategory());
+				//reserveCarModel.getCarCategory().getRentalRates();
+		
         BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
             
         Reservation newReservation = new Reservation();
@@ -334,7 +338,7 @@ public class MainApp {
         
     }
     
-    public void reserveCarByCarCategory(String carCategoryName, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarCategoryNotFoundException {
+    public void reserveCarByCarCategory(String carCategoryName, CarCategory reserveCarCategory, Date pickupDate, Date returnDate, String pickupOutlet, String returnOutlet) throws CarCategoryNotFoundException {
         Scanner scanner = new Scanner(System.in);
             
         System.out.println("*** CaRMS Reservation System :: Reserve Car ***\n");
@@ -342,9 +346,12 @@ public class MainApp {
         String ccNumber = scanner.nextLine().trim();
         System.out.print("Do you want to do immediate payment? (Enter 'Y' to Pay)> ");
         String input = scanner.nextLine().trim();
-        
-        CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
-        List<RentalRate> rentalRates = reserveCarCategory.getRentalRates();
+        //CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
+		System.out.println("CarCategory: " + reserveCarCategory);
+        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarCategory);
+		System.out.println("rentalRates: " + rentalRates);
+				//reserveCarCategory.getRentalRates();
+		
         BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
             
         Reservation newReservation = new Reservation();
@@ -408,8 +415,8 @@ public class MainApp {
             scanner.nextLine();
             
             Reservation reservation = reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId);
-            System.out.printf("%5s%25s%25s%25s", "ID", "Start Date", "End Date", "Payment Date", "Total Amount");
-            System.out.printf("%5s%25s%25s%25s", reservation.getReservationId(), outputDateFormat.format(reservation.getReservationStartDate()),
+            System.out.printf("%-5s%-25s%-25s%-25s\n", "ID", "Start Date", "End Date", "Payment Date", "Total Amount");
+            System.out.printf("%-5s%-25s%-25s%-25s\n", reservation.getReservationId(), outputDateFormat.format(reservation.getReservationStartDate()),
                 outputDateFormat.format(reservation.getReservationEndDate()), outputDateFormat.format(reservation.getPaymentDate()), reservation.getTotalAmount());
         } catch (ReservationNotFoundException ex) {
             System.out.println(ex.getMessage());
