@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -25,5 +26,6 @@ public interface RentalRateSessionBeanLocal {
     public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException;
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws RentalRateExistException, UnknownPersistenceException, InputDataValidationException;
     public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
+    List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
     List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException;
 }

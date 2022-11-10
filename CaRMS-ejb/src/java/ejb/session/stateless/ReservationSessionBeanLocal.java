@@ -5,14 +5,22 @@
  */
 package ejb.session.stateless;
 
+import entity.Customer;
 import entity.OwnCustomer;
+import entity.Partner;
 import entity.Reservation;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.CarNotFoundException;
+import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundException;
+import util.exception.OwnCustomerNotFoundException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -20,11 +28,17 @@ import util.exception.ReservationNotFoundException;
  */
 @Local
 public interface ReservationSessionBeanLocal {
+    Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName) 
+            throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
+    Reservation createNewReservationByCategory(Reservation newReservation, Customer customer, Partner partner, String carCategoryName, String pickupOutletName, String returnOutletName)
+            throws CarCategoryNotFoundException, OutletNotFoundException, CustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
-    BigDecimal calculateRefundPenalty(Reservation reservation);
     public List<Reservation> retrieveCurrentDayReservations();
     public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException;
     public List<Reservation> retrieveReservationsByDate(Date date);
     List<Reservation> retrieveReservationsByCustomerEmail(String email);
-    OwnCustomer removeReservation(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
+    List<Reservation> retrieveReservationsByPartnerUsername(String username);
+    OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
+    Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException;
+    BigDecimal calculateRefundPenalty(Reservation reservation);
 }
