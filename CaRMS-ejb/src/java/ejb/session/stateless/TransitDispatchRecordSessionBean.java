@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
 import entity.TransitDispatchRecord;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.EmployeeNotFoundException;
+import util.exception.OutletNotFoundException;
 import util.exception.TransitDispatchRecordExistException;
 import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -27,20 +29,28 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSessionBeanRemote, TransitDispatchRecordSessionBeanLocal {
 
+	@EJB
+	private OutletSessionBeanLocal outletSessionBeanLocal;
+
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
+	
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @Override
-    public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, UnknownPersistenceException {
+    public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, OutletNotFoundException, UnknownPersistenceException {
 
         try {
-            em.persist(newDispatch);
-            em.flush();
+            Outlet destinationOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(newDispatch.getDestinationOutlet().getOutletId(), false, false, true);
+
+			em.persist(newDispatch);
+			destinationOutlet.getTransitDispatchRecords().add(newDispatch);
+            
+			em.flush();
             em.refresh(newDispatch);
             return newDispatch;
         } catch (PersistenceException ex) {
@@ -53,7 +63,7 @@ public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSe
             } else {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
-        }
+		}
     }
 
     public TransitDispatchRecord retrieveTransitDispatchRecordByTransitDispatchRecordId(Long transitDispatchRecordId) throws TransitDispatchRecordNotFoundException {

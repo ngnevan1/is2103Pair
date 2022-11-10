@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarCategory;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -21,10 +22,10 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface CarSessionBeanLocal {
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException;
-    Car retrieveCarByCarId(Long carId, Boolean retrieveCarModel, Boolean retrieveReservation, Boolean retrieveOutlet) throws CarNotFoundException;
+	public Car retrieveCarByCarId(Long carId, Boolean retrieveReservations) throws CarNotFoundException;
     Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+	public List<Car> retrieveCarsByCarCategory(CarCategory category);
     List<Car> retrieveAllCars();
     List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
-    public boolean isAvailable(Long carId, Date startDate) throws CarNotFoundException;
-    public boolean isAvailableOnDate(Long carId, Date startDate, Date endDate) throws CarNotFoundException;
+	public boolean isAvailable(Long carId, Date reservationStartDate, Date reservationEndDate) throws CarNotFoundException;
 }

@@ -118,8 +118,7 @@ public class SalesManager {
 				System.out.printf("%-20s%-20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
 			}
 			System.out.print("> ");
-			CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(scanner.nextLong(), false, false);
-			newRentalRate.setCarCategory(chosenCategory);
+			Long carCategoryId = scanner.nextLong();
 			System.out.print("Enter Rate Per Day> ");
 			newRentalRate.setRatePerDay(scanner.nextBigDecimal());
 			scanner.nextLine();
@@ -152,7 +151,7 @@ public class SalesManager {
 			Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
 
 			if (constraintViolations.isEmpty()) {
-				RentalRate createdRentalRate = rentalRateSessionBeanRemote.createNewRentalRate(newRentalRate);
+				RentalRate createdRentalRate = rentalRateSessionBeanRemote.createNewRentalRate(newRentalRate, carCategoryId);
 				System.out.println("Rental Rate " + createdRentalRate.getRateName() + " created successfully!");
 			} else {
 				showInputDataValidationErrorsForRentalRate(constraintViolations);
@@ -160,9 +159,7 @@ public class SalesManager {
 
 		} catch (ParseException ex) {
 			System.out.println("Invalid Date Input!\n");
-		} catch (CarCategoryNotFoundException ex) {
-			System.out.println("Invalid Car Category");
-		} catch (RentalRateExistException | UnknownPersistenceException ex) {
+		} catch (CarCategoryNotFoundException | RentalRateExistException | UnknownPersistenceException ex) {
 			System.out.println("Error creating Rental Rate: " + ex.getMessage());
 		} catch (InputDataValidationException ex) {
 			System.out.println(ex.getMessage() + "\n");
@@ -182,7 +179,7 @@ public class SalesManager {
 		for (RentalRate rate : rentalRates) {
 			String rateStartDate = outputDateFormat.format(rate.getRateStartDate());
 			String rateEndDate = outputDateFormat.format(rate.getRateEndDate());
-			System.out.printf("%-15s%-35s%-15s%-18s%-18s%-18s%-5s\n", rate.getRentalRateId().toString(), rate.getRateName(), rate.getRatePerDay().toString(), rateStartDate, rateEndDate, rate.getCarCategory().getCategoryName(), rate.getIsDisabled() ? "Yes" : "No" );
+			System.out.printf("%-15s%-35s%-15s%-18s%-18s%-18s%-5s\n", rate.getRentalRateId().toString(), rate.getRateName(), rate.getRatePerDay().toString(), rateStartDate, rateEndDate, rate.getCarCategory().getCategoryName(), rate.getIsDisabled() ? "Yes" : "No");
 		}
 
 		System.out.print("Press any key to continue...> ");
@@ -280,7 +277,7 @@ public class SalesManager {
 				}
 			}
 			scanner.nextLine();
-			
+
 			rentalRateSessionBeanRemote.updateRentalRate(rate);
 			System.out.println("Rental Rate " + rate.getRateName() + " updated successfully!");
 

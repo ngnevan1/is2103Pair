@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -28,6 +29,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateEnum;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
 import util.exception.RentalRateNotAvailableException;
@@ -41,6 +43,9 @@ import util.exception.UpdateRentalRateException;
  */
 @Stateless
 public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
+
+	@EJB
+	private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
 
 	@PersistenceContext(unitName = "CaRMS-ejbPU")
 	private EntityManager em;
@@ -84,6 +89,37 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
 	}
 
+	@Override
+	public RentalRate createNewRentalRate(RentalRate newRentalRate, Long carCategoryId) throws RentalRateExistException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException {
+		CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryId(carCategoryId);
+		newRentalRate.setCarCategory(carCategory);
+		Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
+
+		if (constraintViolations.isEmpty()) {
+			try {
+				em.persist(newRentalRate);
+				em.flush();
+				em.refresh(newRentalRate);
+				CarCategory category = em.find(CarCategory.class, newRentalRate.getCarCategory().getCarCategoryId());
+				category.getRentalRates().add(newRentalRate);
+				return newRentalRate;
+			} catch (PersistenceException ex) {
+				if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+					if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+						throw new RentalRateExistException("Rental Rate already exists!");
+					} else {
+						throw new UnknownPersistenceException(ex.getMessage());
+					}
+				} else {
+					throw new UnknownPersistenceException(ex.getMessage());
+				}
+			}
+		} else {
+			throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+		}
+
+	}
+	
 	@Override
 	public List<RentalRate> retrieveAllRentalRates() {
 		Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.rateEndDate");

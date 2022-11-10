@@ -101,21 +101,28 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         outlet.getEmployees().add(employee);
     }
     
+	@Override
     public Boolean checkOutletIsOpen(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) throws OutletNotFoundException {
         Outlet pOutlet = retrieveOutletByOutletName(pickupOutlet);
         Outlet rOutlet = retrieveOutletByOutletName(returnOutlet);
         
-        Integer openingTimeMinutes = pOutlet.getOpeningTime();
-        Integer closingTimeMinutes = rOutlet.getClosingTime();
-        
-        if (openingTimeMinutes == null || closingTimeMinutes == null) {
-            return true;
-        }
-        else if (openingTimeMinutes*60 >= (pickupDate.getHours()*60 + pickupDate.getMinutes()) ||  closingTimeMinutes*60 <= (returnDate.getHours()*60 + returnDate.getMinutes())) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        //Integer openingTimeMinutes = pOutlet.getOpeningTime();
+        //Integer closingTimeMinutes = rOutlet.getClosingTime();
+      
+		int openTime = pOutlet.getOpeningTime();
+		int closeTime = rOutlet.getClosingTime();
+		int pickTime = pickupDate.getHours();
+		int returnTime = returnDate.getHours();
+		if (pickTime < openTime || returnTime > closeTime) {
+			return false;
+		}
+		return true;
+//		if (openingTimeMinutes == 0 && closingTimeMinutes == 0) {
+//			return true;
+//		} else if() 
+//		
+//        if (openingTimeMinutes == null || closingTimeMinutes == null) {
+//            return true;
+//        } else return openingTimeMinutes*60 >= (pickupDate.getHours()*60 + pickupDate.getMinutes()) ||  closingTimeMinutes*60 <= (returnDate.getHours()*60 + returnDate.getMinutes());
     }
 }
