@@ -11,13 +11,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
-import util.exception.CarCategoryNotFoundException;
-import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
-import util.exception.InputDataValidationException;
-import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
-import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -25,10 +20,6 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface ReservationSessionBeanLocal {
-    Reservation createNewReservationByModel(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName) 
-            throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, UnknownPersistenceException, InputDataValidationException;
-    Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName) 
-            throws CarCategoryNotFoundException, OutletNotFoundException, UnknownPersistenceException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
     BigDecimal calculateRefundPenalty(Reservation reservation);
     public List<Reservation> retrieveCurrentDayReservations();

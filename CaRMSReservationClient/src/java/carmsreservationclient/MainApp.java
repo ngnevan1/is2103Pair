@@ -65,6 +65,7 @@ public class MainApp {
             CustomerSessionBeanRemote customerSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, 
             ReservationSessionBeanRemote reservationSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
         this();
+		this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
@@ -232,7 +233,7 @@ public class MainApp {
             Date pickupDate = inputDateFormat.parse(scanner.nextLine().trim());
             System.out.print("Enter Pickup Outlet> ");
             String pickupOutlet = scanner.nextLine().trim();
-            System.out.print("Enter Return Date/Time> ");
+            System.out.print("Enter Return Date/Time (dd/MM/yyyy HH)> ");
             Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
             System.out.print("Enter Return Outlet> ");
             String returnOutlet = scanner.nextLine().trim();
@@ -243,7 +244,6 @@ public class MainApp {
             
                 for(CarModel carModel : availableCarModels) {
 				List<RentalRate> rentalRates =	rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(carModel.getCarCategory());
-                     //= carModel.getCarCategory().getRentalRates();
                     BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
                     System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), rentalRate);
                 }
@@ -294,7 +294,6 @@ public class MainApp {
             
         CarModel reserveCarModel = carModelSessionBeanRemote.retrieveCarModelByModelName(carModelName);
         List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarModel.getCarCategory());
-				//reserveCarModel.getCarCategory().getRentalRates();
 		
         BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
             
@@ -324,7 +323,7 @@ public class MainApp {
             try {
                 newReservation = reservationSessionBeanRemote.createNewReservationByModel(newReservation, ownCustomer, carModelName, pickupOutlet, returnOutlet);
                 System.out.println("Car reserved successfully!: " + newReservation.getReservationId() + "\n");
-            } catch (CarCategoryNotFoundException | CarModelNotFoundException | OutletNotFoundException ex) {
+            } catch (CarCategoryNotFoundException | CarModelNotFoundException | OutletNotFoundException | OwnCustomerNotFoundException ex) {
                 System.out.println("An error had occurred while making a reservation: " + ex.getMessage() + "!\n");
             } catch (UnknownPersistenceException ex) {
                 System.out.println("An unknown error had occurred while making a reservation: " + ex.getMessage() + "!\n");
@@ -346,11 +345,7 @@ public class MainApp {
         String ccNumber = scanner.nextLine().trim();
         System.out.print("Do you want to do immediate payment? (Enter 'Y' to Pay)> ");
         String input = scanner.nextLine().trim();
-        //CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
-		System.out.println("CarCategory: " + reserveCarCategory);
         List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarCategory);
-		System.out.println("rentalRates: " + rentalRates);
-				//reserveCarCategory.getRentalRates();
 		
         BigDecimal rentalRate = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
             
@@ -379,7 +374,7 @@ public class MainApp {
             try {
                 newReservation = reservationSessionBeanRemote.createNewReservationByCategory(newReservation, ownCustomer, carCategoryName, pickupOutlet, returnOutlet);
                 System.out.println("Car reserved successfully!: " + newReservation.getReservationId() + "\n");
-            } catch (CarCategoryNotFoundException | OutletNotFoundException | UnknownPersistenceException ex) {
+            } catch (CarCategoryNotFoundException | OutletNotFoundException | OwnCustomerNotFoundException | UnknownPersistenceException ex) {
                 System.out.println("An error had occurred while making a reservation: " + ex.getMessage() + "!\n");
             } catch (InputDataValidationException ex) {
                 System.out.println(ex.getMessage() + "\n");
@@ -408,7 +403,7 @@ public class MainApp {
             Scanner scanner = new Scanner(System.in);
             SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             
-            System.out.println("*** CaRMS Reservation System :: Voew Reservation Details ***\n");
+            System.out.println("*** CaRMS Reservation System :: View Reservation Details ***\n");
             viewAllReservations(false);
             System.out.print("Enter Reservation ID> ");
             Long reservationId = scanner.nextLong();
