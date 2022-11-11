@@ -112,30 +112,6 @@ public class SalesManager {
 			System.out.println("*** CaRMS System :: Sales Management - Sales Manager :: Create New Rental Rate ***\n");
 			System.out.print("Enter Name> ");
 			newRentalRate.setRateName(scanner.nextLine().trim());
-			System.out.print("Choose Car Category by entering Car Category ID \n");
-			System.out.printf("%-20s%-20s\n", "Car Category ID", "Car Category Name");
-			for (CarCategory category : carCategories) {
-				System.out.printf("%-20s%-20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
-			}
-			System.out.print("> ");
-			Long carCategoryId = scanner.nextLong();
-			System.out.print("Enter Rate Per Day> ");
-			newRentalRate.setRatePerDay(scanner.nextBigDecimal());
-			scanner.nextLine();
-			System.out.print("Enter Rental Rate Start Date (DD/MM/YYYY) (Leave blank if always valid)> ");
-			input = scanner.nextLine().trim();
-			if (input.length() > 0) {
-				newRentalRate.setRateStartDate(inputDateFormat.parse(input));
-			} else {
-				newRentalRate.setRateStartDate(fillerStart);
-			}
-			System.out.print("Enter Rental Rate End Date (DD/MM/YYYY) (Leave blank if always valid)> ");
-			input = scanner.nextLine().trim();
-			if (input.length() > 0) {
-				newRentalRate.setRateStartDate(inputDateFormat.parse(input));
-			} else {
-				newRentalRate.setRateEndDate(fillerEnd);
-			}
 			while (true) {
 				System.out.print("Select Rental Rate Type (1: Default, 2: Peak, 3: Promotion)> ");
 				Integer rentalRateInt = scanner.nextInt();
@@ -147,6 +123,31 @@ public class SalesManager {
 					System.out.println("Invalid option, please try again!\n");
 				}
 			}
+			System.out.print("Choose Car Category by entering Car Category ID \n");
+			System.out.printf("%-20s%-20s\n", "Car Category ID", "Car Category Name");
+			for (CarCategory category : carCategories) {
+				System.out.printf("%-20s%-20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
+			}
+			System.out.print("> ");
+			Long carCategoryId = scanner.nextLong();
+			System.out.print("Enter Rate Per Day> ");
+			newRentalRate.setRatePerDay(scanner.nextBigDecimal());
+			scanner.nextLine();
+			System.out.print("Enter Rental Rate Start Date (DD/MM/YYYY hh:mm) (Leave blank if always valid)> ");
+			input = scanner.nextLine().trim();
+			if (input.length() > 0) {
+				newRentalRate.setRateStartDate(format.parse(input));
+			} else {
+				newRentalRate.setRateStartDate(fillerStart);
+			}
+			System.out.print("Enter Rental Rate End Date (DD/MM/YYYY hh:mm) (Leave blank if always valid)> ");
+			input = scanner.nextLine().trim();
+			if (input.length() > 0) {
+				newRentalRate.setRateEndDate(format.parse(input));
+			} else {
+				newRentalRate.setRateEndDate(fillerEnd);
+			}
+			
 
 			Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
 
@@ -169,7 +170,7 @@ public class SalesManager {
 
 	private void doViewAllRentalRates() {
 		Scanner scanner = new Scanner(System.in);
-		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 		System.out.println("*** CaRMS System :: Sales Management - Sales Manager ::  View All Rental Rates ***\n");
 
@@ -189,7 +190,7 @@ public class SalesManager {
 
 	private void doViewRentalRateDetails() {
 		Scanner scanner = new Scanner(System.in);
-		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 		System.out.println("*** CaRMS System :: Sales Management - Sales Manager ::  View Rental Rate Details ***\n");
 
@@ -232,7 +233,7 @@ public class SalesManager {
 		BigDecimal bigDecimalInput;
 		Long longInput;
 		List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
-		SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
+		SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y hh:mm");
 
 		try {
 			System.out.println("*** CaRMS System :: Sales Management - Sales Manager :: View Rental Rate Details :: Update Rental Rate ***\n");
@@ -272,7 +273,7 @@ public class SalesManager {
 				if (rentalRateInt >= 1 && rentalRateInt <= 3) {
 					rate.setRateType(RentalRateEnum.values()[rentalRateInt - 1]);
 					break;
-				} else if (rentalRateInt > 3) {
+				} else if (rentalRateInt > 3 && rentalRateInt < 1) {
 					System.out.println("Invalid option, please try again!\n");
 				}
 			}

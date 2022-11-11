@@ -14,13 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
+import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.TransitDispatchRecordExistException;
 import util.exception.UnknownPersistenceException;
@@ -120,7 +119,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 				if (!carAllocated) {
 					for (Car c : possibleCars) {
 						int minTransitWindow = r.getReservationStartDate().getHours() - 2;
-						Date adjustedTime = r.getReservationStartDate();
+						Date adjustedTime = new Date();
+						adjustedTime.setTime(r.getReservationStartDate().getTime());
 						adjustedTime.setHours(minTransitWindow);
 						if (carSessionBeanLocal.isAvailable(c.getCarId(), adjustedTime, r.getReservationEndDate())) {
 							reservationSessionBeanLocal.allocateCar(c.getCarId(), r.getReservationId());
@@ -143,7 +143,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 				}
 
 			}
-		} catch (CarNotFoundException | ReservationNotFoundException | TransitDispatchRecordExistException | UnknownPersistenceException ex) {
+		} catch (CarNotFoundException | ReservationNotFoundException | OutletNotFoundException | TransitDispatchRecordExistException | UnknownPersistenceException ex) {
 			System.out.println("An error has occurred: " + ex.getMessage());
 		}
 
@@ -228,7 +228,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
 					transitDispatchRecordSessionBeanLocal.createNewTransitDispatchRecord(newDispatch);
 					System.out.println("New Transit Dispatch Record Created for " + r.getCar().getLicensePlate());
-				} catch (TransitDispatchRecordExistException | UnknownPersistenceException ex) {
+				} catch (TransitDispatchRecordExistException | OutletNotFoundException | UnknownPersistenceException ex) {
 					System.out.println("An error has occured: " + ex.getMessage());
 				}
 			}
