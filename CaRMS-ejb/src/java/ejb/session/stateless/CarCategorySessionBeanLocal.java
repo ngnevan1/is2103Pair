@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryExistException;
@@ -22,4 +23,5 @@ public interface CarCategorySessionBeanLocal {
 	public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId) throws CarCategoryNotFoundException; 
     CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
     public void associateCarModelsWithCarCategory(Long categoryId, List<Long> modelIds);
+	public List<CarCategory> searchAvailableCarCategory(Date rNewStart, Date rNewEnd);
 }

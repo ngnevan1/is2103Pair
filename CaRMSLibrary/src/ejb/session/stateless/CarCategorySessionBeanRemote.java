@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarCategoryExistException;
@@ -22,4 +23,5 @@ public interface CarCategorySessionBeanRemote {
     public List<CarCategory> retrieveAllCarCategories();
     public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
     public CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
+	public List<CarCategory> searchAvailableCarCategory(Date rNewStart, Date rNewEnd);
 }
