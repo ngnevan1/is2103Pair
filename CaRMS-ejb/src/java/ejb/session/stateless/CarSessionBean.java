@@ -188,7 +188,8 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
 				if ((rNewStart.before(rExistingEnd) && rNewStart.after(rExistingStart))
 						|| (rNewEnd.after(rExistingStart) && rNewEnd.before(rExistingEnd))
-						|| rNewStart.before(rExistingStart) && rNewEnd.after(rExistingEnd)) {
+						|| (rNewStart.before(rExistingStart) && rNewEnd.after(rExistingEnd))
+						|| (rNewStart.equals(rExistingStart) && rNewEnd.equals(rExistingEnd))) {
 					return false;
 				}
 			}
