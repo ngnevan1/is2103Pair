@@ -74,6 +74,10 @@
 
 <xs:element name="retrieveReservationsByPartnerUsernameResponse" type="tns:retrieveReservationsByPartnerUsernameResponse"/>
 
+<xs:element name="searchAvailableCarCategories" type="tns:searchAvailableCarCategories"/>
+
+<xs:element name="searchAvailableCarCategoriesResponse" type="tns:searchAvailableCarCategoriesResponse"/>
+
 <xs:element name="searchAvailableCarModels" type="tns:searchAvailableCarModels"/>
 
 <xs:element name="searchAvailableCarModelsResponse" type="tns:searchAvailableCarModelsResponse"/>
@@ -405,6 +409,37 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="searchAvailableCarCategories">
+<xs:sequence>
+<xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchAvailableCarCategoriesResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:carCategory" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CarModelNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="calculateRefundPenalty">
+<xs:sequence>
+<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="calculateRefundPenaltyResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="createNewCustomer">
 <xs:sequence>
 <xs:element name="newCustomer" type="tns:customer" minOccurs="0"/>
@@ -423,18 +458,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="calculateRefundPenalty">
-<xs:sequence>
-<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="calculateRefundPenaltyResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:decimal" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="searchAvailableCarModels">
 <xs:sequence>
 <xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
@@ -447,12 +470,6 @@
 <xs:complexType name="searchAvailableCarModelsResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:carModel" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="CarModelNotFoundException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

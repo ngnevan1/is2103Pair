@@ -313,29 +313,21 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException {
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
  
-		if (oldReservation.getCar().getCurrentReservation().equals(oldReservation)) {
-			oldReservation.getCar().setCurrentReservation(null);
+		if (oldReservation.getCar() != null) {
+                    oldReservation.getCar().getReservations().remove(oldReservation);
 		}
-
-		oldReservation.getCar().getReservations().remove(oldReservation);
-                oldReservation.setCar(null);
                 
-		oldReservation.getCarModel().getReservations().remove(oldReservation);
-                oldReservation.setCarModel(null);
+                if (oldReservation.getCarModel() != null) {
+                    oldReservation.getCarModel().getReservations().remove(oldReservation);
+                }
                 
-                oldReservation.getCarCategory().getReservations().remove(oldReservation);
-                oldReservation.setCarCategory(null);
-                
-		partner.getReservations().remove(oldReservation);
-                oldReservation.setPartner(null);
+		oldReservation.getCarCategory().getReservations().remove(oldReservation);
                 
                 oldReservation.getCustomer().getReservations().remove(oldReservation);
-                oldReservation.setCustomer(null);
+                
+		partner.getReservations().remove(oldReservation);
                 
                 oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
-                oldReservation.setPickUpOutlet(null);
-                
-                oldReservation.setReturnOutlet(null);
                 
 		em.remove(oldReservation);
 		return partner;

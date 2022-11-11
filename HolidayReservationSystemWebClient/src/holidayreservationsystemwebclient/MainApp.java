@@ -115,8 +115,6 @@ public class MainApp {
                     partnerCancelReservation();
                 }
                 else if (response == 5) {
-                    System.out.println("Logged Out Successfully!\n");
-                    partner = null;
                     break;
                 }
                 else {
@@ -325,9 +323,9 @@ public class MainApp {
             scanner.nextLine();
             
             Reservation reservation = retrieveReservationByReservationId(reservationId);
-            System.out.printf("%-5s%-25s%-25s%-25s\n", "ID", "Start Date", "End Date", "Payment Date", "Total Amount");
-            System.out.printf("%-5s%-25s%-25s%-25s\n", reservation.getReservationId(), outputDateFormat.format(reservation.getReservationStartDate()),
-                outputDateFormat.format(reservation.getReservationEndDate()), outputDateFormat.format(reservation.getPaymentDate()), reservation.getTotalAmount());
+            System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", "ID", "Start Date", "End Date", "Payment Date", "Total Amount");
+            System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", reservation.getReservationId(), outputDateFormat.format(reservation.getReservationStartDate().toGregorianCalendar().getTime()),
+                outputDateFormat.format(reservation.getReservationEndDate().toGregorianCalendar().getTime()), outputDateFormat.format(reservation.getPaymentDate().toGregorianCalendar().getTime()), reservation.getTotalAmount());
         } catch (ReservationNotFoundException_Exception ex) {
             System.out.println(ex.getMessage());
         }
