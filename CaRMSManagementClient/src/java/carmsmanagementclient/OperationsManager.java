@@ -222,7 +222,7 @@ public class OperationsManager {
             for (CarCategory category : carCategories) {
                 System.out.printf("%8s%20s\n", category.getCarCategoryId().toString(), category.getCategoryName());
             }
-            System.out.print("Enter Car Category ID (blank if no change)> ");
+            System.out.print("Enter Car Category ID (negative number if no change)> ");
             longInput = scanner.nextLong();
             if (longInput > 0l) {
                 CarCategory chosenCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCarCategoryId(longInput, false, false);
@@ -254,7 +254,7 @@ public class OperationsManager {
 
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager :: Delete Car Model ***\n");
 
-        System.out.println("Enter Model Name of Car Model to Update>");
+        System.out.println("Enter Model Name of Car Model to Delete>");
 
         try {
             CarModel model = carModelSessionBeanRemote.retrieveCarModelByModelName(scanner.nextLine().trim());
