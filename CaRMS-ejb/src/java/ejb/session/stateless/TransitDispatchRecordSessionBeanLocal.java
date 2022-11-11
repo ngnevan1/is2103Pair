@@ -18,5 +18,4 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface TransitDispatchRecordSessionBeanLocal {
     public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, OutletNotFoundException, UnknownPersistenceException;
-    
 }

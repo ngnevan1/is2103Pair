@@ -28,7 +28,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     
@@ -74,6 +73,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         }
     }
     
+    @Override
     public Partner retrievePartnerByPartnerUsername(String username) throws PartnerNotFoundException {
         Query query = em.createQuery("SELECT p FROM Partner p WHERE p.username = :inUsername");
         query.setParameter("inUsername", username);

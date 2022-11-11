@@ -9,7 +9,6 @@ import entity.Employee;
 import entity.Outlet;
 import java.util.Date;
 import java.util.List;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -28,12 +27,12 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
-
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+    
     @Override
     public Outlet createNewOutlet(Outlet newOutlet) throws OutletExistException, UnknownPersistenceException {
         try {
@@ -101,7 +100,7 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         outlet.getEmployees().add(employee);
     }
     
-	@Override
+    @Override
     public Boolean checkOutletIsOpen(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) throws OutletNotFoundException {
         Outlet pOutlet = retrieveOutletByOutletName(pickupOutlet);
         Outlet rOutlet = retrieveOutletByOutletName(returnOutlet);
