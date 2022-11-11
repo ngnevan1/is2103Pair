@@ -304,6 +304,12 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="PartnerNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="retrieveReservationByReservationId">
 <xs:sequence>
 <xs:element name="reservationId" type="xs:long" minOccurs="0"/>
@@ -330,12 +336,6 @@
 </xs:complexType>
 
 <xs:complexType name="InvalidLoginCredentialException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="PartnerNotFoundException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
