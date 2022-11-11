@@ -9,7 +9,6 @@ import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.Car;
-import entity.Customer;
 import entity.Employee;
 import entity.Reservation;
 import java.math.BigDecimal;
@@ -33,13 +32,11 @@ public class CustomerService {
     private Employee currentEmployee;
     private CarSessionBeanRemote carSessionBeanRemote;
     private ReservationSessionBeanRemote reservationSessionBeanRemote;
-    private CustomerSessionBeanRemote customerSessionBeanRemote;
 
-    public CustomerService(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
+    public CustomerService(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this.currentEmployee = currentEmployee;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
-        this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
 
     public void menuCustomerService() throws InvalidAccessRightException {
@@ -74,7 +71,7 @@ public class CustomerService {
                 }
             }
 
-            if (response == 4) {
+            if (response == 3) {
                 break;
             }
         }
@@ -86,10 +83,12 @@ public class CustomerService {
         System.out.println("*** CaRMS System :: Customer Service Module :: Pickup Car ***\n");
         try {
             System.out.print("Enter Customer Email> ");
-            Customer customer = customerSessionBeanRemote.retrieveCustomerByCustomerEmail(scanner.nextLine().trim());
-
-            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(customer);
-            if (reservation.getCreditCardNumber().isEmpty()) {
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(scanner.nextLine().trim());
+			Date paymentDate = reservation.getPaymentDate();
+			Date today = new Date();
+            if ((paymentDate.getDate() == today.getDate())
+					&& (paymentDate.getMonth() == today.getMonth()
+					&& (paymentDate.getYear() == today.getYear()))) {
                 BigDecimal paymentDue = reservation.getTotalAmount();
                 System.out.println("Please pay amount outstanding: $" + paymentDue);
 
@@ -103,15 +102,11 @@ public class CustomerService {
                 System.out.println("Amount Paid: $" + paymentDue);
             }
             Car car = reservation.getCar();
-            car.setCarStatus(CarStatusEnum.ONRENTAL);
-            car.setOutlet(null);
-            car.setCurrentReservation(reservation);
-            carSessionBeanRemote.updateCar(car);
-            reservationSessionBeanRemote.updateReservation(reservation);
+			reservationSessionBeanRemote.startReservation(reservation, car.getCarId());
 
             System.out.println("Customer has been allocated " + car.getColour() + " " + car.getCarModel().getMakeName() + " " + car.getCarModel().getModelName() + " with licence plate number: " + car.getLicensePlate());
             System.out.println("Car must be returned by " + reservation.getReservationEndDate());
-        } catch (CustomerNotFoundException | ReservationNotFoundException | CarNotFoundException | UpdateCarException | InputDataValidationException ex) {
+        } catch (CustomerNotFoundException | ReservationNotFoundException | CarNotFoundException  ex) {
             System.out.println("An error has occurred: " + ex.getMessage());
         }
     }
@@ -122,16 +117,14 @@ public class CustomerService {
         
         try {
             System.out.print("Enter Customer Email> ");
-            Customer customer = customerSessionBeanRemote.retrieveCustomerByCustomerEmail(scanner.nextLine().trim());
-
-            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(customer);
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(scanner.nextLine().trim());
             
             Car car = reservation.getCar();
             car.setCarStatus(CarStatusEnum.AVAILABLE);
             car.setOutlet(reservation.getReturnOutlet());
             car.setCurrentReservation(null);
             carSessionBeanRemote.updateCar(car);
-            System.out.println("Car " + car.getLicensePlate() + "returned successfully!");
+            System.out.println("Car " + car.getLicensePlate() + " returned successfully!");
 
         } catch (CustomerNotFoundException | ReservationNotFoundException | CarNotFoundException | UpdateCarException | InputDataValidationException ex) {
             System.out.println("An error has occurred: " + ex.getMessage());
