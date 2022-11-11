@@ -364,17 +364,11 @@ public class MainApp {
         System.out.print("Do you want to do immediate payment? (Enter 'Y' to Pay)> ");
         String input = scanner.nextLine().trim();
         
-        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarCategory);	
-        // For Testing to check if rates returned are correct
-        for (RentalRate rate : rentalRates) {
-            System.out.println(rate);
-        }
-        // Testing Ends
-        
+        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(reserveCarCategory);	        
         BigDecimal totalAmount = new BigDecimal("0.00");
         List<RentalRate> usedRates = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
         for (RentalRate rate : usedRates) {
-            totalAmount.add(rate.getRatePerDay());
+            totalAmount = totalAmount.add(rate.getRatePerDay());
         }
         
         Reservation newReservation = new Reservation();
@@ -391,7 +385,7 @@ public class MainApp {
             System.out.println("Amount Paid: $" + totalAmount);
         }
         else {
-			newReservation.setCreditCardNumber(ccNumber);
+            newReservation.setCreditCardNumber(ccNumber);
             newReservation.setPaymentDate(pickupDate);
             System.out.println("Amount Due: $" + totalAmount + " During Pickup!\n");
         }
@@ -421,6 +415,7 @@ public class MainApp {
         for(Reservation reservation : reservations) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
         }
+        System.out.println();
     }
     
     public void viewReservationDetails() {
