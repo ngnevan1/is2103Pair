@@ -222,25 +222,19 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 	public List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException {
                 Calendar startDate = new GregorianCalendar();
 		startDate.setTime(pickupDate);
-                System.out.println(startDate);
 		Calendar endDate = new GregorianCalendar();
 		endDate.setTime(returnDate);
-                System.out.println(endDate);
                 List<RentalRate> usedRates = new ArrayList<>();
                 
                 while (startDate.before(endDate)) {
                     BigDecimal cheapestRate = new BigDecimal("1000.00");
                     RentalRate rateToUse = null;
                     Date currentDate = startDate.getTime();
-                    // System.out.println(currentDate);
                     Boolean correctRate = Boolean.FALSE;
                     
                     for (RentalRate rate : rates) {
                         Date rateStartDate = rate.getRateStartDate();
                         Date rateEndDate = rate.getRateEndDate();
-                        System.out.println(rate.getRatePerDay());
-                        System.out.println(!rate.getIsDisabled());
-                        System.out.println(rateStartDate.before(currentDate));
                         if ((!rate.getIsDisabled()) && 
                                 (rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) && 
                                 (rateEndDate.equals(currentDate) || rateEndDate.after(currentDate)) && 

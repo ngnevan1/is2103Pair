@@ -290,27 +290,20 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	@Override
 	public OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException {
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
- 
-                if (oldReservation.getCar().getCurrentReservation().equals(oldReservation)) {
-			oldReservation.getCar().setCurrentReservation(null);
-		}
-
-		oldReservation.getCar().getReservations().remove(oldReservation);
-                oldReservation.setCar(null);
                 
-		oldReservation.getCarModel().getReservations().remove(oldReservation);
-                oldReservation.setCarModel(null);
+                if (oldReservation.getCar() != null) {
+                    oldReservation.getCar().getReservations().remove(oldReservation);
+		}
+                
+                if (oldReservation.getCarModel() != null) {
+                    oldReservation.getCarModel().getReservations().remove(oldReservation);
+                }
                 
                 oldReservation.getCarCategory().getReservations().remove(oldReservation);
-                oldReservation.setCarCategory(null);
                 
 		ownCustomer.getReservations().remove(oldReservation);
-                oldReservation.setCustomer(null);
                 
                 oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
-                oldReservation.setPickUpOutlet(null);
-                
-                oldReservation.setReturnOutlet(null);
                 
 		em.remove(oldReservation);
 		return ownCustomer;
