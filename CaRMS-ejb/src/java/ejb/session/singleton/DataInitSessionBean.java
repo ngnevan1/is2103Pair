@@ -93,7 +93,7 @@ public class DataInitSessionBean {
         try {
             Outlet outletA = new Outlet("Outlet A", 0, 0);
             Outlet outletB = new Outlet("Outlet B", 0, 0);
-            Outlet outletC = new Outlet("Outlet C", 10, 22);
+            Outlet outletC = new Outlet("Outlet C", 8, 22);
 
             Employee a1 = new Employee("Employee A1", "a1", EmployeeAccessRightsEnum.SALES_MANAGER, outletA);
             Employee a2 = new Employee("Employee A2", "a2", EmployeeAccessRightsEnum.OPERATIONS_MANAGER, outletA);
