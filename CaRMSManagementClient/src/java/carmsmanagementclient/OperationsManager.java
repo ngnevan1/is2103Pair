@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -486,12 +484,13 @@ public class OperationsManager {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  View All Transit Dispatch Records ***\n");
-
-        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
-        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
+		Outlet outlet = currentEmployee.getOutlet();
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords(outlet);
+        System.out.printf("%-30s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
 
         for (TransitDispatchRecord tdr : tdrs) {
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee().getEmployeeName());
+            System.out.printf("%-30s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee() == null ? "No Employee Assigned" : tdr.getEmployee().getEmployeeName());
+			
         }
 
         System.out.print("Press any key to continue...> ");
@@ -502,11 +501,11 @@ public class OperationsManager {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  Assign Transit Driver ***\n");
-
-        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
-        System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
+		Outlet outlet = currentEmployee.getOutlet();
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords(outlet);
+        System.out.printf("%-30s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
         for (TransitDispatchRecord tdr : tdrs) {
-            System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee().getEmployeeName());
+            System.out.printf("%-30s%-20s%-20s%-20s%-20s\n", tdr.getTransitDispatchRecordId().toString(), outputDateFormat.format(tdr.getDispatchTime()), tdr.getCurrentOutlet().getOutletName(), tdr.getDestinationOutlet().getOutletName(), tdr.getEmployee() == null ? "No Employee Assigned" : tdr.getEmployee().getEmployeeName());
         }
 
         System.out.print("Enter ID of Transit Dispatch Record to Assign Driver> ");
@@ -534,8 +533,8 @@ public class OperationsManager {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         System.out.println("*** CaRMS System :: Sales Management - Operations Manager ::  Update Transit Dispatch Record as Completed ***\n");
-
-        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords();
+		Outlet outlet = currentEmployee.getOutlet();
+        List<TransitDispatchRecord> tdrs = transitDispatchRecordSessionBeanRemote.retrieveCurrentDayTransitDispatchRecords(outlet);
         System.out.printf("%-15s%-20s%-20s%-20s%-20s\n", "Transit Dispatch Record ID", "Dispatch Time", "Current Outlet", "Destination Outlet", "Employee");
 
         for (TransitDispatchRecord tdr : tdrs) {
@@ -560,7 +559,11 @@ public class OperationsManager {
             System.out.print("Enter Date (DD/MM/YYYY)> ");
             Date date = inputDateFormat.parse(scanner.nextLine().trim());
 
-            ejbTimerSessionBeanRemote.allocateCarsManually(date);
+            List<String> output = ejbTimerSessionBeanRemote.allocateCarsManually(date);
+
+			for (String s:output) {
+				System.out.println(s);
+			}
 
         } catch (ParseException ex) {
             System.out.println("Invalid Date Entered!");
