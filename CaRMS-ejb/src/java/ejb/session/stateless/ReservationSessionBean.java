@@ -30,6 +30,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.CarStatusEnum;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
@@ -47,7 +48,6 @@ import util.exception.UnknownPersistenceException;
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
 
-	
 	@PersistenceContext(unitName = "CaRMS-ejbPU")
 	private EntityManager em;
 
@@ -61,7 +61,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	private OutletSessionBeanLocal outletSessionBeanLocal;
 	@EJB
 	private CarSessionBeanLocal carSessionBeanLocal;
-	
 
 	private final ValidatorFactory validatorFactory;
 	private final Validator validator;
@@ -73,55 +72,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
 	// Add business logic below. (Right-click in editor and choose
 	// "Insert Code > Add Business Method")
-        
-        /*
-	@Override
-	public Reservation createNewReservationByModel(Reservation newReservation, OwnCustomer customer, String carModelName, String pickupOutletName, String returnOutletName)
-			throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException {
-		Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(newReservation);
-		if (constraintViolations.isEmpty()) {
-			try {
-				// retrieve attributes
-				Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(pickupOutletName);
-				Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(returnOutletName);
-				CarModel carModel = carModelSessionBeanLocal.retrieveCarModelByModelName(carModelName);
-				CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCategoryName(carModel.getCarCategory().getCategoryName());
-				OwnCustomer managedCustomer = customerSessionBeanLocal.retrieveOwnCustomerByUsername(customer.getUsername());
-				
-				// Set Reservation Relationships
-				newReservation.setPickUpOutlet(pickupOutlet);
-				newReservation.setReturnOutlet(returnOutlet);
-				newReservation.setCarModel(carModel);
-				newReservation.setCarCategory(carCategory);
-				newReservation.setCustomer(customer);
-				
-				// Persist before setting other entity relationships
-				em.persist(newReservation);
-				pickupOutlet.getReservations().add(newReservation);
-				managedCustomer.getReservations().add(newReservation);
-				carModel.getReservations().add(newReservation);
-				carCategory.getReservations().add(newReservation);
-				
-				em.persist(newReservation);
-				newReservation.setCustomer(customer);
-				customer.getReservations().add(newReservation);
-
-				em.flush();
-				em.refresh(newReservation);
-				return newReservation;
-			} catch (PersistenceException ex) {
-				if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-					throw new UnknownPersistenceException(ex.getMessage());
-				} else {
-					throw new UnknownPersistenceException(ex.getMessage());
-				}
-			}
-		} else {
-			throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-		}
-	}
-        */
-
 	@Override
 	public Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName)
 			throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException {
@@ -133,13 +83,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 				Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(returnOutletName);
 				CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCategoryName(carCategoryName);
 				OwnCustomer managedCustomer = customerSessionBeanLocal.retrieveOwnCustomerByUsername(customer.getUsername());
-				
+
 				// Set Reservation Relationships
 				newReservation.setPickUpOutlet(pickupOutlet);
 				newReservation.setReturnOutlet(returnOutlet);
 				newReservation.setCarCategory(carCategory);
 				newReservation.setCustomer(customer);
-				
+
 				// Persist before setting other entity relationships
 				em.persist(newReservation);
 				pickupOutlet.getReservations().add(newReservation);
@@ -159,8 +109,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 			throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
 		}
 	}
-        
-        @Override
+
+	@Override
 	public Reservation createNewReservationByCategory(Reservation newReservation, Customer customer, Partner partner, String carCategoryName, String pickupOutletName, String returnOutletName)
 			throws CarCategoryNotFoundException, OutletNotFoundException, CustomerNotFoundException, UnknownPersistenceException, InputDataValidationException {
 		Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(newReservation);
@@ -171,14 +121,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 				Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletName(returnOutletName);
 				CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCategoryName(carCategoryName);
 				Customer managedCustomer = customerSessionBeanLocal.retrieveCustomerByCustomerEmail(customer.getEmail());
-				
+
 				// Set Reservation Relationships
 				newReservation.setPickUpOutlet(pickupOutlet);
 				newReservation.setReturnOutlet(returnOutlet);
 				newReservation.setCarCategory(carCategory);
 				newReservation.setCustomer(customer);
-                                newReservation.setPartner(partner);
-				
+				newReservation.setPartner(partner);
+
 				// Persist before setting other entity relationships
 				em.persist(newReservation);
 				pickupOutlet.getReservations().add(newReservation);
@@ -216,7 +166,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		Query query = em.createQuery("SELECT r FROM Reservation r");
 
 		List<Reservation> allReservations = query.getResultList();
-		List<Reservation> todayReservations = new ArrayList<>();	
+		List<Reservation> todayReservations = new ArrayList<>();
 		allReservations.forEach(res -> {
 			int resDate = res.getReservationStartDate().getDate();
 			if (resDate == today) {
@@ -231,7 +181,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		Query query = em.createQuery("SELECT r FROM Reservation r");
 		int dateInt = date.getDate();
 		List<Reservation> allReservations = query.getResultList();
-		List<Reservation> dateReservations = new ArrayList<>();	
+		List<Reservation> dateReservations = new ArrayList<>();
 		allReservations.forEach(res -> {
 			int resDate = res.getReservationStartDate().getDate();
 			if (resDate == dateInt) {
@@ -242,19 +192,35 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	}
 
 	@Override
-	public Reservation retrieveReservationsByCustomer(Customer customer) throws ReservationNotFoundException {
+	public Reservation retrieveReservationsByCustomer(String email) throws CustomerNotFoundException, ReservationNotFoundException {
 		Date today = new Date();
+		Customer customer = customerSessionBeanLocal.retrieveCustomerByCustomerEmail(email);
 		Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.customer = :inCustomer");
 		query.setParameter("inCustomer", customer);
 
 		List<Reservation> allReservations = query.getResultList();
 
 		for (Reservation res : allReservations) {
-			if (res.getReservationStartDate().equals(today)) {
+			Date rStart = res.getReservationStartDate();
+			if ((rStart.getDate() == today.getDate())
+					&& (rStart.getMonth() == today.getMonth()
+					&& (rStart.getYear() == today.getYear()))) {
 				return res;
 			}
 		}
 		throw new ReservationNotFoundException("Customer " + customer.getName() + " does not have a reservation today!");
+	}
+
+	@Override
+	public void startReservation(Reservation reservation, Long carId) throws CarNotFoundException {
+		Car car = carSessionBeanLocal.retrieveCarByCarId(carId, Boolean.TRUE);
+
+		car.setCarStatus(CarStatusEnum.ONRENTAL);
+		car.setOutlet(null);
+		car.setCurrentReservation(reservation);
+
+		em.merge(reservation);
+
 	}
 
 	@Override
@@ -279,9 +245,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		query.setParameter("inEmail", email);
 		return query.getResultList();
 	}
-        
-        @Override 
-        public List<Reservation> retrieveReservationsByPartnerUsername(String username) {
+
+	@Override
+	public List<Reservation> retrieveReservationsByPartnerUsername(String username) {
 		Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.username = :inUsername");
 		query.setParameter("inUsername", username);
 		return query.getResultList();
@@ -290,45 +256,45 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	@Override
 	public OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException {
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
-                
-                if (oldReservation.getCar() != null) {
-                    oldReservation.getCar().getReservations().remove(oldReservation);
+
+		if (oldReservation.getCar() != null) {
+			oldReservation.getCar().getReservations().remove(oldReservation);
 		}
-                
-                if (oldReservation.getCarModel() != null) {
-                    oldReservation.getCarModel().getReservations().remove(oldReservation);
-                }
-                
-                oldReservation.getCarCategory().getReservations().remove(oldReservation);
-                
+
+		if (oldReservation.getCarModel() != null) {
+			oldReservation.getCarModel().getReservations().remove(oldReservation);
+		}
+
+		oldReservation.getCarCategory().getReservations().remove(oldReservation);
+
 		ownCustomer.getReservations().remove(oldReservation);
-                
-                oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
-                
+
+		oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
+
 		em.remove(oldReservation);
 		return ownCustomer;
 	}
-        
-        @Override
+
+	@Override
 	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException {
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
- 
+
 		if (oldReservation.getCar() != null) {
-                    oldReservation.getCar().getReservations().remove(oldReservation);
+			oldReservation.getCar().getReservations().remove(oldReservation);
 		}
-                
-                if (oldReservation.getCarModel() != null) {
-                    oldReservation.getCarModel().getReservations().remove(oldReservation);
-                }
-                
+
+		if (oldReservation.getCarModel() != null) {
+			oldReservation.getCarModel().getReservations().remove(oldReservation);
+		}
+
 		oldReservation.getCarCategory().getReservations().remove(oldReservation);
-                
-                oldReservation.getCustomer().getReservations().remove(oldReservation);
-                
+
+		oldReservation.getCustomer().getReservations().remove(oldReservation);
+
 		partner.getReservations().remove(oldReservation);
-                
-                oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
-                
+
+		oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
+
 		em.remove(oldReservation);
 		return partner;
 	}
@@ -343,11 +309,10 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		model.getReservations().add(res);
 		res.setCar(car);
 		res.setCarModel(model);
-		
-		
+
 	}
-        
-        @Override
+
+	@Override
 	public BigDecimal calculateRefundPenalty(Reservation reservation) {
 		Date currentDate = new Date();
 		Date paymentDate = reservation.getPaymentDate();
