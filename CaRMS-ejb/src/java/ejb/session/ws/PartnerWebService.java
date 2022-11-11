@@ -74,16 +74,8 @@ public class PartnerWebService {
     public Partner partnerLogin(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws InvalidLoginCredentialException, PartnerNotFoundException {
         Partner partner = partnerSessionBeanLocal.partnerLogin(username, password);
         em.detach(partner);
-        
-        // nullify - detach
-        for (Reservation reservation : partner.getReservations()) {
-            reservation.setPartner(null);
-        }
-        
-        for (Customer customer : partner.getCustomers()) {
-            customer.setPartner(null);
-        }
-
+        partner.setCustomers(null);
+        partner.setReservations(null);
         return partner;
     }
     
