@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
@@ -34,7 +35,7 @@ public interface ReservationSessionBeanLocal {
             throws CarCategoryNotFoundException, OutletNotFoundException, CustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
     Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
     public List<Reservation> retrieveCurrentDayReservations();
-    public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException;
+    public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, CarModelNotFoundException, ReservationNotFoundException;
     public List<Reservation> retrieveReservationsByDate(Date date);
     List<Reservation> retrieveReservationsByCustomerEmail(String email);
     List<Reservation> retrieveReservationsByPartnerUsername(String username);
