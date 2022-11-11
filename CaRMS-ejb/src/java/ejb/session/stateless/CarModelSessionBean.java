@@ -5,15 +5,7 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
-import entity.CarCategory;
 import entity.CarModel;
-import entity.Reservation;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -28,7 +20,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.enumeration.CarStatusEnum;
 import util.exception.CarModelExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
@@ -165,7 +156,8 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
         
     }
-   
+    
+    /*
     @Override
     public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
         List<CarModel> availableModels = new ArrayList<>();
@@ -210,6 +202,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         
         return new ArrayList<>(new HashSet(availableModels));
     }
+    */
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
         String msg = "Input data validation error!:";

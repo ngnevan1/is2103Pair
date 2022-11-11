@@ -22,10 +22,9 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface CarSessionBeanLocal {
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException;
-	public Car retrieveCarByCarId(Long carId, Boolean retrieveReservations) throws CarNotFoundException;
-    Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
-	public List<Car> retrieveCarsByCarCategory(CarCategory category);
-    List<Car> retrieveAllCars();
-    List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
-	public boolean isAvailable(Long carId, Date reservationStartDate, Date reservationEndDate) throws CarNotFoundException;
+    public Car retrieveCarByCarId(Long carId, Boolean retrieveReservations) throws CarNotFoundException;
+    public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+    public List<Car> retrieveCarsByCarCategory(CarCategory category);
+    public List<Car> retrieveAllCars();
+    public boolean isAvailable(Long carId, Date reservationStartDate, Date reservationEndDate) throws CarNotFoundException;
 }

@@ -29,82 +29,82 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class TransitDispatchRecordSessionBean implements TransitDispatchRecordSessionBeanRemote, TransitDispatchRecordSessionBeanLocal {
+    
+    @PersistenceContext(unitName = "CaRMS-ejbPU")
+    private EntityManager em;
+    
+    @EJB
+    private OutletSessionBeanLocal outletSessionBeanLocal;
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
-	@EJB
-	private OutletSessionBeanLocal outletSessionBeanLocal;
 
-	@EJB
-	private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
-	@PersistenceContext(unitName = "CaRMS-ejbPU")
-	private EntityManager em;
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
+    @Override
+    public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, OutletNotFoundException, UnknownPersistenceException {
 
-	// Add business logic below. (Right-click in editor and choose
-	// "Insert Code > Add Business Method")
-	@Override
-	public TransitDispatchRecord createNewTransitDispatchRecord(TransitDispatchRecord newDispatch) throws TransitDispatchRecordExistException, OutletNotFoundException, UnknownPersistenceException {
+        try {
+            Outlet destinationOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(newDispatch.getDestinationOutlet().getOutletId(), false, false, true);
 
-		try {
-			Outlet destinationOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(newDispatch.getDestinationOutlet().getOutletId(), false, false, true);
+            em.persist(newDispatch);
+            destinationOutlet.getTransitDispatchRecords().add(newDispatch);
 
-			em.persist(newDispatch);
-			destinationOutlet.getTransitDispatchRecords().add(newDispatch);
+            em.flush();
+            em.refresh(newDispatch);
+            return newDispatch;
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new TransitDispatchRecordExistException("Transit Dispatch Record already exists!");
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            } else {
+                throw new UnknownPersistenceException(ex.getMessage());
+            }
+        }
+    }
 
-			em.flush();
-			em.refresh(newDispatch);
-			return newDispatch;
-		} catch (PersistenceException ex) {
-			if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-				if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-					throw new TransitDispatchRecordExistException("Transit Dispatch Record already exists!");
-				} else {
-					throw new UnknownPersistenceException(ex.getMessage());
-				}
-			} else {
-				throw new UnknownPersistenceException(ex.getMessage());
-			}
-		}
-	}
+    public TransitDispatchRecord retrieveTransitDispatchRecordByTransitDispatchRecordId(Long transitDispatchRecordId) throws TransitDispatchRecordNotFoundException {
+        TransitDispatchRecord dispatchRecord = em.find(TransitDispatchRecord.class, transitDispatchRecordId);
 
-	public TransitDispatchRecord retrieveTransitDispatchRecordByTransitDispatchRecordId(Long transitDispatchRecordId) throws TransitDispatchRecordNotFoundException {
-		TransitDispatchRecord dispatchRecord = em.find(TransitDispatchRecord.class, transitDispatchRecordId);
+        if (dispatchRecord != null) {
+            return dispatchRecord;
+        } else {
+            throw new TransitDispatchRecordNotFoundException("Transit Dispatch Record ID " + transitDispatchRecordId + "does not exist!");
+        }
+    }
 
-		if (dispatchRecord != null) {
-			return dispatchRecord;
-		} else {
-			throw new TransitDispatchRecordNotFoundException("Transit Dispatch Record ID " + transitDispatchRecordId + "does not exist!");
-		}
-	}
+    @Override
+    public List<TransitDispatchRecord> retrieveCurrentDayTransitDispatchRecords(Outlet outlet) {
+        Date today = new Date();
+        Query query = em.createQuery("SELECT tdr FROM TransitDispatchRecord tdr");
+        List<TransitDispatchRecord> dispatchRecords = query.getResultList();
+        List<TransitDispatchRecord> currentDay = new ArrayList();
 
-	@Override
-	public List<TransitDispatchRecord> retrieveCurrentDayTransitDispatchRecords(Outlet outlet) {
-		Date today = new Date();
-		Query query = em.createQuery("SELECT tdr FROM TransitDispatchRecord tdr");
-		List<TransitDispatchRecord> dispatchRecords = query.getResultList();
-		List<TransitDispatchRecord> currentDay = new ArrayList();
+        for (TransitDispatchRecord tdr : dispatchRecords) {
+            if (!tdr.getDispatchTime().equals(today) && tdr.getDestinationOutlet().equals(outlet)) {
+                    currentDay.add(tdr);
+            }
+        }
+        return currentDay;
+    }
 
-		for (TransitDispatchRecord tdr : dispatchRecords) {
-			if (!tdr.getDispatchTime().equals(today) && tdr.getDestinationOutlet().equals(outlet)) {
-				currentDay.add(tdr);
-			}
-		}
-		return currentDay;
-	}
+    @Override
+    public void assignDriver(Long tdrId, Long employeeId) throws EmployeeNotFoundException, TransitDispatchRecordNotFoundException {
+        Employee employee = employeeSessionBeanLocal.retrieveEmployeeByEmployeeId(employeeId);
+        TransitDispatchRecord tdr = retrieveTransitDispatchRecordByTransitDispatchRecordId(tdrId);
 
-	@Override
-	public void assignDriver(Long tdrId, Long employeeId) throws EmployeeNotFoundException, TransitDispatchRecordNotFoundException {
-		Employee employee = employeeSessionBeanLocal.retrieveEmployeeByEmployeeId(employeeId);
-		TransitDispatchRecord tdr = retrieveTransitDispatchRecordByTransitDispatchRecordId(tdrId);
+        tdr.setEmployee(employee);
+        employee.setTransitDispatchRecord(tdr);
+        employee.getTransitDispatchRecords().add(tdr);
+    }
 
-		tdr.setEmployee(employee);
-		employee.setTransitDispatchRecord(tdr);
-		employee.getTransitDispatchRecords().add(tdr);
-	}
-
-	@Override
-	public void transitCompleted(Long dispatchId) throws TransitDispatchRecordNotFoundException {
-
-		TransitDispatchRecord dispatchRecord = retrieveTransitDispatchRecordByTransitDispatchRecordId(dispatchId);
-		dispatchRecord.setIsCompleted(true);
-	}
+    @Override
+    public void transitCompleted(Long dispatchId) throws TransitDispatchRecordNotFoundException {
+        TransitDispatchRecord dispatchRecord = retrieveTransitDispatchRecordByTransitDispatchRecordId(dispatchId);
+        dispatchRecord.setIsCompleted(true);
+    }
 }

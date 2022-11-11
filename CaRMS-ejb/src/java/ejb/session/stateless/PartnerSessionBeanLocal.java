@@ -20,6 +20,6 @@ import util.exception.UnknownPersistenceException;
 public interface PartnerSessionBeanLocal {
     public Partner createNewPartner(Partner newPartner) throws PartnerExistException, UnknownPersistenceException;
     public Partner retrievePartnerByPartnerId(Long partnerId, Boolean retrieveCustomers, Boolean retreiveReservations) throws PartnerNotFoundException;
-    Partner retrievePartnerByPartnerUsername(String username) throws PartnerNotFoundException;
-    Partner partnerLogin(String username, String password) throws InvalidLoginCredentialException, PartnerNotFoundException;
+    public Partner retrievePartnerByPartnerUsername(String username) throws PartnerNotFoundException;
+    public Partner partnerLogin(String username, String password) throws InvalidLoginCredentialException, PartnerNotFoundException;
 }

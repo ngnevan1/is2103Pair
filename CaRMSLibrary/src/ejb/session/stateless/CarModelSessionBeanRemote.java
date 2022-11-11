@@ -26,5 +26,5 @@ public interface CarModelSessionBeanRemote {
     public void updateCarModel(CarModel model) throws CarModelNotFoundException, InputDataValidationException;
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
     public List<CarModel> retrieveAllCarModels();
-    public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
+    // public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
 }
