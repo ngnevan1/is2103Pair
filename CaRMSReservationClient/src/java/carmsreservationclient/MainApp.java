@@ -236,14 +236,14 @@ public class MainApp {
             String pickupOutlet = scanner.nextLine().trim();
             System.out.print("Enter Return Date/Time (dd/MM/yyyy HH)> ");
             Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
-            System.out.print("Enter Return Outlet> ");
-            String returnOutlet = scanner.nextLine().trim();
-            //String returnOutlet;
-            //if (input.length() > 0) {
-                //returnOutlet = input;	
-            //} else {
-                //returnOutlet = pickupOutlet;
-            //}
+            System.out.print("Enter Return Outlet (leave blank if same as pickup)> ");
+            String input = scanner.nextLine().trim();
+            String returnOutlet;
+            if (input.length() > 0) {
+                returnOutlet = input;	
+            } else {
+                returnOutlet = pickupOutlet;
+            }
             
             if (outletSessionBeanRemote.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
                 List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
