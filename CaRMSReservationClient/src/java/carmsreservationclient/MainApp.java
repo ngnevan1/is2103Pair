@@ -236,14 +236,14 @@ public class MainApp {
             String pickupOutlet = scanner.nextLine().trim();
             System.out.print("Enter Return Date/Time (dd/MM/yyyy HH)> ");
             Date returnDate = inputDateFormat.parse(scanner.nextLine().trim());
-            System.out.print("Enter Return Outlet (leave blank if same as pickup outlet> ");
-            String input = scanner.nextLine().trim();
-			String returnOutlet;
-			if (input.length() > 0) {
-				returnOutlet = input;	
-			} else {
-				returnOutlet = pickupOutlet;
-			}
+            System.out.print("Enter Return Outlet> ");
+            String returnOutlet = scanner.nextLine().trim();
+            //String returnOutlet;
+            //if (input.length() > 0) {
+                //returnOutlet = input;	
+            //} else {
+                //returnOutlet = pickupOutlet;
+            //}
             
             if (outletSessionBeanRemote.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
                 List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
@@ -251,10 +251,11 @@ public class MainApp {
             
                 for(CarModel carModel : availableCarModels) {
                     List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(carModel.getCarCategory());
-                    BigDecimal totalAmount = new BigDecimal("0.0");
+                    
+                    BigDecimal totalAmount = new BigDecimal("0.00");
                     List<RentalRate> usedRates = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
                     for (RentalRate rate : usedRates) {
-                        totalAmount.add(rate.getRatePerDay());
+                        totalAmount = totalAmount.add(rate.getRatePerDay());
                     }
                     System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), totalAmount);
                 }
@@ -292,7 +293,7 @@ public class MainApp {
         } catch (ParseException ex) {
             System.out.println("Invalid date/time input!\n");
         } catch (OutletNotFoundException /* | CarModelNotFoundException */ | CarCategoryNotFoundException | RentalRateNotAvailableException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage() + "\n");
         }
     }
     
