@@ -13,6 +13,9 @@ import entity.Reservation;
 import java.util.List;
 import java.util.Set;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -26,10 +29,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.CarStatusEnum;
 import util.exception.CarExistException;
+import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundException;
+import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
-import util.exception.UpdateCarException;
 
 /**
  *
@@ -40,6 +45,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
 	@PersistenceContext(unitName = "CaRMS-ejbPU")
 	private EntityManager em;
+
+	@EJB
+	private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
+	@EJB
+	private CarModelSessionBeanLocal carModelSessionBeanLocal;
+
+	@EJB(name = "OutletSessionBeanLocal")
+	private OutletSessionBeanLocal outletSessionBeanLocal;
 
 	private final ValidatorFactory validatorFactory;
 	private final Validator validator;
@@ -142,18 +156,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 	}
 
 	@Override
-	public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException {
+	public void updateCar(Car car) throws CarNotFoundException, InputDataValidationException {
 		if (car != null && car.getCarId() != null) {
 			Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
-
 			if (constraintViolations.isEmpty()) {
-				Car carToUpdate = retrieveCarByCarId(car.getCarId());
-
-				if (carToUpdate.getLicensePlate().equals(car.getLicensePlate())) {
-					em.merge(car);
-				} else {
-					throw new UpdateCarException("Licence Plate Number of Car record to be updated does not match the existing record");
-				}
+				em.merge(car);
 			} else {
 				throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
 			}
@@ -163,18 +170,39 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 	}
 
 	@Override
-	public void deleteCar(Long carId) throws CarNotFoundException {
+	public void deleteCar(Long carId) throws CarNotFoundException, OutletNotFoundException, ReservationNotFoundException, CarModelNotFoundException {
 		Car carToRemove = retrieveCarByCarId(carId);
-
-		if (carToRemove.getCarStatus().equals(CarStatusEnum.AVAILABLE)) {
+		boolean inUse = false;
+		Date today = new Date();
+		List<Reservation> reservations = carToRemove.getReservations();
+		if (reservations.isEmpty()) {
+			inUse = false;
+		} else {
+			for (Reservation r : reservations) {
+				if (r.getReservationEndDate().after(today)) {
+					inUse = true;
+					break;
+				}
+			}
+		}
+		if (carToRemove.getCarStatus().equals(CarStatusEnum.AVAILABLE) && !inUse) {
+			// remove car from existing relationships
+			Outlet outlet = outletSessionBeanLocal.retrieveOutletByOutletId(carToRemove.getOutlet().getOutletId(), true, false, false);
+			outlet.getCars().remove(carToRemove);
+			for (Reservation r : reservations) {
+				Reservation rToRemove = reservationSessionBeanLocal.retrieveReservationByReservationId(r.getReservationId());
+				rToRemove.setCar(null);
+			}
+			CarModel model = carModelSessionBeanLocal.retrieveCarModelByCarModelId(carToRemove.getCarModel().getCarModelId());
+			model.getCars().remove(carToRemove);
 			em.remove(carToRemove);
 		} else {
 			carToRemove.setIsDisabled(true);
-		}
 	}
+}
 
-	@Override
-	public boolean isAvailable(Long carId, Date rNewStart, Date rNewEnd) throws CarNotFoundException {
+@Override
+		public boolean isAvailable(Long carId, Date rNewStart, Date rNewEnd) throws CarNotFoundException {
 		Car car = retrieveCarByCarId(carId, true);
 
 		List<Reservation> reservations = car.getReservations();
