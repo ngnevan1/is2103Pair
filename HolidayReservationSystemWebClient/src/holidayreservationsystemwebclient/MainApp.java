@@ -165,18 +165,32 @@ public class MainApp {
             String returnOutlet = scanner.nextLine().trim();
             
             if (checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
-                List<CarModel> availableCarModels = searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
-                
-                for(CarModel carModel : availableCarModels) {
-                    List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(carModel.getCarCategory());
+					List<CarCategory> availableCarCategories = searchAvailableCarCategories(pickupDate, returnDate);
+                System.out.printf("%-15s%-15s\n", "Car Category", "Rental Rate");
+            
+                for(CarCategory category : availableCarCategories) {
+                    List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(category);
+                    
                     BigDecimal totalAmount = new BigDecimal("0.00");
                     List<RentalRate> usedRates = calculateRentalRate(rentalRates, pickupDate, returnDate);
                     for (RentalRate rate : usedRates) {
-                        totalAmount.add(rate.getRatePerDay());
+                        totalAmount = totalAmount.add(rate.getRatePerDay());
                     }
-                    System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), totalAmount);
+                    System.out.printf("%-15s%-15s\n", category.getCategoryName(), totalAmount);
                 }
+				
+//                List<CarModel> availableCarModels = searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
+//                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
+//                
+//                for(CarModel carModel : availableCarModels) {
+//                    List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(carModel.getCarCategory());
+//                    BigDecimal totalAmount = new BigDecimal("0.00");
+//                    List<RentalRate> usedRates = calculateRentalRate(rentalRates, pickupDate, returnDate);
+//                    for (RentalRate rate : usedRates) {
+//                        totalAmount.add(rate.getRatePerDay());
+//                    }
+//                    System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), totalAmount);
+                
             
                 System.out.println("------------------------");
                 System.out.println("1: Make Reservation");
@@ -229,12 +243,17 @@ public class MainApp {
             newCustomer.setPhoneNumber(scanner.nextLine().trim());
             newCustomer.setPartner(partner);
             
-            if (checkCustomerExist(email)) {
-                newCustomer = retrieveCustomerByCustomerEmail(email);
-            }
-            else {
-                newCustomer = createNewCustomer(newCustomer);
-            }
+			try {
+				newCustomer = retrieveCustomerByCustomerEmail(email);
+			} catch (CustomerNotFoundException_Exception ex) {
+				newCustomer = createNewCustomer(newCustomer);
+			}
+//            if (checkCustomerExist(email)) {
+//                newCustomer = retrieveCustomerByCustomerEmail(email);
+//            }
+//            else {
+//                newCustomer = createNewCustomer(newCustomer);
+//            }
             
             System.out.print("Enter Credit Card Number> ");
             String ccNumber = scanner.nextLine().trim();
@@ -242,19 +261,16 @@ public class MainApp {
             String input = scanner.nextLine().trim();
             
             List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(reserveCarCategory);
-            for (RentalRate rate : rentalRates) {
-                System.out.println(rate);
-            }
             
             BigDecimal totalAmount = new BigDecimal("0.00");
             List<RentalRate> usedRates = calculateRentalRate(rentalRates, pickupDate, returnDate);
             for (RentalRate rate : usedRates) {
-                totalAmount.add(rate.getRatePerDay());
+                totalAmount = totalAmount.add(rate.getRatePerDay());
             }
             
             Reservation newReservation = new Reservation();
-            newReservation.setCarCategory(reserveCarCategory);
-            newReservation.setCustomer(newCustomer);
+//            newReservation.setCarCategory(reserveCarCategory);
+//            newReservation.setCustomer(newCustomer);
             newReservation.setReservationStartDate(pickupDate);
             newReservation.setReservationEndDate(returnDate);
             newReservation.setTotalAmount(totalAmount);
@@ -294,6 +310,7 @@ public class MainApp {
         for(Reservation reservation : reservations) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
         }
+		System.out.println();
     }
     
     public void partnerViewReservationDetails() {
@@ -372,6 +389,14 @@ public class MainApp {
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
     }
+	
+	private static java.util.List<ws.client.partner.CarCategory> searchAvailableCarCategories(javax.xml.datatype.XMLGregorianCalendar pickupDate, javax.xml.datatype.XMLGregorianCalendar returnDate) throws CarModelNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.searchAvailableCarCategories(pickupDate, returnDate);
+    }
+	
+	
     
     private static java.util.List<ws.client.partner.RentalRate> retrieveRentalRateByCarCategory(ws.client.partner.CarCategory carCategory) {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
@@ -433,6 +458,7 @@ public class MainApp {
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.checkCustomerExist(email);
     }
+	
     private static ws.client.partner.Customer retrieveCustomerByCustomerEmail(java.lang.String email) throws CustomerNotFoundException_Exception {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
