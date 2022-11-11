@@ -150,8 +150,6 @@ public class MainApp {
                     cancelReservation();
                 }
                 else if (response == 5) {
-                    System.out.println("Logged Out Successfully!\n");
-                    ownCustomer = null;
                     break;
                 }
                 else {
