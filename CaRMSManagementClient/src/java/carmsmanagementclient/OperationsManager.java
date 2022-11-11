@@ -324,7 +324,7 @@ public class OperationsManager {
 
             if (constraintViolations.isEmpty()) {
                 Car createdCar = carSessionBeanRemote.createNewCar(newCar);
-                System.out.println("Car " + createdCar.getCarId() + " created successfully!");
+                System.out.println("Car " + createdCar.getLicensePlate() + " created successfully!");
             } else {
                 showInputDataValidationErrorsForCar(constraintViolations);
             }
