@@ -12,14 +12,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import ws.client.partner.CarCategory;
 import ws.client.partner.CarCategoryNotFoundException_Exception;
-import ws.client.partner.CarModel;
 import ws.client.partner.CarModelNotFoundException_Exception;
 import ws.client.partner.Customer;
 import ws.client.partner.CustomerExistException_Exception;
@@ -178,20 +175,7 @@ public class MainApp {
                     }
                     System.out.printf("%-15s%-15s\n", category.getCategoryName(), totalAmount);
                 }
-				
-//                List<CarModel> availableCarModels = searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-//                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
-//                
-//                for(CarModel carModel : availableCarModels) {
-//                    List<RentalRate> rentalRates = retrieveRentalRateByCarCategory(carModel.getCarCategory());
-//                    BigDecimal totalAmount = new BigDecimal("0.00");
-//                    List<RentalRate> usedRates = calculateRentalRate(rentalRates, pickupDate, returnDate);
-//                    for (RentalRate rate : usedRates) {
-//                        totalAmount.add(rate.getRatePerDay());
-//                    }
-//                    System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), totalAmount);
-                
-            
+ 
                 System.out.println("------------------------");
                 System.out.println("1: Make Reservation");
                 System.out.println("2: Back\n");
@@ -243,17 +227,11 @@ public class MainApp {
             newCustomer.setPhoneNumber(scanner.nextLine().trim());
             newCustomer.setPartner(partner);
             
-			try {
-				newCustomer = retrieveCustomerByCustomerEmail(email);
-			} catch (CustomerNotFoundException_Exception ex) {
-				newCustomer = createNewCustomer(newCustomer);
-			}
-//            if (checkCustomerExist(email)) {
-//                newCustomer = retrieveCustomerByCustomerEmail(email);
-//            }
-//            else {
-//                newCustomer = createNewCustomer(newCustomer);
-//            }
+            try {
+		newCustomer = retrieveCustomerByCustomerEmail(email);
+            } catch (CustomerNotFoundException_Exception ex) {
+		newCustomer = createNewCustomer(newCustomer);
+            }
             
             System.out.print("Enter Credit Card Number> ");
             String ccNumber = scanner.nextLine().trim();
@@ -269,8 +247,6 @@ public class MainApp {
             }
             
             Reservation newReservation = new Reservation();
-//            newReservation.setCarCategory(reserveCarCategory);
-//            newReservation.setCustomer(newCustomer);
             newReservation.setReservationStartDate(pickupDate);
             newReservation.setReservationEndDate(returnDate);
             newReservation.setTotalAmount(totalAmount);
@@ -310,7 +286,7 @@ public class MainApp {
         for(Reservation reservation : reservations) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
         }
-		System.out.println();
+	System.out.println();
     }
     
     public void partnerViewReservationDetails() {
@@ -383,20 +359,12 @@ public class MainApp {
         // XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(pickupDate.getYear(), pickupDate.getMonth(), pickupDate.getDay(), pickupDate.getHours(), 0, 0);
         return port.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet);
     }
-
-    private static java.util.List<ws.client.partner.CarModel> searchAvailableCarModels(javax.xml.datatype.XMLGregorianCalendar pickupDate, java.lang.String pickupOutlet, javax.xml.datatype.XMLGregorianCalendar returnDate, java.lang.String returnOutlet) throws CarModelNotFoundException_Exception {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
-        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
-        return port.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-    }
 	
-	private static java.util.List<ws.client.partner.CarCategory> searchAvailableCarCategories(javax.xml.datatype.XMLGregorianCalendar pickupDate, javax.xml.datatype.XMLGregorianCalendar returnDate) throws CarModelNotFoundException_Exception {
+    private static java.util.List<ws.client.partner.CarCategory> searchAvailableCarCategories(javax.xml.datatype.XMLGregorianCalendar pickupDate, javax.xml.datatype.XMLGregorianCalendar returnDate) throws CarModelNotFoundException_Exception {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.searchAvailableCarCategories(pickupDate, returnDate);
     }
-	
-	
     
     private static java.util.List<ws.client.partner.RentalRate> retrieveRentalRateByCarCategory(ws.client.partner.CarCategory carCategory) {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
@@ -451,12 +419,6 @@ public class MainApp {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.removeReservationByPartner(reservationId, partner);
-    }
-    
-    private static Boolean checkCustomerExist(java.lang.String email) throws CustomerNotFoundException_Exception {
-        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
-        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
-        return port.checkCustomerExist(email);
     }
 	
     private static ws.client.partner.Customer retrieveCustomerByCustomerEmail(java.lang.String email) throws CustomerNotFoundException_Exception {

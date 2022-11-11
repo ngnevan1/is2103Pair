@@ -6,15 +6,12 @@
 package ejb.session.ws;
 
 import ejb.session.stateless.CarCategorySessionBeanLocal;
-import ejb.session.stateless.CarModelSessionBeanLocal;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
-import entity.Car;
 import entity.CarCategory;
-import entity.CarModel;
 import entity.Customer;
 import entity.Partner;
 import entity.RentalRate;
@@ -55,8 +52,6 @@ public class PartnerWebService {
     @EJB
     private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
     @EJB
-    private CarModelSessionBeanLocal carModelSessionBeanLocal;
-    @EJB
     private CustomerSessionBeanLocal customerSessionBeanLocal;
     @EJB
     private OutletSessionBeanLocal outletSessionBeanLocal;
@@ -67,9 +62,7 @@ public class PartnerWebService {
     @EJB
     private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
     
-    /**
-     * This is a sample web service operation
-     */
+
     @WebMethod(operationName = "partnerLogin")
     public Partner partnerLogin(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws InvalidLoginCredentialException, PartnerNotFoundException {
         Partner partner = partnerSessionBeanLocal.partnerLogin(username, password);
@@ -83,38 +76,18 @@ public class PartnerWebService {
     public Boolean checkOutletIsOpen(@WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "pickupOutlet") String pickupOutlet, @WebParam(name = "returnDate") Date returnDate,  @WebParam(name = "returnOutlet") String returnOutlet) throws OutletNotFoundException {
         return outletSessionBeanLocal.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet);
     }
-    
-    @WebMethod(operationName = "searchAvailableCarModels")
-    public List<CarModel> searchAvailableCarModels(@WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "pickupOutlet") String pickupOutlet, @WebParam(name = "returnDate") Date returnDate,  @WebParam(name = "returnOutlet") String returnOutlet) throws CarModelNotFoundException {
-        List<CarModel> carModels = carModelSessionBeanLocal.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-        
-        for (CarModel carModel : carModels) {
-            em.detach(carModel);
-            carModel.setCarCategory(null);
-            
-            for (Reservation reservation : carModel.getReservations()) {
-                reservation.setCarModel(null);
-            }
-            
-            for (Car car : carModel.getCars()) {
-                car.setCarModel(null);
-            }
-        }
-        return carModels;
-    }
 
-	@WebMethod(operationName = "searchAvailableCarCategories")
+    @WebMethod(operationName = "searchAvailableCarCategories")
     public List<CarCategory> searchAvailableCarCategories(@WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) throws CarModelNotFoundException {
-		
-		List<CarCategory> categories = carCategorySessionBeanLocal.searchAvailableCarCategory(pickupDate, returnDate);
+        List<CarCategory> categories = carCategorySessionBeanLocal.searchAvailableCarCategory(pickupDate, returnDate);
         
-		for (CarCategory cc:categories) {
-			// detach before nullifying relationships to prevent loop
-			em.detach(cc);
-			cc.setCarModels(null);
-			cc.setRentalRates(null);
-			cc.setReservations(null);
-		}
+        for (CarCategory cc:categories) {
+            // detach before nullifying relationships to prevent loop
+            em.detach(cc);
+            cc.setCarModels(null);
+            cc.setRentalRates(null);
+            cc.setReservations(null);
+        }
 		
         return categories;
     }
@@ -147,11 +120,9 @@ public class PartnerWebService {
     public CarCategory retrieveCarCategoryByCategoryName(@WebParam(name = "carCategoryName") String carCategoryName) throws CarCategoryNotFoundException {
         CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCategoryName(carCategoryName);
         em.detach(carCategory);
-		
         carCategory.setCarModels(null);
-		carCategory.setRentalRates(null);
-		carCategory.setReservations(null);
-        
+	carCategory.setRentalRates(null);
+	carCategory.setReservations(null);
         return carCategory;
     }
     
@@ -160,12 +131,7 @@ public class PartnerWebService {
         Customer customer = customerSessionBeanLocal.createNewCustomer(newCustomer);
         em.detach(customer);
         customer.setPartner(null);
-		customer.setReservations(null);
-//        
-//        for (Reservation reservation : customer.getReservations()) {
-//            reservation.setCustomer(null);
-//        }
-        
+        customer.setReservations(null);
         return customer;
     }
     
@@ -225,15 +191,6 @@ public class PartnerWebService {
         em.detach(currentPartner);
 	currentPartner.setCustomers(null);
 	currentPartner.setReservations(null);
-        
-//        for (Reservation reservation : currentPartner.getReservations()) {
-//            reservation.setPartner(null);
-//        }
-//        
-//        for (Customer customer : currentPartner.getCustomers()) {
-//            customer.setPartner(null);
-//        }
-
         return currentPartner;
     }
     

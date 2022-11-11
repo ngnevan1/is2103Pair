@@ -78,10 +78,6 @@
 
 <xs:element name="searchAvailableCarCategoriesResponse" type="tns:searchAvailableCarCategoriesResponse"/>
 
-<xs:element name="searchAvailableCarModels" type="tns:searchAvailableCarModels"/>
-
-<xs:element name="searchAvailableCarModelsResponse" type="tns:searchAvailableCarModelsResponse"/>
-
 <xs:complexType name="checkOutletIsOpen">
 <xs:sequence>
 <xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
@@ -455,21 +451,6 @@
 <xs:complexType name="CustomerExistException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="searchAvailableCarModels">
-<xs:sequence>
-<xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="pickupOutlet" type="xs:string" minOccurs="0"/>
-<xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="returnOutlet" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="searchAvailableCarModelsResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:carModel" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
 
