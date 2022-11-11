@@ -38,6 +38,7 @@ import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.OwnCustomerNotFoundException;
+import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -61,6 +62,10 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	private OutletSessionBeanLocal outletSessionBeanLocal;
 	@EJB
 	private CarSessionBeanLocal carSessionBeanLocal;
+
+  @EJB
+  private PartnerSessionBeanLocal partnerSessionBeanLocal;
+	
 
 	private final ValidatorFactory validatorFactory;
 	private final Validator validator;
@@ -275,8 +280,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		return ownCustomer;
 	}
 
-	@Override
-	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException {
+        @Override
+	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException, PartnerNotFoundException {
+
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
 
 		if (oldReservation.getCar() != null) {
@@ -289,11 +295,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
 		oldReservation.getCarCategory().getReservations().remove(oldReservation);
 
-		oldReservation.getCustomer().getReservations().remove(oldReservation);
-
-		partner.getReservations().remove(oldReservation);
-
-		oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
+                oldReservation.getCustomer().getReservations().remove(oldReservation);
+                
+		Partner currentPartner = partnerSessionBeanLocal.retrievePartnerByPartnerUsername(partner.getUsername());
+                currentPartner.getReservations().remove(oldReservation);
+                
+                oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
+                
 
 		em.remove(oldReservation);
 		return partner;

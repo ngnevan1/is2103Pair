@@ -7,7 +7,6 @@ package entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +32,6 @@ public class Outlet implements Serializable {
     private String outletAddress;
     private Integer openingTime;
     private Integer closingTime;
-    
     
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
