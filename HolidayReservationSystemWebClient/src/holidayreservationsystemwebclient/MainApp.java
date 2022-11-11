@@ -223,12 +223,18 @@ public class MainApp {
             System.out.print("Enter Passport Number> ");
             newCustomer.setPassportNumber(scanner.nextLine().trim());
             System.out.print("Enter Email> ");
-            newCustomer.setEmail(scanner.nextLine().trim());
+            String email = scanner.nextLine().trim();
+            newCustomer.setEmail(email);
             System.out.print("Enter Phone Number> ");
             newCustomer.setPhoneNumber(scanner.nextLine().trim());
             newCustomer.setPartner(partner);
             
-            newCustomer = createNewCustomer(newCustomer);
+            if (checkCustomerExist(email)) {
+                newCustomer = retrieveCustomerByCustomerEmail(email);
+            }
+            else {
+                newCustomer = createNewCustomer(newCustomer);
+            }
             
             System.out.print("Enter Credit Card Number> ");
             String ccNumber = scanner.nextLine().trim();
@@ -248,6 +254,7 @@ public class MainApp {
             
             Reservation newReservation = new Reservation();
             newReservation.setCarCategory(reserveCarCategory);
+            newReservation.setCustomer(newCustomer);
             newReservation.setReservationStartDate(pickupDate);
             newReservation.setReservationEndDate(returnDate);
             newReservation.setTotalAmount(totalAmount);
@@ -324,7 +331,7 @@ public class MainApp {
             scanner.nextLine();
             
             Reservation reservation = retrieveReservationByReservationId(reservationId);
-            GregorianCalendar calendarPayment = calendarPayment = reservation.getPaymentDate().toGregorianCalendar();
+            GregorianCalendar calendarPayment = reservation.getPaymentDate().toGregorianCalendar();
                         
             if(calendarPayment.compareTo(calendar) == -1) {
                 BigDecimal refundAmount = calculateRefundPenalty(reservation);
@@ -419,6 +426,17 @@ public class MainApp {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.removeReservationByPartner(reservationId, partner);
+    }
+    
+    private static Boolean checkCustomerExist(java.lang.String email) throws CustomerNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.checkCustomerExist(email);
+    }
+    private static ws.client.partner.Customer retrieveCustomerByCustomerEmail(java.lang.String email) throws CustomerNotFoundException_Exception {
+        ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
+        ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
+        return port.retrieveCustomerByCustomerEmail(email);
     }
 
 }
