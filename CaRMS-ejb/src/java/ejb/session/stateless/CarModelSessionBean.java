@@ -155,9 +155,9 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException {
-        CarModel modelToRemove = retrieveCarModelByCarModelId(carModelId, false, true, false);
+        CarModel modelToRemove = retrieveCarModelByCarModelId(carModelId, true, true, false);
         
-        if (modelToRemove.getReservations().isEmpty()) {
+        if (modelToRemove.getReservations().isEmpty() && modelToRemove.getCars().isEmpty()) {
             em.remove(modelToRemove);
         } else {
             modelToRemove.setIsDisabled(true);

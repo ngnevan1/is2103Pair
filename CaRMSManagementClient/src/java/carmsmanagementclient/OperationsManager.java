@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -39,6 +41,7 @@ import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.OutletNotFoundException;
+import util.exception.ReservationNotFoundException;
 import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarException;
@@ -234,6 +237,7 @@ public class OperationsManager {
 
             if (constraintViolations.isEmpty()) {
                 carModelSessionBeanRemote.updateCarModel(model);
+				System.out.println("Car Model: " + model.getModelName() + " updated successfully!");
             } else {
                 showInputDataValidationErrorsForCarModel(constraintViolations);
             }
@@ -296,7 +300,7 @@ public class OperationsManager {
             newCar.setCarModel(chosenModel);
 
             while (true) {
-                System.out.print("Select Car Status (1: In Outlet, 2: On Rental, 3: In Transit, 4: Servicing)> ");
+                System.out.print("Select Car Status (1: Available , 2: On Rental, 3: In Transit, 4: Servicing)> ");
                 Integer carStatusInt = scanner.nextInt();
 
                 if (carStatusInt >= 1 && carStatusInt <= 4) {
@@ -400,7 +404,12 @@ public class OperationsManager {
             if (input.length() > 0) {
                 car.setColour(input);
             }
-			 System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
+			System.out.println("Enter License Plate (blank if no change)> ");
+			input = scanner.nextLine().trim();
+			if (input.length() > 0) {
+				car.setLicensePlate(input);
+			}
+			System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", "Car Model ID", "Car Category" , "Make Name", "Model Name", "Disabled?");
             for (CarModel model : carModels) {
 			System.out.printf("%-15s%-20s%-20s%-20s%-5s\n", model.getCarModelId().toString(), model.getCarCategory().getCategoryName(), model.getMakeName(), model.getModelName(), model.getIsDisabled() ? "Yes" : "No");
             }
@@ -411,7 +420,7 @@ public class OperationsManager {
                 car.setCarModel(chosenModel);
             }
             while (true) {
-                System.out.print("Select Car Status (1: In Outlet, 2: On Rental, 3: In Transit, 4: Servicing)> ");
+                System.out.print("Select Car Status (1: Available, 2: On Rental, 3: In Transit, 4: Servicing)> ");
                 Integer carStatusInt = scanner.nextInt();
 
                 if (carStatusInt >= 1 && carStatusInt <= 4) {
@@ -437,7 +446,7 @@ public class OperationsManager {
 
             if (constraintViolations.isEmpty()) {
                 carSessionBeanRemote.updateCar(car);
-                System.out.println("Car " + car.getCarId() + " updated successfully!");
+                System.out.println("Car " + car.getLicensePlate() + " updated successfully!");
             } else {
                 showInputDataValidationErrorsForCar(constraintViolations);
             }
@@ -465,7 +474,7 @@ public class OperationsManager {
             try {
                 carSessionBeanRemote.deleteCar(car.getCarId());
                 System.out.println("Car deleted successfully!\n");
-            } catch (CarNotFoundException ex) {
+            } catch (CarNotFoundException | OutletNotFoundException | ReservationNotFoundException | CarModelNotFoundException ex) {
                 System.out.println("An error has occurred while deleting Car: " + ex.getMessage() + "\n");
             }
         } else {
