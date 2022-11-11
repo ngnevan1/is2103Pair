@@ -21,10 +21,10 @@ import util.exception.UnknownPersistenceException;
 @Remote
 public interface CarModelSessionBeanRemote {
     public CarModel createNewCarModel(CarModel newCarModel) throws CarModelExistException, UnknownPersistenceException, InputDataValidationException;
-    List<CarModel> retrieveAllCarModels();
-    CarModel retrieveCarModelByCarModelId(Long carModelId, Boolean retrieveCar, Boolean retrieveReservation, Boolean retrieveCarCategory) throws CarModelNotFoundException;
-    CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
+    public CarModel retrieveCarModelByCarModelId(Long carModelId, Boolean retrieveCar, Boolean retrieveReservation, Boolean retrieveCarCategory) throws CarModelNotFoundException;
+    public CarModel retrieveCarModelByModelName(String modelName) throws CarModelNotFoundException;
     public void updateCarModel(CarModel model) throws CarModelNotFoundException, InputDataValidationException;
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
-    List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
+    public List<CarModel> retrieveAllCarModels();
+    public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
 }
