@@ -7,7 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.CarCategory;
-// import entity.CarModel;
+import entity.CarModel;
 import entity.Customer;
 import entity.Outlet;
 import entity.OwnCustomer;
@@ -31,7 +31,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CarCategoryNotFoundException;
-// import util.exception.CarModelNotFoundException;
+import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
@@ -334,12 +334,17 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	}
 
 	@Override
-	public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, ReservationNotFoundException {
+	public void allocateCar(Long carId, Long reservationId) throws CarNotFoundException, CarModelNotFoundException, ReservationNotFoundException {
 		Car car = carSessionBeanLocal.retrieveCarByCarId(carId, true);
+		CarModel model = carModelSessionBeanLocal.retrieveCarModelByCarModelId(car.getCarModel().getCarModelId());
 		Reservation res = retrieveReservationByReservationId(reservationId);
 
 		car.getReservations().add(res);
+		model.getReservations().add(res);
 		res.setCar(car);
+		res.setCarModel(model);
+		
+		
 	}
         
         @Override
