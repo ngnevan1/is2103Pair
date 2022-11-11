@@ -115,17 +115,24 @@ public class PartnerWebService {
     public List<RentalRate> calculateRentalRate(@WebParam(name = "rentalRates") List<RentalRate> rentalRates, @WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) throws RentalRateNotAvailableException {
         List<RentalRate> rates = rentalRateSessionBeanLocal.calculateRentalRate(rentalRates, pickupDate, returnDate);
         
-         for (RentalRate rate : rates) {
+        for (RentalRate rate : rates) {
             em.detach(rate);
             rate.setCarCategory(null);
-         }
+        }
             
         return rates;
     }
     
     @WebMethod(operationName = "retrieveRentalRateByCarCategory")
     public List<RentalRate> retrieveRentalRateByCarCategory(@WebParam(name = "carCategory") CarCategory carCategory) {
-        return rentalRateSessionBeanLocal.retrieveRentalRateByCarCategory(carCategory);
+        List<RentalRate> rates = rentalRateSessionBeanLocal.retrieveRentalRateByCarCategory(carCategory);
+        
+        for (RentalRate rate : rates) {
+            em.detach(rate);
+            rate.setCarCategory(null);
+        }
+        
+        return rates;
     }
     
     @WebMethod(operationName = "retrieveCarCategoryByCategoryName")
@@ -178,12 +185,32 @@ public class PartnerWebService {
     
     @WebMethod(operationName = "retrieveReservationsByPartnerUsername")
     public List<Reservation> retrieveReservationsByPartnerUsername(@WebParam(name = "username") String username){
-        return reservationSessionBeanLocal.retrieveReservationsByPartnerUsername(username);
+        List<Reservation> reservations = reservationSessionBeanLocal.retrieveReservationsByPartnerUsername(username);
+        for (Reservation reservation : reservations) {
+            em.detach(reservation);
+            reservation.setCar(null);
+            reservation.setCarModel(null);
+            reservation.setCarCategory(null);
+            reservation.setPartner(null);
+            reservation.setCustomer(null);
+            reservation.setPickUpOutlet(null);
+            reservation.setReturnOutlet(null);
+        }
+        return reservations;
     }
     
     @WebMethod(operationName = "retrieveReservationByReservationId")
     public Reservation retrieveReservationByReservationId(@WebParam(name = "reservationId") Long reservationId) throws ReservationNotFoundException{
-        return reservationSessionBeanLocal.retrieveReservationByReservationId(reservationId);
+        Reservation reservation = reservationSessionBeanLocal.retrieveReservationByReservationId(reservationId);
+        em.detach(reservation);
+        reservation.setCar(null);
+        reservation.setCarModel(null);
+        reservation.setCarCategory(null);
+        reservation.setPartner(null);
+        reservation.setCustomer(null);
+        reservation.setPickUpOutlet(null);
+        reservation.setReturnOutlet(null);
+        return reservation;
     }
     
     @WebMethod(operationName = "calculateRefundPenalty")
@@ -193,7 +220,40 @@ public class PartnerWebService {
     
     @WebMethod(operationName = "removeReservationByPartner")
     public Partner removeReservationByPartner(@WebParam(name = "reservationId") Long reservationId, @WebParam(name = "partner") Partner partner) throws ReservationNotFoundException{
-        return reservationSessionBeanLocal.removeReservationByPartner(reservationId, partner);
+        Partner currentPartner = reservationSessionBeanLocal.removeReservationByPartner(reservationId, partner);
+        em.detach(currentPartner);
+        
+        for (Reservation reservation : currentPartner.getReservations()) {
+            reservation.setPartner(null);
+        }
+        
+        for (Customer customer : currentPartner.getCustomers()) {
+            customer.setPartner(null);
+        }
+
+        return currentPartner;
+    }
+    
+    @WebMethod(operationName = "checkCustomerExist")
+    public Boolean checkCustomerExist(@WebParam(name = "email") String email) throws CustomerNotFoundException {
+        Customer customer = customerSessionBeanLocal.retrieveCustomerByCustomerEmail(email);
+        if (customer != null) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+    
+    @WebMethod(operationName = "retrieveCustomerByCustomerEmail")
+    public Customer retrieveCustomerByCustomerEmail(@WebParam(name = "email") String email) throws CustomerNotFoundException {
+        Customer customer = customerSessionBeanLocal.retrieveCustomerByCustomerEmail(email);
+        em.detach(customer);
+        customer.setPartner(null);
+        
+        for (Reservation reservation : customer.getReservations()) {
+            reservation.setCustomer(null);
+        }
+        
+        return customer;
     }
     
 }
