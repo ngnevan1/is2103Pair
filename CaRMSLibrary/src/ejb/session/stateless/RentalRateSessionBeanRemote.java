@@ -26,18 +26,11 @@ import util.exception.UpdateRentalRateException;
  */
 @Remote
 public interface RentalRateSessionBeanRemote {
-
-	public RentalRate createNewRentalRate(RentalRate newRentalRate, Long carCategoryId) throws RentalRateExistException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException;
-    public List<RentalRate> retrieveAllRentalRates();
-
-    public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException;
-
+    public RentalRate createNewRentalRate(RentalRate newRentalRate, Long carCategoryId) throws RentalRateExistException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException;
     public RentalRate retrieveRentalRateByRateName(String rateName) throws RentalRateNotFoundException;
-
     public void updateRentalRate(RentalRate rate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
-    
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
-    List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException;
-	
+    public List<RentalRate> retrieveAllRentalRates();
+    public List<RentalRate> calculateRentalRate(List<RentalRate> rates, Date pickupDate, Date returnDate) throws RentalRateNotAvailableException;
     public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
 }

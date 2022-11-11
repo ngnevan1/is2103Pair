@@ -20,8 +20,8 @@ import util.exception.UnknownPersistenceException;
 @Remote
 public interface CarCategorySessionBeanRemote {
     public CarCategory createNewCarCategory(CarCategory newCarCategory) throws CarCategoryExistException, UnknownPersistenceException;
-    public List<CarCategory> retrieveAllCarCategories();
     public CarCategory retrieveCarCategoryByCarCategoryId(Long carCategoryId, Boolean retrieveCarModel, Boolean retrieveRentalRate) throws CarCategoryNotFoundException;
     public CarCategory retrieveCarCategoryByCategoryName(String categoryName) throws CarCategoryNotFoundException;
-	public List<CarCategory> searchAvailableCarCategory(Date rNewStart, Date rNewEnd);
+    public List<CarCategory> retrieveAllCarCategories();
+    public List<CarCategory> searchAvailableCarCategory(Date rNewStart, Date rNewEnd);
 }

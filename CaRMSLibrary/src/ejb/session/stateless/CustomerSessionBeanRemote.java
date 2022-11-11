@@ -22,9 +22,9 @@ import util.exception.UnknownPersistenceException;
  */
 @Remote
 public interface CustomerSessionBeanRemote {
-    Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException;
-    Customer retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
-    OwnCustomer createNewOwnCustomer(OwnCustomer newOwnCustomer) throws OwnCustomerExistException, UnknownPersistenceException, InputDataValidationException;
-    OwnCustomer retrieveOwnCustomerByUsername(String username) throws OwnCustomerNotFoundException;
-    OwnCustomer ownCustomerLogin(String username, String password) throws InvalidLoginCredentialException, OwnCustomerNotFoundException;
+    public Customer createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException;
+    public Customer retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
+    public OwnCustomer createNewOwnCustomer(OwnCustomer newOwnCustomer) throws OwnCustomerExistException, UnknownPersistenceException, InputDataValidationException;
+    public OwnCustomer retrieveOwnCustomerByUsername(String username) throws OwnCustomerNotFoundException;
+    public OwnCustomer ownCustomerLogin(String username, String password) throws InvalidLoginCredentialException, OwnCustomerNotFoundException;
 }

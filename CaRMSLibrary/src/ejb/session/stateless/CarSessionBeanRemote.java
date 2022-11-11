@@ -25,9 +25,9 @@ import util.exception.UpdateCarException;
 @Remote
 public interface CarSessionBeanRemote {
     public Car createNewCar(Car newCar) throws CarExistException, UnknownPersistenceException, InputDataValidationException;
-    public List<Car> retrieveAllCars();
     public Car retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+    public List<Car> retrieveAllCars();
     public List<Car> searchAvailableCars(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet);
     public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException;
-	public void deleteCar(Long carId) throws CarNotFoundException, OutletNotFoundException, ReservationNotFoundException, CarModelNotFoundException;
+    public void deleteCar(Long carId) throws CarNotFoundException, OutletNotFoundException, ReservationNotFoundException, CarModelNotFoundException;
 }

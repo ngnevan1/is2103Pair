@@ -127,20 +127,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 	}
 
 	@Override
-	public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId, Boolean retrieveCarCategory) throws RentalRateNotFoundException {
-		RentalRate rentalRate = retrieveRentalRateByRentalRateId(rentalRateId);
-
-		if (rentalRate != null) {
-			if (retrieveCarCategory) {
-				rentalRate.getCarCategory();
-			}
-			return rentalRate;
-		} else {
-			throw new RentalRateNotFoundException("Rental Rate ID " + rentalRateId + "does not exist!");
-		}
-	}
-
-	@Override
 	public RentalRate retrieveRentalRateByRentalRateId(Long rentalRateId) throws RentalRateNotFoundException {
 		RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
 
