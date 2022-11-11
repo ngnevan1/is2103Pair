@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -14,5 +15,5 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface EjbTimerSessionBeanRemote {
-    public void allocateCarsManually(Date date);
+    public List<String> allocateCarsManually(Date date);
 }

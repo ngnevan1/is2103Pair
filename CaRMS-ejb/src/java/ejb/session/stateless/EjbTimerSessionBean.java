@@ -11,6 +11,7 @@ import entity.Outlet;
 import entity.Reservation;
 import entity.TransitDispatchRecord;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -91,8 +92,9 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 	}
 
 	@Override
-	public void allocateCarsManually(Date date) {
+	public List<String> allocateCarsManually(Date date) {
 		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		List<String> output = new ArrayList<>();
 		System.out.println("********** Manual Car Allocation " + outputDateFormat.format(date));
 
 		// Get list of reservations that need a car to be allocated to them
@@ -110,6 +112,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 						if (carSessionBeanLocal.isAvailable(c.getCarId(), r.getReservationStartDate(), r.getReservationEndDate())) {
 							reservationSessionBeanLocal.allocateCar(c.getCarId(), r.getReservationId());
 							carAllocated = true;
+							output.add("Car " + c.getLicensePlate() + " allocated to " + r.getCustomer().getName() + " for pickup on " + outputDateFormat.format(r.getReservationStartDate()) + " at " + r.getPickUpOutlet().getOutletName());	
 							System.out.println("Car " + c.getLicensePlate() + " allocated to " + r.getCustomer().getName() + " for pickup on " + outputDateFormat.format(r.getReservationStartDate()) + " at " + r.getPickUpOutlet().getOutletName());
 							break;
 						}
@@ -124,6 +127,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 						adjustedTime.setHours(minTransitWindow);
 						if (carSessionBeanLocal.isAvailable(c.getCarId(), adjustedTime, r.getReservationEndDate())) {
 							reservationSessionBeanLocal.allocateCar(c.getCarId(), r.getReservationId());
+							output.add("Car " + c.getLicensePlate() + " allocated to " + r.getCustomer().getName() + " for pickup on " + outputDateFormat.format(r.getReservationStartDate()) + " at " + r.getPickUpOutlet().getOutletName());
+							output.add("Car is currently at " + c.getOutlet().getOutletName() + " and needs transit dispatch");
 							System.out.println("Car " + c.getLicensePlate() + " allocated to " + r.getCustomer().getName() + " for pickup on " + outputDateFormat.format(r.getReservationStartDate()) + " at " + r.getPickUpOutlet().getOutletName());
 							System.out.println("Car is currently at " + c.getOutlet().getOutletName() + " and needs transit dispatch");
 							// generate transit dispatch record
@@ -136,6 +141,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 							newDispatch.setDispatchTime(dispatchTime);
 
 							transitDispatchRecordSessionBeanLocal.createNewTransitDispatchRecord(newDispatch);
+							output.add("New Transit Dispatch Record Created for " + r.getCar().getLicensePlate());
 							System.out.println("New Transit Dispatch Record Created for " + r.getCar().getLicensePlate());
 							break;
 						}
@@ -146,7 +152,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 		} catch (CarNotFoundException | ReservationNotFoundException | OutletNotFoundException | TransitDispatchRecordExistException | UnknownPersistenceException ex) {
 			System.out.println("An error has occurred: " + ex.getMessage());
 		}
-
+		return output;
 	}
 
 //	@Override
