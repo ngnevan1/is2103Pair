@@ -46,15 +46,6 @@
 <message name="removeReservationByPartnerResponse">
 <part name="parameters" element="tns:removeReservationByPartnerResponse"/>
 </message>
-<message name="searchAvailableCarModels">
-<part name="parameters" element="tns:searchAvailableCarModels"/>
-</message>
-<message name="searchAvailableCarModelsResponse">
-<part name="parameters" element="tns:searchAvailableCarModelsResponse"/>
-</message>
-<message name="CarModelNotFoundException">
-<part name="fault" element="tns:CarModelNotFoundException"/>
-</message>
 <message name="retrieveCustomerByCustomerEmail">
 <part name="parameters" element="tns:retrieveCustomerByCustomerEmail"/>
 </message>
@@ -93,6 +84,9 @@
 </message>
 <message name="searchAvailableCarCategoriesResponse">
 <part name="parameters" element="tns:searchAvailableCarCategoriesResponse"/>
+</message>
+<message name="CarModelNotFoundException">
+<part name="fault" element="tns:CarModelNotFoundException"/>
 </message>
 <message name="retrieveRentalRateByCarCategory">
 <part name="parameters" element="tns:retrieveRentalRateByCarCategory"/>
@@ -154,11 +148,6 @@
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartnerResponse" message="tns:removeReservationByPartnerResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartner/Fault/ReservationNotFoundException"/>
 <fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartner/Fault/PartnerNotFoundException"/>
-</operation>
-<operation name="searchAvailableCarModels">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsRequest" message="tns:searchAvailableCarModels"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsResponse" message="tns:searchAvailableCarModelsResponse"/>
-<fault message="tns:CarModelNotFoundException" name="CarModelNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModels/Fault/CarModelNotFoundException"/>
 </operation>
 <operation name="retrieveCustomerByCustomerEmail">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveCustomerByCustomerEmailRequest" message="tns:retrieveCustomerByCustomerEmail"/>
@@ -276,18 +265,6 @@
 </fault>
 <fault name="PartnerNotFoundException">
 <soap:fault name="PartnerNotFoundException" use="literal"/>
-</fault>
-</operation>
-<operation name="searchAvailableCarModels">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="CarModelNotFoundException">
-<soap:fault name="CarModelNotFoundException" use="literal"/>
 </fault>
 </operation>
 <operation name="retrieveCustomerByCustomerEmail">
