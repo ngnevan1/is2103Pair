@@ -20,6 +20,7 @@ import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.OwnCustomerNotFoundException;
+import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -40,6 +41,6 @@ public interface ReservationSessionBeanLocal {
     List<Reservation> retrieveReservationsByCustomerEmail(String email);
     List<Reservation> retrieveReservationsByPartnerUsername(String username);
     OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
-    Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException;
+    Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException, PartnerNotFoundException;
     BigDecimal calculateRefundPenalty(Reservation reservation);
 }

@@ -153,6 +153,7 @@
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartnerRequest" message="tns:removeReservationByPartner"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartnerResponse" message="tns:removeReservationByPartnerResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartner/Fault/ReservationNotFoundException"/>
+<fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/removeReservationByPartner/Fault/PartnerNotFoundException"/>
 </operation>
 <operation name="searchAvailableCarModels">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/searchAvailableCarModelsRequest" message="tns:searchAvailableCarModels"/>
@@ -272,6 +273,9 @@
 </output>
 <fault name="ReservationNotFoundException">
 <soap:fault name="ReservationNotFoundException" use="literal"/>
+</fault>
+<fault name="PartnerNotFoundException">
+<soap:fault name="PartnerNotFoundException" use="literal"/>
 </fault>
 </operation>
 <operation name="searchAvailableCarModels">

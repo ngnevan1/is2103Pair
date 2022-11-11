@@ -37,6 +37,7 @@ import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.OwnCustomerNotFoundException;
+import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -46,7 +47,6 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
-
 	
 	@PersistenceContext(unitName = "CaRMS-ejbPU")
 	private EntityManager em;
@@ -61,6 +61,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	private OutletSessionBeanLocal outletSessionBeanLocal;
 	@EJB
 	private CarSessionBeanLocal carSessionBeanLocal;
+        @EJB
+        private PartnerSessionBeanLocal partnerSessionBeanLocal;
 	
 
 	private final ValidatorFactory validatorFactory;
@@ -310,7 +312,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	}
         
         @Override
-	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException {
+	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException, PartnerNotFoundException {
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
  
 		if (oldReservation.getCar() != null) {
@@ -325,7 +327,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 
                 oldReservation.getCustomer().getReservations().remove(oldReservation);
                 
-		partner.getReservations().remove(oldReservation);
+		Partner currentPartner = partnerSessionBeanLocal.retrievePartnerByPartnerUsername(partner.getUsername());
+                currentPartner.getReservations().remove(oldReservation);
                 
                 oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
                 

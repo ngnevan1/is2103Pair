@@ -220,11 +220,11 @@ public class PartnerWebService {
     }
     
     @WebMethod(operationName = "removeReservationByPartner")
-    public Partner removeReservationByPartner(@WebParam(name = "reservationId") Long reservationId, @WebParam(name = "partner") Partner partner) throws ReservationNotFoundException{
+    public Partner removeReservationByPartner(@WebParam(name = "reservationId") Long reservationId, @WebParam(name = "partner") Partner partner) throws ReservationNotFoundException, PartnerNotFoundException{
         Partner currentPartner = reservationSessionBeanLocal.removeReservationByPartner(reservationId, partner);
         em.detach(currentPartner);
-		currentPartner.setCustomers(null);
-		currentPartner.setReservations(null);
+	currentPartner.setCustomers(null);
+	currentPartner.setReservations(null);
         
 //        for (Reservation reservation : currentPartner.getReservations()) {
 //            reservation.setPartner(null);

@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -362,7 +364,7 @@ public class MainApp {
             }
             
             partner = removeReservationByPartner(reservationId, partner);   // Ensures local copy is synchronous
-        } catch (ReservationNotFoundException_Exception ex) {
+        } catch (ReservationNotFoundException_Exception | PartnerNotFoundException_Exception ex) {
             System.out.println(ex.getMessage());
         } catch (DatatypeConfigurationException ex) {
             System.out.println("An unknown error has occurred while cancelling the reservation!");
@@ -445,7 +447,7 @@ public class MainApp {
         return port.calculateRefundPenalty(reservation);
     }
     
-    private static ws.client.partner.Partner removeReservationByPartner(Long reservationId, ws.client.partner.Partner partner) throws ReservationNotFoundException_Exception {
+    private static ws.client.partner.Partner removeReservationByPartner(Long reservationId, ws.client.partner.Partner partner) throws ReservationNotFoundException_Exception, PartnerNotFoundException_Exception {
         ws.client.partner.PartnerWebService_Service service = new ws.client.partner.PartnerWebService_Service();
         ws.client.partner.PartnerWebService port = service.getPartnerWebServicePort();
         return port.removeReservationByPartner(reservationId, partner);
