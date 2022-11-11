@@ -244,18 +244,20 @@ public class MainApp {
             }
             
             if (outletSessionBeanRemote.checkOutletIsOpen(pickupDate, pickupOutlet, returnDate, returnOutlet)) {
-                List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
-                System.out.printf("%-15s%-15s%-15s%-15s\n", "Car Category", "Car Make", "Car Model", "Rental Rate");
+                //List<CarModel> availableCarModels = carModelSessionBeanRemote.searchAvailableCarModels(pickupDate, pickupOutlet, returnDate, returnOutlet);
+
+				List<CarCategory> availableCarCategories = carCategorySessionBeanRemote.searchAvailableCarCategory(pickupDate, returnDate);
+                System.out.printf("%-15s%-15s\n", "Car Category", "Rental Rate");
             
-                for(CarModel carModel : availableCarModels) {
-                    List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(carModel.getCarCategory());
+                for(CarCategory category : availableCarCategories) {
+                    List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveRentalRateByCarCategory(category);
                     
                     BigDecimal totalAmount = new BigDecimal("0.00");
                     List<RentalRate> usedRates = rentalRateSessionBeanRemote.calculateRentalRate(rentalRates, pickupDate, returnDate);
                     for (RentalRate rate : usedRates) {
                         totalAmount = totalAmount.add(rate.getRatePerDay());
                     }
-                    System.out.printf("%-15s%-15s%-15s%-15s\n", carModel.getCarCategory().getCategoryName(), carModel.getMakeName(), carModel.getModelName(), totalAmount);
+                    System.out.printf("%-15s%-15s\n", category.getCategoryName(), totalAmount);
                 }
                 
                 System.out.println("------------------------");

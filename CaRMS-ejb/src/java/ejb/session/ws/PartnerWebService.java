@@ -110,6 +110,22 @@ public class PartnerWebService {
         }
         return carModels;
     }
+
+	@WebMethod(operationName = "searchAvailableCarCategories")
+    public List<CarCategory> searchAvailableCarCategories(@WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) throws CarModelNotFoundException {
+		
+		List<CarCategory> categories = carCategorySessionBeanLocal.searchAvailableCarCategory(pickupDate, returnDate);
+        
+		for (CarCategory cc:categories) {
+			// detach before nullifying relationships to prevent loop
+			em.detach(cc);
+			cc.setCarModels(null);
+			cc.setRentalRates(null);
+			cc.setReservations(null);
+		}
+		
+        return categories;
+    }
     
     @WebMethod(operationName = "calculateRentalRate")
     public List<RentalRate> calculateRentalRate(@WebParam(name = "rentalRates") List<RentalRate> rentalRates, @WebParam(name = "pickupDate") Date pickupDate, @WebParam(name = "returnDate") Date returnDate) throws RentalRateNotAvailableException {
@@ -139,18 +155,10 @@ public class PartnerWebService {
     public CarCategory retrieveCarCategoryByCategoryName(@WebParam(name = "carCategoryName") String carCategoryName) throws CarCategoryNotFoundException {
         CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCategoryName(carCategoryName);
         em.detach(carCategory);
-        
-        for (CarModel carModel : carCategory.getCarModels()) {
-            carModel.setCarCategory(null);
-        }
-        
-        for (Reservation reservation : carCategory.getReservations()) {
-            reservation.setCarCategory(null);
-        }
-        
-        for (RentalRate rentalRate : carCategory.getRentalRates()) {
-            rentalRate.setCarCategory(null);
-        }
+		
+        carCategory.setCarModels(null);
+		carCategory.setRentalRates(null);
+		carCategory.setReservations(null);
         
         return carCategory;
     }
@@ -160,10 +168,11 @@ public class PartnerWebService {
         Customer customer = customerSessionBeanLocal.createNewCustomer(newCustomer);
         em.detach(customer);
         customer.setPartner(null);
-        
-        for (Reservation reservation : customer.getReservations()) {
-            reservation.setCustomer(null);
-        }
+		customer.setReservations(null);
+//        
+//        for (Reservation reservation : customer.getReservations()) {
+//            reservation.setCustomer(null);
+//        }
         
         return customer;
     }
@@ -222,14 +231,16 @@ public class PartnerWebService {
     public Partner removeReservationByPartner(@WebParam(name = "reservationId") Long reservationId, @WebParam(name = "partner") Partner partner) throws ReservationNotFoundException{
         Partner currentPartner = reservationSessionBeanLocal.removeReservationByPartner(reservationId, partner);
         em.detach(currentPartner);
+		currentPartner.setCustomers(null);
+		currentPartner.setReservations(null);
         
-        for (Reservation reservation : currentPartner.getReservations()) {
-            reservation.setPartner(null);
-        }
-        
-        for (Customer customer : currentPartner.getCustomers()) {
-            customer.setPartner(null);
-        }
+//        for (Reservation reservation : currentPartner.getReservations()) {
+//            reservation.setPartner(null);
+//        }
+//        
+//        for (Customer customer : currentPartner.getCustomers()) {
+//            customer.setPartner(null);
+//        }
 
         return currentPartner;
     }

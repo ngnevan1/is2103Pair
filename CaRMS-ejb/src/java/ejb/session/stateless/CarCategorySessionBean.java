@@ -5,9 +5,14 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.Reservation;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -25,6 +30,9 @@ import util.exception.UnknownPersistenceException;
  */
 @Stateless
 public class CarCategorySessionBean implements CarCategorySessionBeanRemote, CarCategorySessionBeanLocal {
+
+	@EJB
+	private CarSessionBeanLocal carSessionBeanLocal;
 
 	@PersistenceContext(unitName = "CaRMS-ejbPU")
 	private EntityManager em;
@@ -99,6 +107,41 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 		} catch (NoResultException | NonUniqueResultException ex) {
 			throw new CarCategoryNotFoundException("Car Category Name " + categoryName + " does not exist!");
 		}
+	}
+
+	@Override
+	public List<CarCategory> searchAvailableCarCategory(Date rNewStart, Date rNewEnd) {
+		List<CarCategory> allCategories = retrieveAllCarCategories();
+		List<CarCategory> availableCategories = new ArrayList<>();
+		for (CarCategory cc : allCategories) {
+			// get number of reservations during selected reservation time
+			List<Reservation> allReservations = cc.getReservations();
+			int numOfReservations = 0;
+			for (Reservation r : allReservations) {
+				Date rExistingStart = r.getReservationStartDate();
+				Date rExistingEnd = r.getReservationEndDate();
+
+				if ((rNewStart.before(rExistingEnd) && rNewStart.after(rExistingStart))
+						|| (rNewEnd.after(rExistingStart) && rNewEnd.before(rExistingEnd))
+						|| (rNewStart.before(rExistingStart) && rNewEnd.after(rExistingEnd))
+						|| (rNewStart.equals(rExistingStart) && rNewEnd.equals(rExistingEnd))) {
+					numOfReservations++;
+				}
+			}
+			// get number of cars available at any one point of time
+			List<Car> cars = carSessionBeanLocal.retrieveCarsByCarCategory(cc);
+			List<Car> availableCars = new ArrayList<>();
+			for (Car c:cars) {
+				if (!c.getIsDisabled()) {
+					availableCars.add(c);	
+				}
+			}
+			if (numOfReservations < availableCars.size()) {
+				availableCategories.add(cc);
+			}
+
+		}
+		return availableCategories;
 	}
 
 	@Override

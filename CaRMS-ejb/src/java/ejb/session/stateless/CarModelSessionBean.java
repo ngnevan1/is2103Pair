@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarCategory;
 import entity.CarModel;
 import entity.Reservation;
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
         
     }
-    
+   
     @Override
     public List<CarModel> searchAvailableCarModels(Date pickupDate, String pickupOutlet, Date returnDate, String returnOutlet) {
         List<CarModel> availableModels = new ArrayList<>();
