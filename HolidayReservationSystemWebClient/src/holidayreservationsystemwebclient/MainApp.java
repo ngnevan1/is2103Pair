@@ -148,7 +148,7 @@ public class MainApp {
             GregorianCalendar calendar = new GregorianCalendar();
             
             System.out.println("*** Holiday Reservation System :: Partner Search Car ***\n");
-            System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH> ");
+            System.out.print("Enter Pickup Date/Time (dd/MM/yyyy HH)> ");
             Date pDate = inputDateFormat.parse(scanner.nextLine().trim());
             calendar.setTime(pDate);
             XMLGregorianCalendar pickupDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);

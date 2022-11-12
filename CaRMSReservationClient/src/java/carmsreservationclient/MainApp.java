@@ -261,10 +261,15 @@ public class MainApp {
                 
                 if (ownCustomer != null) {
                     if (response == 1) {
-                        System.out.print("Enter Car Category Name> ");
-                        String carCategoryName = scanner.nextLine().trim();
-			CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
-                        reserveCarByCarCategory(carCategoryName, reserveCarCategory, pickupDate, returnDate, pickupOutlet, returnOutlet);
+                        if (!availableCarCategories.isEmpty()) {
+                            System.out.print("Enter Car Category Name> ");
+                            String carCategoryName = scanner.nextLine().trim();
+                            CarCategory reserveCarCategory = carCategorySessionBeanRemote.retrieveCarCategoryByCategoryName(carCategoryName);
+                            reserveCarByCarCategory(carCategoryName, reserveCarCategory, pickupDate, returnDate, pickupOutlet, returnOutlet);
+                        }
+                        else {
+                            System.out.println("No available cars for rental during this period!\n");                                    
+                        }
                     }
                 }
                 else {

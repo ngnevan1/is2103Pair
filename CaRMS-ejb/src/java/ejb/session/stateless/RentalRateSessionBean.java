@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.RentalRateEnum;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateExistException;
@@ -221,11 +222,26 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 Date rateEndDate = rate.getRateEndDate();
                 if ((!rate.getIsDisabled()) && 
                         (rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) && 
-                        (rateEndDate.equals(currentDate) || rateEndDate.after(currentDate)) && 
-                        ((rate.getRatePerDay().compareTo(cheapestRate) == -1) /*|| (cheapestRate.equals(new BigDecimal("0.00"))) */ )) {
-                    cheapestRate = rate.getRatePerDay();
-                    rateToUse = rate;
-                    correctRate = Boolean.TRUE;
+                        (rateEndDate.equals(currentDate) || rateEndDate.after(currentDate))) {
+                    if ((rate.getRatePerDay().compareTo(cheapestRate) == -1) || (rate.getRateType().equals(RentalRateEnum.PEAK))) {
+                        if (rate.getRateType().equals(RentalRateEnum.PROMOTION)) {
+                            cheapestRate = rate.getRatePerDay();
+                            rateToUse = rate;
+                            correctRate = Boolean.TRUE;
+                            break;
+                        }
+                        else if ((rateToUse != null) && (rate.getRateType().equals(RentalRateEnum.PEAK) && 
+                                (rateToUse.getRateType().equals(RentalRateEnum.PEAK))) && (rate.getRatePerDay().compareTo(cheapestRate) == -1)) {
+                            cheapestRate = rate.getRatePerDay();
+                            rateToUse = rate;
+                            correctRate = Boolean.TRUE;
+                        }
+                        else {
+                            cheapestRate = rate.getRatePerDay();
+                            rateToUse = rate;
+                            correctRate = Boolean.TRUE;
+                        }
+                    }
                 }
             }
 
