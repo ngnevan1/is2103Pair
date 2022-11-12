@@ -108,7 +108,7 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         Integer openingTime = pOutlet.getOpeningTime();
         Integer closingTime = rOutlet.getClosingTime();
 
-        if ((openingTime.intValue() == 0) || (closingTime.intValue() == 0) || (openingTime.intValue() <= (pickupDate.getHours())) || (closingTime.intValue() >= (returnDate.getHours()))) {
+        if (((openingTime == 0) && (closingTime == 0)) || ((openingTime <= (pickupDate.getHours())) && (closingTime >= (returnDate.getHours())))) {
             return true;
         }
         return false;
