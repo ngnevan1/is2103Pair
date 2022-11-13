@@ -189,7 +189,7 @@ public class DataInitSessionBean {
             carSessionBeanLocal.createNewCar(new Car("LS00B4B5", series, CarStatusEnum.AVAILABLE, outletB));
             carSessionBeanLocal.createNewCar(new Car("LS00C4A6", a6, CarStatusEnum.AVAILABLE, outletC));
 
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 			Date fillerStart = format.parse("01/01/1900 00:00");
 			Date fillerEnd = format.parse("31/12/2100 23:59");
             rentalRateSessionBeanLocal.createNewRentalRate(new RentalRate("Standard Sedan - Default", RentalRateEnum.DEFAULT, standard, new BigDecimal("100.00"), fillerStart, fillerEnd));

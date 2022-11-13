@@ -227,12 +227,10 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
             for (RentalRate rate : rates) {
                 Date rateStartDate = rate.getRateStartDate();
-                //Calendar hour = new GregorianCalendar();
-                //hour.setTime(rateStartDate);
                 Date rateEndDate = rate.getRateEndDate();
                 if ((!rate.getIsDisabled()) && 
                         ((rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) ||
-                        ((rateStartDate.before(currentDatePlusOne) || rateStartDate.equals(currentDatePlusOne))) /*&& (plusOne.get(Calendar.HOUR_OF_DAY)) >= hour.get(Calendar.HOUR_OF_DAY)*/) && 
+                        ((rateStartDate.before(currentDatePlusOne) || rateStartDate.equals(currentDatePlusOne)))) && 
                         ((rateEndDate.equals(currentDate) || rateEndDate.after(currentDate)))) {
                     if ((rate.getRateType().equals(RentalRateEnum.PROMOTION)) && (rate.getRatePerDay().compareTo(cheapestPromoRate) == -1)) {
                         cheapestPromoRate = rate.getRatePerDay();
@@ -269,11 +267,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
             startDate.add(Calendar.DAY_OF_MONTH, 1);
         }
-        // For debugging
-        for (RentalRate r : usedRates) {
-            System.out.println(r.getRateName());
-        }
-
+        
         return usedRates;
     }
 
