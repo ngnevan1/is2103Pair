@@ -212,47 +212,66 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         List<RentalRate> usedRates = new ArrayList<>();
 
         while (startDate.before(endDate)) {
-            BigDecimal cheapestRate = new BigDecimal("1000.00");
+            BigDecimal cheapestRate = new BigDecimal("2000.00");
+            BigDecimal cheapestPeakRate = new BigDecimal("2000.00");
+            BigDecimal cheapestPromoRate = new BigDecimal("2000.00");
             RentalRate rateToUse = null;
+            RentalRate rateToUsePeak = null;
+            RentalRate rateToUsePromo = null;
             Date currentDate = startDate.getTime();
+            Calendar plusOne = new GregorianCalendar();
+            plusOne.setTime(startDate.getTime());
+            plusOne.add(Calendar.DAY_OF_MONTH, 1);
+            Date currentDatePlusOne = plusOne.getTime();
             Boolean correctRate = Boolean.FALSE;
 
             for (RentalRate rate : rates) {
                 Date rateStartDate = rate.getRateStartDate();
+                //Calendar hour = new GregorianCalendar();
+                //hour.setTime(rateStartDate);
                 Date rateEndDate = rate.getRateEndDate();
                 if ((!rate.getIsDisabled()) && 
-                        (rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) && 
-                        (rateEndDate.equals(currentDate) || rateEndDate.after(currentDate))) {
-                    if ((rate.getRatePerDay().compareTo(cheapestRate) == -1) || (rate.getRateType().equals(RentalRateEnum.PEAK))) {
-                        if (rate.getRateType().equals(RentalRateEnum.PROMOTION)) {
-                            cheapestRate = rate.getRatePerDay();
-                            rateToUse = rate;
-                            correctRate = Boolean.TRUE;
-                            break;
-                        }
-                        else if ((rateToUse != null) && (rate.getRateType().equals(RentalRateEnum.PEAK) && 
-                                (rateToUse.getRateType().equals(RentalRateEnum.PEAK))) && (rate.getRatePerDay().compareTo(cheapestRate) == -1)) {
-                            cheapestRate = rate.getRatePerDay();
-                            rateToUse = rate;
-                            correctRate = Boolean.TRUE;
-                        }
-                        else {
-                            cheapestRate = rate.getRatePerDay();
-                            rateToUse = rate;
-                            correctRate = Boolean.TRUE;
-                        }
+                        ((rateStartDate.before(currentDate) || rateStartDate.equals(currentDate)) ||
+                        ((rateStartDate.before(currentDatePlusOne) || rateStartDate.equals(currentDatePlusOne))) /*&& (plusOne.get(Calendar.HOUR_OF_DAY)) >= hour.get(Calendar.HOUR_OF_DAY)*/) && 
+                        ((rateEndDate.equals(currentDate) || rateEndDate.after(currentDate)))) {
+                    if ((rate.getRateType().equals(RentalRateEnum.PROMOTION)) && (rate.getRatePerDay().compareTo(cheapestPromoRate) == -1)) {
+                        cheapestPromoRate = rate.getRatePerDay();
+                        rateToUsePromo = rate;
+                        correctRate = Boolean.TRUE;
+                    }
+                    else if ((rate.getRateType().equals(RentalRateEnum.PEAK) && (rate.getRatePerDay().compareTo(cheapestPeakRate) == -1))) {
+                        cheapestPeakRate = rate.getRatePerDay();
+                        rateToUsePeak = rate;
+                        correctRate = Boolean.TRUE;
+                    }
+                    else if ((rate.getRateType().equals(RentalRateEnum.DEFAULT) && (rate.getRatePerDay().compareTo(cheapestRate) == -1))) {
+                        cheapestRate = rate.getRatePerDay();
+                        rateToUse = rate;
+                        correctRate = Boolean.TRUE;
                     }
                 }
             }
 
             if (correctRate) {
-                usedRates.add(rateToUse);
+                if (rateToUsePromo != null) {
+                    usedRates.add(rateToUsePromo);
+                }
+                else if (rateToUsePeak != null) {
+                    usedRates.add(rateToUsePeak);
+                } 
+                else { 
+                    usedRates.add(rateToUse);
+                }
             } 
             else {
                 throw new RentalRateNotAvailableException("Rental Rate is not available for a particular day!");
             }
 
             startDate.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        // For debugging
+        for (RentalRate r : usedRates) {
+            System.out.println(r.getRateName());
         }
 
         return usedRates;
