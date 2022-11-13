@@ -63,9 +63,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	@EJB
 	private CarSessionBeanLocal carSessionBeanLocal;
 
-  @EJB
-  private PartnerSessionBeanLocal partnerSessionBeanLocal;
-	
+	@EJB
+	private PartnerSessionBeanLocal partnerSessionBeanLocal;
 
 	private final ValidatorFactory validatorFactory;
 	private final Validator validator;
@@ -197,6 +196,27 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 	}
 
 	@Override
+	public List<Reservation> retrieveCustomerCurrentDayReservation(String email) throws CustomerNotFoundException, ReservationNotFoundException {
+		List<Reservation> allCustReservations = retrieveReservationsByCustomerEmail(email);
+		List<Reservation> todCustReservations = new ArrayList<>();
+		Date today = new Date();
+
+		for (Reservation res : allCustReservations) {
+			Date rStart = res.getReservationStartDate();
+			if ((rStart.getDate() == today.getDate())
+					&& (rStart.getMonth() == today.getMonth()
+					&& (rStart.getYear() == today.getYear()))) {
+				todCustReservations.add(res);
+			}
+		}
+		if (todCustReservations.isEmpty()) {
+			throw new ReservationNotFoundException("Customer does not have a reservation today!");
+		} else {
+			return todCustReservations;
+		}
+	}
+
+	@Override
 	public Reservation retrieveReservationsByCustomer(String email) throws CustomerNotFoundException, ReservationNotFoundException {
 		Date today = new Date();
 		Customer customer = customerSessionBeanLocal.retrieveCustomerByCustomerEmail(email);
@@ -280,7 +300,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 		return ownCustomer;
 	}
 
-        @Override
+	@Override
 	public Partner removeReservationByPartner(Long reservationId, Partner partner) throws ReservationNotFoundException, PartnerNotFoundException {
 
 		Reservation oldReservation = retrieveReservationByReservationId(reservationId);
@@ -295,13 +315,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
 		oldReservation.getCarCategory().getReservations().remove(oldReservation);
 
-                oldReservation.getCustomer().getReservations().remove(oldReservation);
-                
+		oldReservation.getCustomer().getReservations().remove(oldReservation);
+
 		Partner currentPartner = partnerSessionBeanLocal.retrievePartnerByPartnerUsername(partner.getUsername());
-                currentPartner.getReservations().remove(oldReservation);
-                
-                oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
-                
+		currentPartner.getReservations().remove(oldReservation);
+
+		oldReservation.getPickUpOutlet().getReservations().remove(oldReservation);
 
 		em.remove(oldReservation);
 		return partner;

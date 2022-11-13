@@ -12,7 +12,9 @@ import entity.Car;
 import entity.Employee;
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightsEnum;
@@ -80,10 +82,24 @@ public class CustomerService {
 
     private void doPickupCar() {
         Scanner scanner = new Scanner(System.in);
+		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         System.out.println("*** CaRMS System :: Customer Service Module :: Pickup Car ***\n");
         try {
             System.out.print("Enter Customer Email> ");
-            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(scanner.nextLine().trim());
+            List<Reservation> reservations = reservationSessionBeanRemote.retrieveCustomerCurrentDayReservation(scanner.nextLine().trim());
+
+			int count = 0;
+			for (Reservation r:reservations) {
+				System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", "Seq No.", "Start Date", "End Date", "Payment Date", "Total Amount");
+            System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", count, outputDateFormat.format(r.getReservationStartDate()),
+                outputDateFormat.format(r.getReservationEndDate()), outputDateFormat.format(r.getPaymentDate()), r.getTotalAmount());
+			count++;
+			}
+			
+			System.out.println("Enter Chosen Reservation Seq No.>");
+
+			Reservation reservation = reservations.get(scanner.nextInt());
+			
 			Date paymentDate = reservation.getPaymentDate();
 			Date today = new Date();
             if ((paymentDate.getDate() == today.getDate())
@@ -113,12 +129,24 @@ public class CustomerService {
 
     private void doReturnCar() {
         Scanner scanner = new Scanner(System.in);
+		SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         System.out.println("*** CaRMS System :: Customer Service Module :: Return Car ***\n");
         
         try {
             System.out.print("Enter Customer Email> ");
-            Reservation reservation = reservationSessionBeanRemote.retrieveReservationsByCustomer(scanner.nextLine().trim());
-            
+            List<Reservation> reservations = reservationSessionBeanRemote.retrieveCustomerCurrentDayReservation(scanner.nextLine().trim());
+
+			int count = 0;
+			for (Reservation r:reservations) {
+				System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", "Seq No.", "Start Date", "End Date", "Payment Date", "Total Amount");
+            System.out.printf("%-5s%-25s%-25s%-25s%-10s\n", count, outputDateFormat.format(r.getReservationStartDate()),
+                outputDateFormat.format(r.getReservationEndDate()), outputDateFormat.format(r.getPaymentDate()), r.getTotalAmount());
+			count++;
+			}
+			
+			System.out.println("Enter Chosen Reservation Seq No.>");
+
+			Reservation reservation = reservations.get(scanner.nextInt());
             Car car = reservation.getCar();
             car.setCarStatus(CarStatusEnum.AVAILABLE);
             car.setOutlet(reservation.getReturnOutlet());

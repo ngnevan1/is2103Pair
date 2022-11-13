@@ -26,20 +26,22 @@ import util.exception.UnknownPersistenceException;
 @Remote
 public interface ReservationSessionBeanRemote {
 
-    public Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName)
-            throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
+	public Reservation createNewReservationByCategory(Reservation newReservation, OwnCustomer customer, String carCategoryName, String pickupOutletName, String returnOutletName)
+			throws CarCategoryNotFoundException, OutletNotFoundException, OwnCustomerNotFoundException, UnknownPersistenceException, InputDataValidationException;
 
-    public Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
+	public Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException;
 
-    public Reservation retrieveReservationsByCustomer(String email) throws CustomerNotFoundException, ReservationNotFoundException;
+	public Reservation retrieveReservationsByCustomer(String email) throws CustomerNotFoundException, ReservationNotFoundException;
 
-    public void updateReservation(Reservation reservation) throws ReservationNotFoundException, InputDataValidationException;
+	public List<Reservation> retrieveCustomerCurrentDayReservation(String email) throws CustomerNotFoundException, ReservationNotFoundException;
 
-    public void startReservation(Reservation reservation, Long carId) throws CarNotFoundException;
+	public void updateReservation(Reservation reservation) throws ReservationNotFoundException, InputDataValidationException;
 
-    public BigDecimal calculateRefundPenalty(Reservation reservation);
+	public void startReservation(Reservation reservation, Long carId) throws CarNotFoundException;
 
-    public List<Reservation> retrieveReservationsByCustomerEmail(String email);
+	public BigDecimal calculateRefundPenalty(Reservation reservation);
 
-    public OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
+	public List<Reservation> retrieveReservationsByCustomerEmail(String email);
+
+	public OwnCustomer removeReservationByOwnCustomer(Long reservationId, OwnCustomer ownCustomer) throws ReservationNotFoundException;
 }
